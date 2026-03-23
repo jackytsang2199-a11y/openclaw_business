@@ -1,0 +1,80 @@
+import { Link } from "react-router-dom";
+import { MessageCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+
+const WHATSAPP_URL = "https://wa.me/85200000000";
+
+const techSections = [
+  {
+    name: "OpenClaw",
+    headline: "全球第一開源 AI 智能體框架",
+    body: "200,000+ GitHub Stars，全球 200 萬人每週使用。我們基於此平台深度定製，加入獨家插件生態，打造遠超原版的完整系統。",
+  },
+  {
+    name: "Mem0 + Qdrant",
+    headline: "向量級永久記憶 — AI 最強大腦",
+    body: "不是 ChatGPT 那種 100 條記憶上限。基於 Qdrant 向量資料庫 + Mem0 記憶引擎，你說過的每一句話，它永遠記得。三個月前提過的偏好？它記得。越用越聰明，越用越了解你。",
+  },
+  {
+    name: "SearXNG",
+    headline: "突破 AI 搜尋封鎖 — 全網搜尋引擎",
+    body: "ChatGPT 的搜尋被大量網站封鎖 — Reddit、論壇、部分新聞網站都搜不到。SearXNG 是自架元搜尋引擎，bypass 所有 AI 搜尋封鎖，即時搜尋全網資訊。ChatGPT 搜不到的，它搜得到。",
+  },
+  {
+    name: "WireGuard",
+    headline: "軍事級 VPN 隧道 — 永不中斷",
+    body: "新一代 VPN 協議，加密強度媲美軍事級。內建多伺服器自動切換（東京 → 新加坡），VPN 斷線時 Watchdog 自動重連，確保 AI 服務 24/7 不中斷。你完全不需要處理。",
+  },
+  {
+    name: "Chromium Headless",
+    headline: "AI 代你操作瀏覽器 — 不只聊天，真正做事",
+    body: "無頭瀏覽器自動化引擎。AI 直接操作瀏覽器幫你填表、格價、訂位、搶票、查評價。不只是回答問題 — 是真正動手幫你完成任務。（🚀 全能大師 專屬功能）",
+  },
+  {
+    name: "Docker",
+    headline: "容器化一鍵部署 — 企業級標準",
+    body: "整套系統以 Docker 容器化部署。環境完全隔離，安全穩定，一鍵啟動。需要遷移？打包整個系統搬到新伺服器，資料完整保留。這是企業用的部署標準。",
+  },
+];
+
+const Technology = () => (
+  <section className="container py-20">
+    <div className="text-center space-y-4 mb-16">
+      <h1 className="text-3xl md:text-5xl">我們的獨家技術生態系統</h1>
+      <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+        經過數月研究與深度整合，每個組件都經過嚴格測試。這不是原版 OpenClaw — 這是完整的 AI 生態系統。
+      </p>
+    </div>
+
+    <div className="max-w-3xl mx-auto space-y-6">
+      {techSections.map((tech) => (
+        <div
+          key={tech.name}
+          className="rounded-2xl border border-border bg-card p-8 space-y-4 shadow-sm"
+        >
+          <p className="text-xs text-primary font-semibold uppercase tracking-wider">{tech.name}</p>
+          <h2 className="text-xl md:text-2xl">{tech.headline}</h2>
+          <p className="text-muted-foreground leading-relaxed">{tech.body}</p>
+        </div>
+      ))}
+    </div>
+
+    {/* Bottom CTA */}
+    <div className="max-w-xl mx-auto text-center mt-16 space-y-4">
+      <p className="text-muted-foreground text-lg">想了解更多？</p>
+      <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+        <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 text-base px-8 rounded-2xl shadow-lg">
+          <Link to="/pricing">查看收費方案 →</Link>
+        </Button>
+        <Button asChild variant="outline" size="lg" className="border-primary/20 text-primary hover:bg-primary/[0.05] rounded-2xl text-base px-8 gap-2">
+          <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer">
+            <MessageCircle className="h-5 w-5" />
+            WhatsApp 聯絡我們
+          </a>
+        </Button>
+      </div>
+    </div>
+  </section>
+);
+
+export default Technology;

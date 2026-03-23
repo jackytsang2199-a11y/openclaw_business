@@ -1,2 +1,6 @@
-# Website source code has its own repo (jackytsang2199-a11y/Openclaw_website)
-website-lovable/src/
+# Node modules inside website source
+website-lovable/src/node_modules/
+
+# Website source has its own .git (jackytsang2199-a11y/openclaw_website-1797296e)
+website-lovable/src/.git/
+website-lovable/src/.git_backup/
