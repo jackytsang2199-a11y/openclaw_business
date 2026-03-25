@@ -1,0 +1,98 @@
+{
+  "browser": {
+    "enabled": false
+  },
+  "auth": {
+    "profiles": {
+      "deepseek:default": {
+        "provider": "openai-compatible",
+        "mode": "token"
+      }
+    }
+  },
+  "acp": {
+    "enabled": false
+  },
+  "agents": {
+    "defaults": {
+      "model": {
+        "primary": "deepseek/deepseek-chat"
+      },
+      "workspace": "__HOME__/clawd",
+      "contextPruning": {
+        "mode": "cache-ttl",
+        "ttl": "1h"
+      },
+      "compaction": {
+        "mode": "safeguard"
+      },
+      "heartbeat": {
+        "every": "1h"
+      },
+      "maxConcurrent": 4,
+      "subagents": {
+        "maxConcurrent": 8,
+        "model": "deepseek/deepseek-chat"
+      }
+    }
+  },
+  "messages": {
+    "ackReactionScope": "group-mentions"
+  },
+  "commands": {
+    "native": "auto",
+    "nativeSkills": "auto",
+    "restart": true,
+    "ownerDisplay": "raw"
+  },
+  "session": {
+    "dmScope": "main",
+    "identityLinks": {
+      "owner": ["telegram:__TELEGRAM_USER_ID__"]
+    }
+  },
+  "channels": {
+    "telegram": {
+      "enabled": true,
+      "dmPolicy": "allowlist",
+      "botToken": "__TELEGRAM_BOT_TOKEN__",
+      "allowFrom": ["__TELEGRAM_USER_ID__"],
+      "groupPolicy": "allowlist",
+      "streaming": "partial"
+    }
+  },
+  "gateway": {
+    "port": 18789,
+    "mode": "local",
+    "bind": "loopback",
+    "controlUi": {
+      "allowedOrigins": [
+        "http://localhost:18789",
+        "http://127.0.0.1:18789"
+      ]
+    },
+    "auth": {
+      "mode": "token",
+      "token": "__GATEWAY_TOKEN__"
+    },
+    "tailscale": {
+      "mode": "off",
+      "resetOnExit": false
+    }
+  },
+  "skills": {
+    "install": {
+      "nodeManager": "npm"
+    }
+  },
+  "plugins": {
+    "load": {
+      "paths": []
+    },
+    "slots": {},
+    "entries": {
+      "telegram": { "enabled": true }
+    },
+    "installs": {}
+  }
+}

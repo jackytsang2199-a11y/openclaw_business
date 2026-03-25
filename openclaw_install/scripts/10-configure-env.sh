@@ -1,0 +1,170 @@
+#!/bin/bash
+set -euo pipefail
+SCRIPT_NAME="10-configure-env"
+log() { echo "[$SCRIPT_NAME] $1"; }
+error() { echo "[$SCRIPT_NAME] ERROR: $1" >&2; exit 1; }
+
+export XDG_RUNTIME_DIR=/run/user/$(id -u)
+export DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$(id -u)/bus
+
+# Read client.env (SCP'd to home dir by operator)
+CLIENT_ENV="$HOME/client.env"
+if [ ! -f "$CLIENT_ENV" ]; then
+  error "client.env not found at $CLIENT_ENV. SCP it first."
+fi
+source "$CLIENT_ENV"
+
+# Validate required vars
+for var in CLIENT_ID TIER DEEPSEEK_API_KEY OPENAI_API_KEY TELEGRAM_BOT_TOKEN TELEGRAM_ALLOWED_USERS; do
+  if [ -z "${!var:-}" ]; then
+    error "Missing required variable: $var in client.env"
+  fi
+done
+
+log "Configuring for client: $CLIENT_ID (Tier $TIER)"
+
+# Pre-check installed components
+[ -f ~/.openclaw/openclaw.json ] || error "openclaw.json not found. Run 04-install-openclaw.sh first."
+command -v openclaw &>/dev/null || error "OpenClaw not installed."
+docker ps --filter name=qdrant --format '{{.Names}}' | grep -q qdrant || error "Qdrant not running. Run 05-setup-qdrant.sh first."
+docker ps --filter name=searxng --format '{{.Names}}' | grep -q searxng || error "SearXNG not running. Run 07-setup-searxng.sh first."
+
+# Generate gateway auth token
+GATEWAY_TOKEN=$(openssl rand -hex 32)
+log "Generated gateway token."
+
+# Inject API keys into env file
+cat > ~/.openclaw/env << ENV_EOF
+DEEPSEEK_API_KEY=$DEEPSEEK_API_KEY
+OPENAI_API_KEY=$OPENAI_API_KEY
+ENV_EOF
+chmod 600 ~/.openclaw/env
+log "API keys written to ~/.openclaw/env"
+
+# Build openclaw.json with client-specific values using python3 (jq not available)
+python3 << PYEOF
+import json, os
+
+with open(os.path.expanduser("~/.openclaw/openclaw.json")) as f:
+    cfg = json.load(f)
+
+tier = int("$TIER")
+client_id = "$CLIENT_ID"
+bot_token = "$TELEGRAM_BOT_TOKEN"
+allowed_users = "$TELEGRAM_ALLOWED_USERS".split(",")
+deepseek_key = "$DEEPSEEK_API_KEY"
+openai_key = "$OPENAI_API_KEY"
+gateway_token = "$GATEWAY_TOKEN"
+home = os.path.expanduser("~")
+
+# Telegram config
+cfg["channels"]["telegram"]["botToken"] = bot_token
+cfg["channels"]["telegram"]["allowFrom"] = allowed_users
+cfg["session"]["identityLinks"]["owner"] = [f"telegram:{uid}" for uid in allowed_users]
+
+# Gateway token
+cfg["gateway"]["auth"]["token"] = gateway_token
+
+# Mem0 plugin config (Tier 2+)
+if tier >= 2:
+    cfg["plugins"]["slots"]["memory"] = "openclaw-mem0"
+    cfg["plugins"]["entries"]["openclaw-mem0"] = {
+        "enabled": True,
+        "config": {
+            "mode": "open-source",
+            "userId": "owner",
+            "autoCapture": True,
+            "autoRecall": True,
+            "enableGraph": False,
+            "topK": 5,
+            "searchThreshold": 0.3,
+            "oss": {
+                "embedder": {
+                    "provider": "openai",
+                    "config": {
+                        "model": "text-embedding-3-small",
+                        "embeddingDims": 1536,
+                        "apiKey": openai_key
+                    }
+                },
+                "vectorStore": {
+                    "provider": "qdrant",
+                    "config": {
+                        "url": "http://localhost:6333",
+                        "collectionName": f"client-{client_id}-memories",
+                        "embeddingModelDims": 1536
+                    }
+                },
+                "llm": {
+                    "provider": "deepseek",
+                    "config": {
+                        "model": "deepseek-chat",
+                        "apiKey": deepseek_key
+                    }
+                },
+                "historyDbPath": f"{home}/clawd/mem0-history.db"
+            }
+        }
+    }
+else:
+    cfg["plugins"]["slots"].pop("memory", None)
+    cfg["plugins"]["entries"].pop("openclaw-mem0", None)
+
+# Browser config (Tier 3 only)
+if tier >= 3:
+    cfg["browser"] = {
+        "enabled": True,
+        "provider": "cdp",
+        "cdp": {
+            "endpoint": "http://localhost:9222"
+        }
+    }
+else:
+    cfg["browser"] = {"enabled": False}
+
+# ACP config (Tier 3 only)
+if tier >= 3:
+    cfg["acp"]["enabled"] = True
+else:
+    cfg["acp"]["enabled"] = False
+
+with open(os.path.expanduser("~/.openclaw/openclaw.json"), "w") as f:
+    json.dump(cfg, f, indent=2)
+
+print(f"openclaw.json configured for {client_id} tier {tier}")
+PYEOF
+
+chmod 600 ~/.openclaw/openclaw.json
+log "openclaw.json updated with client credentials."
+
+# Create empty soul.md (populated per-customer after setup)
+touch ~/.openclaw/agents/main/soul.md
+log "soul.md created (empty — customize after setup)."
+
+# Restart all services
+log "Starting/restarting services..."
+systemctl --user restart openclaw-gateway.service
+log "OpenClaw gateway restarted."
+
+# Watchdog (Tier 2+)
+if [ "$TIER" -ge 2 ]; then
+  systemctl --user restart openclaw-watchdog.service 2>/dev/null && log "Gateway watchdog restarted." || log "WARNING: openclaw-watchdog not found."
+fi
+
+# Chromium (Tier 3)
+if [ "$TIER" -ge 3 ]; then
+  systemctl --user restart chromium-debug.service 2>/dev/null && log "Chromium debug restarted." || log "WARNING: chromium-debug not found."
+fi
+
+sleep 3
+
+# Verify gateway is running
+if systemctl --user is-active openclaw-gateway.service &>/dev/null; then
+  log "OpenClaw gateway is ACTIVE."
+else
+  error "OpenClaw gateway failed to start. Check: journalctl --user -u openclaw-gateway.service"
+fi
+
+log "Configuration complete for $CLIENT_ID (Tier $TIER)."
+log "Gateway token: $GATEWAY_TOKEN"
+log "Next: Send a Telegram message to verify bot responds."
