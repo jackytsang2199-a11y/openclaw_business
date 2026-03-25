@@ -8,6 +8,7 @@ export XDG_RUNTIME_DIR=/run/user/$(id -u)
 export DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$(id -u)/bus
 
 # Install Google Chrome (snap chromium-browser fails headless on Ubuntu 24.04)
+# NOTE: Downloads latest Chrome stable. Pin version here if reproducibility needed.
 if command -v google-chrome &>/dev/null; then
   log "Google Chrome already installed: $(google-chrome --version 2>/dev/null)"
 else

@@ -33,9 +33,7 @@ mkdir -p ~/bin
 ln -sf ~/clawteam-env/bin/clawteam ~/bin/clawteam
 
 # Add to PATH if not already
-if ! grep -q 'HOME/bin' ~/.bashrc 2>/dev/null; then
-  echo 'export PATH="$HOME/bin:$PATH"' >> ~/.bashrc
-fi
+grep -q '$HOME/bin' ~/.bashrc 2>/dev/null || echo 'export PATH="$HOME/bin:$PATH"' >> ~/.bashrc
 
 log "ClawTeam installed. Available at: ~/bin/clawteam"
 log "Version: $(~/clawteam-env/bin/clawteam --version 2>/dev/null || echo 'unknown')"

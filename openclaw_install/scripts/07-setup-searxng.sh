@@ -33,6 +33,10 @@ done
 
 # Enable JSON API format and disable rate limiter
 log "Configuring SearXNG for JSON API access..."
+
+# Ensure pyyaml is available for settings manipulation
+python3 -c "import yaml" 2>/dev/null || sudo apt-get install -y python3-yaml
+
 docker cp searxng:/etc/searxng/settings.yml /tmp/searxng-settings.yml
 
 python3 << 'PYEOF'

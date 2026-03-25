@@ -131,7 +131,7 @@ $SSH_CMD "bash ~/qa/04-telegram-test.sh && bash ~/qa/05-full-integration.sh"
 ```
 All 28 checks must PASS.
 
-### Phase 5: Report
+### Phase 4: Report
 
 Generate `clients/{CLIENT_ID}/setup-report.md` using the template from T001.
 
