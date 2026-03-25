@@ -1,19 +1,38 @@
 # Qdrant — Discovery Notes
 
 **Script:** scripts/05-setup-qdrant.sh
-**Started:** {TIMESTAMP}
+**Started:** 2026-03-25 19:10 HKT
 
 ## Commands Run
-<!-- Log each command + output AS YOU GO, not after -->
+
+```bash
+$ docker run -d --name qdrant --restart unless-stopped \
+    -p 6333:6333 \
+    -v qdrant_data:/qdrant/storage \
+    qdrant/qdrant:latest
+# Pulled image, started container 563492cc816b
+
+$ curl -s http://localhost:6333/healthz
+healthz check passed
+```
 
 ## Gotchas
-<!-- Things that surprised us -->
+- Docker group was already active (no re-login needed — cloud-init had run, and we SCPed from a new session).
+- No x86 page size issues (as expected — only ARM64 needed the 4KB kernel fix).
+- gRPC port 6334 not mapped to host (not needed for local Mem0 access).
 
 ## Verification
-<!-- Health check result -->
+```
+$ curl -s http://localhost:6333/healthz
+healthz check passed
+
+$ docker ps --filter name=qdrant
+NAMES   STATUS        PORTS
+qdrant  Up 4 minutes  0.0.0.0:6333->6333/tcp, 6334/tcp
+```
 
 ## Resource Snapshot
-<!-- free -h, df -h, docker stats after this step -->
+Qdrant: 24MB RAM at idle.
 
 ## Time Taken
-<!-- Start → end -->
+~30 seconds (image pull + start)
