@@ -1,0 +1,32 @@
+#cloud-config
+users:
+  - name: deploy
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    shell: /bin/bash
+    ssh_authorized_keys:
+      - SSH_PUBLIC_KEY_PLACEHOLDER
+
+package_update: true
+packages:
+  - curl
+  - git
+  - ufw
+  - fail2ban
+  - ca-certificates
+  - gnupg
+  - htop
+  - jq
+
+timezone: Asia/Hong_Kong
+
+swap:
+  filename: /swapfile
+  size: 2G
+  maxsize: 2G
+
+runcmd:
+  - ufw allow OpenSSH
+  - ufw --force enable
+  - sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication no/' /etc/ssh/sshd_config
+  - sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin no/' /etc/ssh/sshd_config
+  - systemctl restart ssh
