@@ -124,8 +124,8 @@ Generate `clients/{CLIENT_ID}/setup-report.md` using the template from T001.
 
 Always use these flags:
 ```bash
-ssh -o StrictHostKeyChecking=no -i $SSH_KEY_PATH deploy@$SERVER_IP
-scp -o StrictHostKeyChecking=no -i $SSH_KEY_PATH
+ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i $SSH_KEY_PATH deploy@$SERVER_IP
+scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i $SSH_KEY_PATH
 ```
 
 For systemd commands over SSH, scripts already set `XDG_RUNTIME_DIR` and `DBUS_SESSION_BUS_ADDRESS`.
@@ -165,6 +165,8 @@ For systemd commands over SSH, scripts already set `XDG_RUNTIME_DIR` and `DBUS_S
 | Claude Code CLI 404 | `npm install @anthropic/claude-code` | Package is `@anthropic-ai/claude-code` |
 | Watchdog service name | `gateway-watchdog.service` not found | Service is `openclaw-watchdog.service` |
 | `((PASS++))` in bash | Script exits with code 1 | Use `PASS=$((PASS+1))` with `set -e` |
+| apt upgrade conffile prompt | Hangs on sshd_config prompt, kills SSH | Use `sudo DEBIAN_FRONTEND=noninteractive` (not just `export`) + `--force-confold` |
+| Host key changed after destroy/recreate | SSH refuses connection | `ssh-keygen -R <IP>` or use `-o UserKnownHostsFile=/dev/null` |
 
 ## Tier Feature Matrix
 
