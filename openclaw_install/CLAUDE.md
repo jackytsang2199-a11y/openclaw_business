@@ -52,28 +52,9 @@ scp -o StrictHostKeyChecking=no -i $SSH_KEY_PATH qa/*.sh deploy@$SERVER_IP:~/qa/
 
 ### Phase 3: Run Install Scripts
 
-Run each script via SSH. Check exit code. Retry once on failure; halt on second failure.
+Run in 3 phases with gate checks between each. Retry once on script failure; halt on second failure.
 
-```bash
-SCRIPTS=(
-  00-swap-setup.sh
-  01-system-update.sh
-  02-install-node.sh
-  03-install-docker.sh
-  04-install-openclaw.sh
-  05-setup-qdrant.sh
-  06-setup-mem0.sh
-  07-setup-searxng.sh
-  08-setup-watchdogs.sh
-  09-security-hardening.sh
-  10-configure-env.sh      # Requires client.env — see below
-  11-setup-chromium.sh     # Tier 3 only
-  12-setup-acpx.sh         # Tier 3 only
-  13-setup-clawteam.sh     # Tier 3 only
-)
-```
-
-**Before running 10-configure-env.sh**, create and upload `client.env`:
+**Before starting Phase 2**, create and upload `client.env`:
 
 ```bash
 cat > /tmp/client.env << EOF
@@ -84,37 +65,71 @@ OPENAI_API_KEY=$OPENAI_API_KEY
 TELEGRAM_BOT_TOKEN=${CLIENT_ID}_TELEGRAM_BOT_TOKEN_VALUE
 TELEGRAM_ALLOWED_USERS=${CLIENT_ID}_TELEGRAM_ALLOWED_USERS_VALUE
 EOF
-scp -o StrictHostKeyChecking=no -i $SSH_KEY_PATH /tmp/client.env deploy@$SERVER_IP:~/client.env
+scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i $SSH_KEY_PATH /tmp/client.env deploy@$SERVER_IP:~/client.env
 ```
 
-**Script execution pattern:**
+**Script execution pattern** (use for each phase):
 
 ```bash
-for script in "${SCRIPTS[@]}"; do
+run_script() {
+  local script="$1"
   echo "=== Running $script ==="
   $SSH_CMD "bash ~/scripts/$script"
-  RC=$?
+  local RC=$?
   if [ $RC -ne 0 ]; then
     echo "FAILED ($RC). Retrying once..."
     $SSH_CMD "bash ~/scripts/$script"
     RC=$?
     if [ $RC -ne 0 ]; then
       echo "HALTED: $script failed twice. Debug before continuing."
-      break
+      return 1
     fi
   fi
-done
+}
 ```
 
-### Phase 4: QA
+#### Phase 1: Base System (scripts 00-03)
 
 ```bash
-for qa in ~/qa/0{1,2,3,4,5}-*.sh; do
-  $SSH_CMD "bash $qa"
+for s in 00-swap-setup.sh 01-system-update.sh 02-install-node.sh 03-install-docker.sh; do
+  run_script "$s" || exit 1
 done
 ```
 
-All 5 layers must pass. If any fail, debug and re-run.
+**GATE CHECK:** Verify node, docker, swap:
+```bash
+$SSH_CMD "node --version && docker --version && swapon --show | grep -q /swapfile"
+```
+If any fails → STOP. Do not proceed.
+
+#### Phase 2: Core Services (scripts 04-07)
+
+```bash
+for s in 04-install-openclaw.sh 05-setup-qdrant.sh 06-setup-mem0.sh 07-setup-searxng.sh; do
+  run_script "$s" || exit 1
+done
+```
+
+**GATE CHECK:** Run QA layers 1-3:
+```bash
+$SSH_CMD "bash ~/qa/01-health-check.sh && bash ~/qa/02-port-check.sh && bash ~/qa/03-api-check.sh"
+```
+If any fails → STOP. Core stack is broken, do not install extras.
+
+#### Phase 3: Extras + Config (scripts 08-13)
+
+```bash
+for s in 08-setup-watchdogs.sh 09-security-hardening.sh 10-configure-env.sh \
+         11-setup-chromium.sh 12-setup-acpx.sh 13-setup-clawteam.sh; do
+  run_script "$s" || exit 1
+done
+```
+
+**GATE CHECK:** Run QA layers 4-5:
+```bash
+$SSH_CMD "bash ~/qa/04-telegram-test.sh && bash ~/qa/05-full-integration.sh"
+```
+All 28 checks must PASS.
 
 ### Phase 5: Report
 
