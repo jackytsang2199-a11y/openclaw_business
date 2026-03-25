@@ -1,0 +1,5 @@
+.env
+clients/*/.env
+clients/*/soul.md
+logs/
+*.log
