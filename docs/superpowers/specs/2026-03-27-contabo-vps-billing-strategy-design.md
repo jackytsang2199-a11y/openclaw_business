@@ -1,7 +1,7 @@
 # Contabo VPS Billing & Lifecycle Strategy — Design Spec
 
 > **Date:** 2026-03-27
-> **Status:** Draft
+> **Status:** Reviewed — fixes applied
 > **Scope:** VPS provisioning billing model, churn handling, recycling pool, and cancellation automation
 > **Depends on:** Customer Onboarding Pipeline (2026-03-26 spec), Plan A (CF Worker), Plan B (Pi5 Worker)
 > **Modifies:** Plan B Tasks 2 (Contabo provisioning), 6 (Deployer), 7 (Main loop); CF Worker D1 schema
@@ -33,6 +33,8 @@ Without a strategy, every churned customer bleeds at least 1 extra month of VPS 
 
 Reduce churn frequency by making multi-month bundles the obvious choice.
 
+*Illustrative pricing — see business plan for final numbers. Note: 6-month discount may create pricing inversion with annual rate; align during pricing review.*
+
 | Customer Plan | Monthly Price | Discount vs 1-mo | Internal Contabo Plan |
 |---|---|---|---|
 | 1 month | HK$248/mo | — | 1-month Contabo |
@@ -49,18 +51,21 @@ New D1 table tracks every VPS through its lifecycle:
 
 ```sql
 CREATE TABLE vps_instances (
-  vps_id          TEXT PRIMARY KEY,       -- Contabo instance UUID
-  contabo_ip      TEXT NOT NULL,
-  customer_id     TEXT,                   -- T1043, NULL if recyclable
-  status          TEXT NOT NULL DEFAULT 'provisioning',
+  vps_id              TEXT PRIMARY KEY,       -- Contabo instance UUID
+  contabo_contract_id TEXT,                   -- Contabo contract ID (used for billing/cancel/revoke API calls)
+  contabo_ip          TEXT NOT NULL,
+  customer_id         TEXT,                   -- T1043, NULL if recyclable
+  status              TEXT NOT NULL DEFAULT 'provisioning',
     -- provisioning: being created
     -- active: customer using it
     -- cancelling: cancellation submitted, available for recycle
+    -- failed: provisioning failed, never became active
     -- expired: Contabo terminated it (no recycle happened)
-  tier            INTEGER NOT NULL,       -- 1, 2, or 3
-  contabo_plan_id TEXT,                   -- Contabo plan reference
-  billing_start   TEXT NOT NULL,          -- ISO 8601
-  billing_end     TEXT,                   -- current period end (NULL = unknown)
+  tier                INTEGER NOT NULL,       -- 1, 2, or 3
+  contabo_plan_id     TEXT,                   -- Contabo plan reference
+  reinstall_count     INTEGER NOT NULL DEFAULT 0,  -- times this VPS has been recycled
+  billing_start       TEXT NOT NULL,          -- ISO 8601
+  billing_end         TEXT,                   -- current period end; if NULL, cron assumes billing_start + 30 days
   cancel_date     TEXT,                   -- when cancellation was submitted
   cancel_deadline TEXT,                   -- date Contabo will terminate the VPS (last day to revoke)
   created_at      TEXT NOT NULL DEFAULT (datetime('now')),
@@ -68,11 +73,12 @@ CREATE TABLE vps_instances (
 );
 ```
 
-**Daily cron** (CF Worker scheduled trigger):
-- Count VPS by status
-- Alert via Telegram if idle (`cancelling`) VPS count > 0 approaching cancel deadline
-- Alert if total VPS cost exceeds 10% of monthly revenue
-- Summary: "Active: 12, Cancelling: 3 (2 expiring in <7 days), Total cost: €XX"
+**Daily cron** (CF Worker `scheduled` handler, `cron: 0 1 * * *` = 09:00 HKT daily):
+- Count VPS by status — track `active + cancelling` against 75 VPS account limit
+- Alert via Telegram if any `cancelling` VPS has `cancel_deadline` within 7 days (last chance to recycle)
+- Alert if total idle VPS cost exceeds threshold (config: `VPS_COST_ALERT_THRESHOLD`, default €25 = ~5 idle VPS)
+- Revenue threshold uses a manually-updated config value `MONTHLY_REVENUE_ESTIMATE` (not dynamically calculated — at this scale, precision doesn't matter)
+- Summary: "Active: 12, Cancelling: 3 (2 expiring <7d), Limit: 15/75, Idle cost: €XX"
 
 ### Layer 3: Recycling Pool + Auto-Cancel/Revoke
 
@@ -80,8 +86,10 @@ The core innovation — treat VPS as **infrastructure pool**, not per-customer a
 
 #### Churn Flow (Auto-Cancel)
 
+The churn flow begins when a `cancel` job reaches the Pi5 worker. The upstream onboarding pipeline spec controls when this job is created (e.g., after the Day 1-7 grace period). This spec does not own the grace period logic.
+
 ```
-Customer churns (payment webhook / manual)
+Cancel job arrives at Pi5 worker (after grace period)
     │
     ├─ 1. Wipe customer data on VPS (OS reinstall or script)
     ├─ 2. Submit cancellation via Contabo API
@@ -101,7 +109,7 @@ New customer payment confirmed
     ├─ YES (recyclable VPS available):
     │   ├─ 1. Revoke cancellation via Contabo API
     │   ├─ 2. OS reinstall via Contabo API
-    │   ├─ 3. Update D1: status → 'active', customer_id → new customer, clear cancel fields
+    │   ├─ 3. Update D1: status → 'active', customer_id → new customer, tier → new customer's tier, reinstall_count++, clear cancel fields
     │   ├─ 4. Deploy as normal (same pipeline from OS install step onward)
     │   └─ Cost: €0 extra (VPS was already paid for)
     │
@@ -117,25 +125,37 @@ New customer payment confirmed
 **Why automate (not manual):**
 At 50 customers with 20% monthly churn = 10 cancellations/month. Manual process (login panel → click cancel → confirm per VPS) is error-prone and a missed cancellation costs a full month's VPS fee. The automation is ~20 lines of code with high ROI.
 
-**Implementation:**
+**Implementation** (API calls first, D1 updates only on success — no rollback needed):
 ```python
-# On churn detection:
-async def handle_churn(vps_id: str):
-    contabo_api.cancel_vps(vps_id)           # Submit cancellation
-    d1.update_vps(vps_id, status='cancelling', cancel_date=now())
+# On cancel job processed:
+async def handle_cancel(vps_id: str):
+    # 1. Contabo API first — if this fails, D1 stays unchanged
+    contabo_api.cancel_vps(vps_id, contract_id=d1.get_contract_id(vps_id))
+    # 2. Only update D1 after API success
+    d1.update_vps(vps_id, status='cancelling', cancel_date=now(), customer_id=None)
     notifier.send(f"VPS {vps_id} cancellation submitted")
 
 # On new customer needing VPS:
-async def get_or_create_vps(tier: int) -> VPS:
-    recyclable = d1.query("SELECT * FROM vps_instances WHERE status = 'cancelling' ORDER BY cancel_deadline ASC LIMIT 1")
+async def get_or_create_vps(tier: int, customer_id: str) -> VPS:
+    recyclable = d1.query(
+        "SELECT * FROM vps_instances WHERE status = 'cancelling' "
+        "ORDER BY cancel_deadline ASC LIMIT 1"
+    )
     if recyclable:
-        contabo_api.revoke_cancellation(recyclable.vps_id)  # Undo cancel
-        contabo_api.reinstall_os(recyclable.vps_id)          # Fresh OS
-        d1.update_vps(recyclable.vps_id, status='active', customer_id=new_customer_id)
+        # 1. Contabo API calls first — if revoke fails, D1 stays as 'cancelling'
+        contabo_api.revoke_cancellation(recyclable.contabo_contract_id)
+        contabo_api.reinstall_os(recyclable.vps_id)
+        # 2. Only update D1 after both API calls succeed
+        d1.update_vps(
+            recyclable.vps_id,
+            status='active', customer_id=customer_id,
+            tier=tier, reinstall_count=recyclable.reinstall_count + 1,
+            cancel_date=None, cancel_deadline=None
+        )
         return recyclable
     else:
         new_vps = contabo_api.create_vps(tier)
-        d1.insert_vps(new_vps)
+        d1.insert_vps(new_vps, customer_id=customer_id)
         return new_vps
 ```
 
@@ -155,17 +175,20 @@ async def get_or_create_vps(tier: int) -> VPS:
                        │
                        v
     ┌──────────── provisioning ────────────┐
-    │                  │                    │
-    │                  v                    │
-    │              active ◄────────┐       │
-    │                  │           │       │
-    │    churn         │    revoke +       │
-    │                  v    recycle        │
-    │            cancelling ───────┘       │
-    │                  │                    │
-    │    no recycle    │                    │
-    │    within 4wk    v                    │
-    │              expired                  │
+    │              │         │              │
+    │          success     failure          │
+    │              │         │              │
+    │              v         v              │
+    │           active    failed            │
+    │              │                        │
+    │    churn     │  ◄────────┐           │
+    │              v           │           │
+    │         cancelling ──────┘           │
+    │              │      revoke +         │
+    │    no recycle│      recycle          │
+    │    within 4wk│                       │
+    │              v                        │
+    │           expired                     │
     └──────────────────────────────────────┘
 ```
 
@@ -174,7 +197,8 @@ async def get_or_create_vps(tier: int) -> VPS:
 |---|---|---|
 | — | provisioning | New VPS created via API |
 | provisioning | active | Deploy pipeline completes |
-| active | cancelling | Customer churns, cancellation submitted |
+| provisioning | failed | Contabo API error or provisioning failure |
+| active | cancelling | Customer churns, `cancel` job processed |
 | cancelling | active | New customer assigned, cancellation revoked, OS reinstalled |
 | cancelling | expired | 4-week window passes, Contabo terminates |
 
@@ -225,7 +249,7 @@ Multi-month bundles are pure upside: customer pre-commits, you cancel VPS immedi
 | Contabo API doesn't support cancellation revoke | Can't auto-recycle, must use panel | Test in P2; fallback: Telegram alert + manual panel click |
 | Contabo changes billing model | Strategy assumptions break | Monitor Contabo announcements; strategy is conservative (1-month plans) |
 | Mass churn event (>30% in one month) | Multiple idle VPS bleeding | Daily cron alerts; manual emergency cancellation batch |
-| VPS limit hit (75 max) | Can't provision new customers | Monitor count; consider 2nd Contabo account or Hetzner fallback |
+| VPS limit hit (75 max) | Can't provision new customers | Daily cron tracks `active + cancelling` count against 75 limit; consider 2nd Contabo account or Hetzner fallback when approaching |
 | Recycled VPS has residual customer data | Security/privacy breach | Full OS reinstall via API (not just script wipe) — confirmed as approach |
 | Cancellation submitted but customer reactivates | VPS on death timer | Revoke cancellation immediately on reactivation payment |
 
@@ -237,7 +261,7 @@ Multi-month bundles are pure upside: customer pre-commits, you cancel VPS immedi
 
 1. **New D1 table:** `vps_instances` (schema in Section 2)
 2. **New endpoint:** `GET /api/vps/recyclable` — returns oldest cancelling VPS for recycler
-3. **Daily cron handler:** VPS cost monitoring + idle alerts
+3. **Daily cron handler** (`cron: 0 1 * * *`): VPS count/cost monitoring + idle alerts via Telegram
 4. **Churn webhook handler:** On subscription cancellation event from Lemon Squeezy, update job queue AND `vps_instances`
 
 ### Changes to Pi5 Worker (Plan B)
@@ -245,15 +269,30 @@ Multi-month bundles are pure upside: customer pre-commits, you cancel VPS immedi
 1. **Deployer recycling branch:** Before provisioning new VPS, check `/api/vps/recyclable`
    - If available: revoke cancellation → OS reinstall → deploy (same pipeline from SSH step)
    - If empty: provision fresh → deploy
-2. **Churn handler:** New job type `churn` in queue
-   - Wipe customer data (or OS reinstall)
-   - Submit Contabo cancellation
-   - Update `vps_instances` via PATCH
+2. **Cancel job handler expanded:** Existing `cancel` job type gains VPS lifecycle handling:
+   - Wipe customer data (OS reinstall)
+   - Submit Contabo cancellation via API (using `contabo_contract_id`)
+   - Update `vps_instances` status → `cancelling`
 3. **Config addition:** No new config — uses existing Contabo API credentials
+
+### Contabo API Authentication
+
+Contabo uses OAuth2 client credentials flow. All API calls require a bearer token obtained via:
+
+```
+POST https://auth.contabo.com/auth/realms/contabo/protocol/openid-connect/token
+  grant_type=password
+  client_id=CONTABO_CLIENT_ID
+  client_secret=CONTABO_CLIENT_SECRET
+  username=CONTABO_API_USER
+  password=CONTABO_API_PASSWORD
+```
+
+The bearer token is short-lived; the Pi5 worker refreshes it before each API session. SSH key provisioning requires using the Secrets Management API (`POST /v1/secrets`) to store the public key and reference it by `secretId` — not raw key strings. See Plan B Task 2 for full implementation.
 
 ### Changes to Customer Onboarding Pipeline Spec
 
-1. **Job types expanded:** Add `churn` alongside existing `deploy`, `upgrade`, `downgrade`
+1. **`cancel` job type expanded:** Existing `cancel` handler gains VPS lifecycle steps (wipe → Contabo cancel → D1 update)
 2. **D1 schema addition:** `vps_instances` table
 3. **Lifecycle section:** Reference this spec for VPS billing details
 
@@ -282,6 +321,6 @@ Multi-month bundles are pure upside: customer pre-commits, you cancel VPS immedi
 | Item | Test | Fallback |
 |---|---|---|
 | Cancel VPS via API | `POST /v1/compute/instances/{id}/cancel` | Manual panel |
-| Revoke cancellation via API | Look for revoke/undo endpoint in API docs | Manual panel + Telegram alert |
+| Revoke cancellation via API | Look for revoke/undo endpoint in API docs | **Fallback strategy if no API revoke:** don't cancel on churn — wipe data, set status to `recyclable`. New customer takes recyclable VPS (no revoke needed). Submit cancellation only when VPS has been idle 3+ weeks with no recycle prospect. This is slightly worse (hold VPS longer) but recycling still works without revoke API. Secondary fallback: manual panel click + Telegram alert. |
 | OS reinstall via API | `POST /v1/compute/instances/{id}/actions/reinstall` | SSH wipe script |
 | Time from reinstall to SSH-ready | Measure during P2 test | Add polling/retry in deployer |
