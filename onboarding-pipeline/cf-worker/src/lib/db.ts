@@ -1,4 +1,4 @@
-import { Job, VpsInstance } from "./types";
+import { Job, VpsInstance, ApiUsage } from "./types";
 
 // --- ID generation ---
 
@@ -196,4 +196,212 @@ export async function listVpsByStatus(db: D1Database, status: string): Promise<V
     .bind(status)
     .all<VpsInstance>();
   return results;
+}
+
+// ── API Usage ──
+
+function currentMonth(): string {
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+}
+
+export async function createApiUsage(
+  db: D1Database,
+  params: { customer_id: string; gateway_token: string; tier: number; monthly_budget_hkd?: number }
+): Promise<ApiUsage> {
+  const now = new Date().toISOString();
+  const month = currentMonth();
+  return db
+    .prepare(
+      `INSERT INTO api_usage (customer_id, gateway_token, tier, monthly_budget_hkd, current_month, current_spend_hkd, total_requests, total_tokens_in, total_tokens_out, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, 0, 0, 0, 0, ?, ?)
+       RETURNING *`
+    )
+    .bind(params.customer_id, params.gateway_token, params.tier, params.monthly_budget_hkd ?? null, month, now, now)
+    .first<ApiUsage>() as Promise<ApiUsage>;
+}
+
+export async function getUsageByToken(db: D1Database, token: string): Promise<ApiUsage | null> {
+  return db
+    .prepare("SELECT * FROM api_usage WHERE gateway_token = ?")
+    .bind(token)
+    .first<ApiUsage>();
+}
+
+export async function getUsageByCustomerId(db: D1Database, customerId: string): Promise<ApiUsage | null> {
+  return db
+    .prepare("SELECT * FROM api_usage WHERE customer_id = ?")
+    .bind(customerId)
+    .first<ApiUsage>();
+}
+
+export async function listAllUsage(db: D1Database): Promise<ApiUsage[]> {
+  const result = await db
+    .prepare("SELECT * FROM api_usage ORDER BY customer_id")
+    .all<ApiUsage>();
+  return result.results;
+}
+
+export async function updateUsageSpend(
+  db: D1Database,
+  customerId: string,
+  update: { cost_hkd: number; tokens_in: number; tokens_out: number }
+): Promise<ApiUsage> {
+  const now = new Date().toISOString();
+  return db
+    .prepare(
+      `UPDATE api_usage SET
+         current_spend_hkd = current_spend_hkd + ?,
+         total_requests = total_requests + 1,
+         total_tokens_in = total_tokens_in + ?,
+         total_tokens_out = total_tokens_out + ?,
+         updated_at = ?
+       WHERE customer_id = ?
+       RETURNING *`
+    )
+    .bind(update.cost_hkd, update.tokens_in, update.tokens_out, now, customerId)
+    .first<ApiUsage>() as Promise<ApiUsage>;
+}
+
+export async function updateUsageBudget(
+  db: D1Database,
+  customerId: string,
+  budgetHkd: number
+): Promise<ApiUsage | null> {
+  const now = new Date().toISOString();
+  return db
+    .prepare(
+      "UPDATE api_usage SET monthly_budget_hkd = ?, updated_at = ? WHERE customer_id = ? RETURNING *"
+    )
+    .bind(budgetHkd, now, customerId)
+    .first<ApiUsage>();
+}
+
+export async function updateUsageBudgetByTier(
+  db: D1Database,
+  tier: number,
+  budgetHkd: number
+): Promise<number> {
+  const now = new Date().toISOString();
+  const result = await db
+    .prepare("UPDATE api_usage SET monthly_budget_hkd = ?, updated_at = ? WHERE tier = ?")
+    .bind(budgetHkd, now, tier)
+    .run();
+  return result.meta.changes;
+}
+
+export async function setWarned(db: D1Database, customerId: string): Promise<void> {
+  const now = new Date().toISOString();
+  await db
+    .prepare("UPDATE api_usage SET warned_at = ?, updated_at = ? WHERE customer_id = ?")
+    .bind(now, now, customerId)
+    .run();
+}
+
+export async function setBlocked(db: D1Database, customerId: string): Promise<void> {
+  const now = new Date().toISOString();
+  await db
+    .prepare("UPDATE api_usage SET blocked_at = ?, updated_at = ? WHERE customer_id = ?")
+    .bind(now, now, customerId)
+    .run();
+}
+
+export async function resetUsageMonth(
+  db: D1Database,
+  customerId: string,
+  oldMonth: string
+): Promise<ApiUsage> {
+  // Get current values for history
+  const current = await getUsageByCustomerId(db, customerId);
+  if (current) {
+    await writeUsageHistory(db, {
+      customer_id: customerId,
+      month: oldMonth,
+      spend_hkd: current.current_spend_hkd,
+      requests: current.total_requests,
+      tokens_in: current.total_tokens_in,
+      tokens_out: current.total_tokens_out,
+      budget_hkd: current.monthly_budget_hkd,
+    });
+  }
+
+  const now = new Date().toISOString();
+  const month = currentMonth();
+  return db
+    .prepare(
+      `UPDATE api_usage SET
+         current_month = ?, current_spend_hkd = 0,
+         warned_at = NULL, blocked_at = NULL,
+         total_requests = 0, total_tokens_in = 0, total_tokens_out = 0,
+         updated_at = ?
+       WHERE customer_id = ?
+       RETURNING *`
+    )
+    .bind(month, now, customerId)
+    .first<ApiUsage>() as Promise<ApiUsage>;
+}
+
+export async function revokeToken(db: D1Database, customerId: string): Promise<void> {
+  const now = new Date().toISOString();
+  await db
+    .prepare("UPDATE api_usage SET gateway_token = '', updated_at = ? WHERE customer_id = ?")
+    .bind(now, customerId)
+    .run();
+}
+
+export async function rotateToken(
+  db: D1Database,
+  customerId: string,
+  newToken: string
+): Promise<ApiUsage | null> {
+  const now = new Date().toISOString();
+  return db
+    .prepare(
+      "UPDATE api_usage SET gateway_token = ?, updated_at = ? WHERE customer_id = ? RETURNING *"
+    )
+    .bind(newToken, now, customerId)
+    .first<ApiUsage>();
+}
+
+// ── Audit Log ──
+
+export async function writeAuditLog(
+  db: D1Database,
+  params: { action: string; customer_id: string; details?: string; actor_ip?: string }
+): Promise<void> {
+  const now = new Date().toISOString();
+  await db
+    .prepare(
+      "INSERT INTO audit_log (action, customer_id, details, actor_ip, created_at) VALUES (?, ?, ?, ?, ?)"
+    )
+    .bind(params.action, params.customer_id, params.details ?? null, params.actor_ip ?? null, now)
+    .run();
+}
+
+// ── Usage History ──
+
+export async function writeUsageHistory(
+  db: D1Database,
+  params: {
+    customer_id: string;
+    month: string;
+    spend_hkd: number;
+    requests: number;
+    tokens_in: number;
+    tokens_out: number;
+    budget_hkd: number | null;
+  }
+): Promise<void> {
+  const now = new Date().toISOString();
+  await db
+    .prepare(
+      `INSERT INTO usage_history (customer_id, month, spend_hkd, requests, tokens_in, tokens_out, budget_hkd, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+    )
+    .bind(
+      params.customer_id, params.month, params.spend_hkd,
+      params.requests, params.tokens_in, params.tokens_out,
+      params.budget_hkd, now
+    )
+    .run();
 }
