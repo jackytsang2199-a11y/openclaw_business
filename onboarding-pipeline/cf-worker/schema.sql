@@ -11,8 +11,8 @@ CREATE TABLE IF NOT EXISTS jobs (
   telegram_user_id TEXT NOT NULL,
   email TEXT NOT NULL,
   payment_method TEXT,                          -- lemon_squeezy | fps | payme
-  bot_token TEXT NOT NULL,
-  bot_username TEXT NOT NULL,                   -- from getMe validation
+  bot_token TEXT NOT NULL UNIQUE,
+  bot_username TEXT NOT NULL UNIQUE,            -- from getMe validation
   server_ip TEXT,
   error_log TEXT,
   re_queue_count INTEGER DEFAULT 0,
