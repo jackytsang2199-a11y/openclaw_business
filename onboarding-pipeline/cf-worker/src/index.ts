@@ -5,6 +5,7 @@ import { handleGetNextJob, handleUpdateJob } from "./handlers/jobs";
 import { handleHealthPing, checkPi5Health } from "./handlers/health";
 import { handleCreateOrder } from "./handlers/orders";
 import { handleGetRecyclableVps, handleCreateVps, handleUpdateVps, handleListVps } from "./handlers/vps";
+import { handleAiProxy } from "./handlers/proxy";
 import { json } from "./lib/auth";
 
 export default {
@@ -69,6 +70,12 @@ export default {
       return handleUpdateVps(request, env, vpsMatch[1]);
     }
 
+    // Route: AI Gateway proxy (customer API traffic)
+    const aiMatch = path.match(/^\/api\/ai\/([^/]+)\/(.+)$/);
+    if (method === "POST" && aiMatch) {
+      return handleAiProxy(request, env, aiMatch[1], aiMatch[2]);
+    }
+
     // Catch-all
     return json({ error: "Not found", endpoints: [
       "POST /api/orders",
@@ -81,6 +88,7 @@ export default {
       "POST /api/vps",
       "PATCH /api/vps/:id",
       "GET  /api/vps?status=:status",
+      "POST /api/ai/:provider/*",
     ]}, 404);
   },
 };
