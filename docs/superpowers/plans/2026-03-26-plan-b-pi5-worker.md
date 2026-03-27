@@ -10,6 +10,7 @@
 
 **Spec:** `docs/superpowers/specs/2026-03-26-customer-onboarding-pipeline-design.md`
 **VPS Strategy:** `docs/superpowers/specs/2026-03-27-contabo-vps-billing-strategy-design.md`
+**Backup Strategy:** `docs/superpowers/specs/2026-03-27-customer-backup-strategy-design.md`
 
 **Depends on:** Plan A (CF Worker must be deployed and reachable at `api.3nexgen.com`)
 
@@ -161,6 +162,8 @@ onboarding-pipeline/
     playbook.py            — Builds deployment prompts from CLAUDE.md playbook for Agent SDK
     deployer.py            — Orchestrates deployment: recycle-or-provision → install+QA (Agent SDK) → deliver
     vps_lifecycle.py       — VPS recycling pool + cancel/revoke logic (calls Contabo API + CF Worker D1)
+    backup.py              — Backup orchestrator: VPS→Pi5 weekly backup of ~/clawd/, Qdrant, Mem0
+    restore.py             — Restore helper: Pi5→VPS data restore (clawd, Qdrant snapshot, Mem0)
     worker.py              — Main loop: poll → process (deploy/cancel) → repeat
     requirements.txt       — Python dependencies (requests, claude-agent-sdk, anyio)
     .env.example           — Template for Pi5 .env file
@@ -169,6 +172,8 @@ onboarding-pipeline/
       test_api_client.py
       test_deployer.py
       test_vps_lifecycle.py
+      test_backup.py
+      test_restore.py
   cf-worker/               — (Plan A, already exists)
 
 openclaw_install/
@@ -179,6 +184,9 @@ openclaw_install/
     contabo-cancel.sh      — NEW: Submit Contabo cancellation (billing)
     contabo-revoke.sh      — NEW: Revoke pending cancellation (for recycling)
     contabo-reinstall.sh   — NEW: OS reinstall for recycled VPS
+
+scripts/
+  nexgen-backup-pull.sh    — PC-side script: rsync from Pi5 to PC, cleanup old weeklies
 ```
 
 All Pi5 worker files live under `f:\openclaw_setup_business\onboarding-pipeline\pi5-worker\`.
@@ -597,6 +605,10 @@ CONTABO_API_PASSWORD=your_contabo_api_password
 
 # Agent SDK (Claude Max plan — no API key needed, uses ~/.claude/ OAuth token)
 AGENT_MAX_TURNS=50
+
+# Backup
+BACKUPS_DIR=/home/pi/backups
+BACKUP_STAGGER_SECONDS=300
 ```
 
 - [ ] **Step 3: Create config.py**
@@ -650,6 +662,10 @@ CONTABO_API_USER = os.environ["CONTABO_API_USER"]
 CONTABO_API_PASSWORD = os.environ["CONTABO_API_PASSWORD"]
 CONTABO_AUTH_URL = "https://auth.contabo.com/auth/realms/contabo/protocol/openid-connect/token"
 CONTABO_API_URL = "https://api.contabo.com/v1"
+
+# Backup
+BACKUPS_DIR = Path(os.environ.get("BACKUPS_DIR", str(Path.home() / "backups")))
+BACKUP_STAGGER_SECONDS = int(os.environ.get("BACKUP_STAGGER_SECONDS", "300"))  # 5 min between VPSes
 ```
 
 - [ ] **Step 4: Install dependencies on Pi5**
@@ -2584,6 +2600,1074 @@ git commit -m "feat(plan-b): VPS lifecycle module — recycling pool + auto-canc
 
 ---
 
+### Task 11: Backup Orchestrator (VPS → Pi5 Weekly)
+
+**Spec:** `docs/superpowers/specs/2026-03-27-customer-backup-strategy-design.md`
+
+**Files:**
+- Create: `onboarding-pipeline/pi5-worker/backup.py`
+- Create: `onboarding-pipeline/pi5-worker/tests/test_backup.py`
+- Modify: `onboarding-pipeline/pi5-worker/config.py` (add BACKUPS_DIR, BACKUP_STAGGER_SECONDS — already done in Task 2 updates above)
+- Modify: `onboarding-pipeline/pi5-worker/.env.example` (add BACKUPS_DIR — already done in Task 2 updates above)
+
+This module runs as a weekly cron on Pi5. For each active customer VPS, it SSHes in, creates a safe backup of ~/clawd/, Qdrant snapshot (Tier 2+), and mem0.db (Tier 2+), then SCPs the files to Pi5 `/backups/active/{CUSTOMER_ID}/`.
+
+- [ ] **Step 1: Write the failing test**
+
+Create `tests/test_backup.py`:
+```python
+import unittest
+from unittest.mock import patch, MagicMock, call
+import os
+import json
+import tempfile
+import shutil
+
+os.environ.setdefault("CF_WORKER_URL", "http://test")
+os.environ.setdefault("WORKER_TOKEN", "test")
+os.environ.setdefault("OWNER_TELEGRAM_BOT_TOKEN", "test")
+os.environ.setdefault("OWNER_TELEGRAM_CHAT_ID", "test")
+os.environ.setdefault("DEEPSEEK_API_KEY", "test")
+os.environ.setdefault("OPENAI_API_KEY", "test")
+os.environ.setdefault("BOT_POOL_DIR", "/tmp/test-pool")
+os.environ.setdefault("CONTABO_CLIENT_ID", "test")
+os.environ.setdefault("CONTABO_CLIENT_SECRET", "test")
+os.environ.setdefault("CONTABO_API_USER", "test")
+os.environ.setdefault("CONTABO_API_PASSWORD", "test")
+
+from backup import BackupOrchestrator
+
+
+class TestBackupSingleVps(unittest.TestCase):
+    """Test backing up a single VPS to Pi5."""
+
+    def setUp(self):
+        self.mock_api = MagicMock()
+        self.mock_notifier = MagicMock()
+        self.backups_dir = tempfile.mkdtemp()
+        self.orchestrator = BackupOrchestrator(
+            self.mock_api, self.mock_notifier, self.backups_dir
+        )
+
+    def tearDown(self):
+        shutil.rmtree(self.backups_dir)
+
+    @patch("backup.subprocess.run")
+    def test_backup_tier2_all_steps(self, mock_run):
+        """Tier 2 VPS: safe-copy mem0.db + Qdrant snapshot + tar clawd + SCP all 3."""
+        # SSH commands all succeed
+        mock_run.return_value = MagicMock(
+            returncode=0,
+            stdout='{"result":{"name":"mem0-123.snapshot"}}',
+        )
+
+        vps = {
+            "vps_id": "inst-abc",
+            "contabo_ip": "203.0.113.50",
+            "customer_id": "T1043",
+            "tier": 2,
+        }
+        result = self.orchestrator.backup_single_vps(vps)
+
+        self.assertTrue(result["success"])
+        self.assertEqual(result["customer_id"], "T1043")
+        # Should have run at least: sqlite3 backup, qdrant snapshot, tar, scp, cleanup
+        self.assertGreaterEqual(mock_run.call_count, 4)
+
+    @patch("backup.subprocess.run")
+    def test_backup_tier1_skips_qdrant_mem0(self, mock_run):
+        """Tier 1 VPS: only tar clawd + SCP. No Qdrant/Mem0 steps."""
+        mock_run.return_value = MagicMock(returncode=0, stdout="")
+
+        vps = {
+            "vps_id": "inst-def",
+            "contabo_ip": "203.0.113.51",
+            "customer_id": "T1044",
+            "tier": 1,
+        }
+        result = self.orchestrator.backup_single_vps(vps)
+
+        self.assertTrue(result["success"])
+        # Should NOT contain sqlite3 or qdrant snapshot calls
+        all_commands = " ".join(str(c) for c in mock_run.call_args_list)
+        self.assertNotIn("sqlite3", all_commands)
+        self.assertNotIn("snapshots", all_commands)
+
+    @patch("backup.subprocess.run")
+    def test_backup_ssh_failure_returns_error(self, mock_run):
+        """If SSH fails, returns error result (does not raise)."""
+        mock_run.return_value = MagicMock(
+            returncode=255, stderr="Connection refused"
+        )
+
+        vps = {
+            "vps_id": "inst-ghi",
+            "contabo_ip": "203.0.113.52",
+            "customer_id": "T1045",
+            "tier": 2,
+        }
+        result = self.orchestrator.backup_single_vps(vps)
+
+        self.assertFalse(result["success"])
+        self.assertIn("error", result)
+
+
+class TestBackupMetaJson(unittest.TestCase):
+    """Test that backup-meta.json is written correctly."""
+
+    def setUp(self):
+        self.mock_api = MagicMock()
+        self.mock_notifier = MagicMock()
+        self.backups_dir = tempfile.mkdtemp()
+        self.orchestrator = BackupOrchestrator(
+            self.mock_api, self.mock_notifier, self.backups_dir
+        )
+
+    def tearDown(self):
+        shutil.rmtree(self.backups_dir)
+
+    def test_write_meta_creates_valid_json(self):
+        """backup-meta.json should contain timestamp, customer_id, tier, status."""
+        customer_dir = os.path.join(self.backups_dir, "active", "T1043")
+        os.makedirs(customer_dir, exist_ok=True)
+
+        self.orchestrator.write_meta(
+            customer_id="T1043",
+            vps_ip="203.0.113.50",
+            tier=2,
+            size_bytes=1024000,
+            status="success",
+        )
+
+        meta_path = os.path.join(customer_dir, "backup-meta.json")
+        self.assertTrue(os.path.exists(meta_path))
+        with open(meta_path) as f:
+            meta = json.load(f)
+        self.assertEqual(meta["customer_id"], "T1043")
+        self.assertEqual(meta["tier"], 2)
+        self.assertEqual(meta["status"], "success")
+        self.assertIn("timestamp", meta)
+
+
+class TestBackupRunAll(unittest.TestCase):
+    """Test the full backup run across all active VPSes."""
+
+    def setUp(self):
+        self.mock_api = MagicMock()
+        self.mock_notifier = MagicMock()
+        self.backups_dir = tempfile.mkdtemp()
+        self.orchestrator = BackupOrchestrator(
+            self.mock_api, self.mock_notifier, self.backups_dir
+        )
+
+    def tearDown(self):
+        shutil.rmtree(self.backups_dir)
+
+    @patch.object(BackupOrchestrator, "backup_single_vps")
+    def test_run_all_queries_d1_and_processes_each(self, mock_single):
+        """run_all queries D1 for active VPSes and backs up each one."""
+        self.mock_api.get_active_vps_list.return_value = [
+            {"vps_id": "inst-1", "contabo_ip": "1.1.1.1", "customer_id": "T1043", "tier": 2},
+            {"vps_id": "inst-2", "contabo_ip": "2.2.2.2", "customer_id": "T1044", "tier": 1},
+        ]
+        mock_single.return_value = {"success": True, "customer_id": "T1043"}
+
+        self.orchestrator.run_all(stagger_seconds=0)
+
+        self.assertEqual(mock_single.call_count, 2)
+        self.mock_api.get_active_vps_list.assert_called_once()
+
+    @patch.object(BackupOrchestrator, "backup_single_vps")
+    def test_run_all_failure_notifies_and_continues(self, mock_single):
+        """If one VPS fails, it continues to the next and notifies admin."""
+        self.mock_api.get_active_vps_list.return_value = [
+            {"vps_id": "inst-1", "contabo_ip": "1.1.1.1", "customer_id": "T1043", "tier": 2},
+            {"vps_id": "inst-2", "contabo_ip": "2.2.2.2", "customer_id": "T1044", "tier": 2},
+        ]
+        mock_single.side_effect = [
+            {"success": False, "customer_id": "T1043", "error": "SSH refused"},
+            {"success": True, "customer_id": "T1044"},
+        ]
+
+        self.orchestrator.run_all(stagger_seconds=0)
+
+        # Both VPSes attempted
+        self.assertEqual(mock_single.call_count, 2)
+        # Failure notification sent for T1043
+        self.mock_notifier.send.assert_called()
+
+    @patch.object(BackupOrchestrator, "backup_single_vps")
+    def test_run_all_size_anomaly_alert(self, mock_single):
+        """If backup size is >2x previous or 0, send alert."""
+        self.mock_api.get_active_vps_list.return_value = [
+            {"vps_id": "inst-1", "contabo_ip": "1.1.1.1", "customer_id": "T1043", "tier": 2},
+        ]
+        mock_single.return_value = {
+            "success": True, "customer_id": "T1043", "size_bytes": 0,
+        }
+
+        self.orchestrator.run_all(stagger_seconds=0)
+
+        # Zero-size alert
+        alert_calls = [str(c) for c in self.mock_notifier.send.call_args_list]
+        self.assertTrue(any("anomaly" in s.lower() or "0 bytes" in s for s in alert_calls))
+
+
+if __name__ == "__main__":
+    unittest.main()
+```
+
+- [ ] **Step 2: Run test to verify it fails**
+
+```bash
+cd onboarding-pipeline/pi5-worker
+python3 -m pytest tests/test_backup.py -v
+```
+
+Expected: FAIL — `backup` module not found.
+
+- [ ] **Step 3: Implement backup.py**
+
+```python
+"""Backup orchestrator: VPS → Pi5 weekly backup.
+
+Spec: docs/superpowers/specs/2026-03-27-customer-backup-strategy-design.md
+
+For each active customer VPS:
+  1. SSH in, safe-copy mem0.db (Tier 2+)
+  2. Create Qdrant snapshot (Tier 2+)
+  3. Tar ~/clawd/ workspace
+  4. SCP files to Pi5 /backups/active/{CUSTOMER_ID}/
+  5. Write backup-meta.json
+  6. Clean up /tmp on VPS
+"""
+
+import json
+import os
+import subprocess
+import time
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Optional
+
+import config
+from api_client import ApiClient
+from notifier import Notifier
+
+
+class BackupOrchestrator:
+    def __init__(self, api: ApiClient, notifier: Notifier, backups_dir: str = None):
+        self.api = api
+        self.notifier = notifier
+        self.backups_dir = Path(backups_dir or str(config.BACKUPS_DIR))
+        self.ssh_key = str(config.SSH_KEY_PATH)
+        self.ssh_opts = [
+            "-o", "StrictHostKeyChecking=no",
+            "-o", "UserKnownHostsFile=/dev/null",
+            "-o", "ConnectTimeout=15",
+            "-i", self.ssh_key,
+        ]
+
+    def _ssh_cmd(self, ip: str, command: str, timeout: int = 120) -> subprocess.CompletedProcess:
+        """Run a command on a remote VPS via SSH."""
+        return subprocess.run(
+            ["ssh", *self.ssh_opts, f"deploy@{ip}", command],
+            capture_output=True, text=True, timeout=timeout,
+        )
+
+    def _scp_from(self, ip: str, remote_path: str, local_path: str, timeout: int = 300) -> subprocess.CompletedProcess:
+        """SCP a file from VPS to Pi5."""
+        os.makedirs(os.path.dirname(local_path), exist_ok=True)
+        return subprocess.run(
+            ["scp", *self.ssh_opts, f"deploy@{ip}:{remote_path}", local_path],
+            capture_output=True, text=True, timeout=timeout,
+        )
+
+    def write_meta(self, customer_id: str, vps_ip: str, tier: int,
+                   size_bytes: int, status: str) -> None:
+        """Write backup-meta.json to the customer's backup directory."""
+        customer_dir = self.backups_dir / "active" / customer_id
+        customer_dir.mkdir(parents=True, exist_ok=True)
+        meta = {
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "customer_id": customer_id,
+            "vps_ip": vps_ip,
+            "tier": tier,
+            "size_bytes": size_bytes,
+            "status": status,
+        }
+        meta_path = customer_dir / "backup-meta.json"
+        meta_path.write_text(json.dumps(meta, indent=2))
+
+    def _read_previous_size(self, customer_id: str) -> Optional[int]:
+        """Read size_bytes from previous backup-meta.json. Returns None if not found."""
+        meta_path = self.backups_dir / "active" / customer_id / "backup-meta.json"
+        if meta_path.exists():
+            try:
+                meta = json.loads(meta_path.read_text())
+                return meta.get("size_bytes")
+            except (json.JSONDecodeError, KeyError):
+                return None
+        return None
+
+    def backup_single_vps(self, vps: dict) -> dict:
+        """Back up a single customer VPS to Pi5.
+
+        Args:
+            vps: dict with vps_id, contabo_ip, customer_id, tier
+
+        Returns:
+            dict with success (bool), customer_id, and optionally error or size_bytes
+        """
+        customer_id = vps["customer_id"]
+        ip = vps["contabo_ip"]
+        tier = vps["tier"]
+        customer_dir = self.backups_dir / "active" / customer_id
+
+        print(f"[backup] {customer_id}: Starting backup from {ip} (Tier {tier})")
+
+        # Step 1: Tier 2+ — safe-copy SQLite DB
+        if tier >= 2:
+            result = self._ssh_cmd(ip, 'sqlite3 ~/mem0.db ".backup /tmp/mem0-backup.db"')
+            if result.returncode != 0:
+                error = f"sqlite3 backup failed: {result.stderr[:200]}"
+                print(f"[backup] {customer_id}: {error}")
+                return {"success": False, "customer_id": customer_id, "error": error}
+
+        # Step 2: Tier 2+ — create Qdrant snapshot
+        qdrant_snapshot_name = None
+        if tier >= 2:
+            result = self._ssh_cmd(
+                ip,
+                'curl -s -X POST http://localhost:6333/collections/mem0/snapshots',
+            )
+            if result.returncode != 0:
+                error = f"Qdrant snapshot failed: {result.stderr[:200]}"
+                print(f"[backup] {customer_id}: {error}")
+                return {"success": False, "customer_id": customer_id, "error": error}
+            try:
+                snap_response = json.loads(result.stdout)
+                qdrant_snapshot_name = snap_response["result"]["name"]
+            except (json.JSONDecodeError, KeyError):
+                error = f"Qdrant snapshot response parse failed: {result.stdout[:200]}"
+                print(f"[backup] {customer_id}: {error}")
+                return {"success": False, "customer_id": customer_id, "error": error}
+
+        # Step 3: Tar the workspace
+        result = self._ssh_cmd(ip, 'tar -czf /tmp/clawd-backup.tar.gz -C ~/ clawd/', timeout=300)
+        if result.returncode != 0:
+            error = f"tar failed: {result.stderr[:200]}"
+            print(f"[backup] {customer_id}: {error}")
+            return {"success": False, "customer_id": customer_id, "error": error}
+
+        # Step 4: SCP files to Pi5
+        customer_dir.mkdir(parents=True, exist_ok=True)
+
+        # 4a: clawd.tar.gz (always)
+        result = self._scp_from(ip, "/tmp/clawd-backup.tar.gz", str(customer_dir / "clawd.tar.gz"))
+        if result.returncode != 0:
+            error = f"SCP clawd.tar.gz failed: {result.stderr[:200]}"
+            print(f"[backup] {customer_id}: {error}")
+            return {"success": False, "customer_id": customer_id, "error": error}
+
+        # 4b: Qdrant snapshot (Tier 2+)
+        if tier >= 2 and qdrant_snapshot_name:
+            qdrant_remote = f"/qdrant/snapshots/mem0/{qdrant_snapshot_name}"
+            result = self._scp_from(ip, qdrant_remote, str(customer_dir / "qdrant-snapshot.tar.gz"))
+            if result.returncode != 0:
+                error = f"SCP Qdrant snapshot failed: {result.stderr[:200]}"
+                print(f"[backup] {customer_id}: {error}")
+                return {"success": False, "customer_id": customer_id, "error": error}
+
+        # 4c: mem0.db (Tier 2+)
+        if tier >= 2:
+            result = self._scp_from(ip, "/tmp/mem0-backup.db", str(customer_dir / "mem0.db"))
+            if result.returncode != 0:
+                error = f"SCP mem0.db failed: {result.stderr[:200]}"
+                print(f"[backup] {customer_id}: {error}")
+                return {"success": False, "customer_id": customer_id, "error": error}
+
+        # Step 5: Calculate total backup size
+        total_size = sum(
+            f.stat().st_size for f in customer_dir.iterdir() if f.is_file() and f.name != "backup-meta.json"
+        )
+
+        # Step 6: Write meta
+        self.write_meta(customer_id, ip, tier, total_size, "success")
+
+        # Step 7: Clean up /tmp on VPS
+        cleanup_cmd = "rm -f /tmp/clawd-backup.tar.gz /tmp/mem0-backup.db"
+        if tier >= 2 and qdrant_snapshot_name:
+            cleanup_cmd += f" /qdrant/snapshots/mem0/{qdrant_snapshot_name}"
+        self._ssh_cmd(ip, cleanup_cmd)
+
+        print(f"[backup] {customer_id}: OK ({total_size} bytes)")
+        return {"success": True, "customer_id": customer_id, "size_bytes": total_size}
+
+    def run_all(self, stagger_seconds: int = None) -> None:
+        """Back up all active VPSes. Queries D1 for the list.
+
+        Args:
+            stagger_seconds: seconds to wait between VPSes (default from config)
+        """
+        if stagger_seconds is None:
+            stagger_seconds = config.BACKUP_STAGGER_SECONDS
+
+        vps_list = self.api.get_active_vps_list()
+        total = len(vps_list)
+        print(f"[backup] Starting backup run: {total} active VPSes")
+
+        successes = 0
+        failures = 0
+
+        for i, vps in enumerate(vps_list):
+            customer_id = vps["customer_id"]
+            previous_size = self._read_previous_size(customer_id)
+
+            result = self.backup_single_vps(vps)
+
+            if result["success"]:
+                successes += 1
+                # Size anomaly check
+                current_size = result.get("size_bytes", 0)
+                if current_size == 0:
+                    self.notifier.send(
+                        f"⚠️ Backup anomaly: {customer_id} — 0 bytes"
+                    )
+                elif previous_size and current_size > previous_size * 2:
+                    self.notifier.send(
+                        f"⚠️ Backup anomaly: {customer_id} — "
+                        f"{current_size} bytes (was {previous_size})"
+                    )
+            else:
+                failures += 1
+                self.notifier.send(
+                    f"🔴 Backup failed: {customer_id} — {result.get('error', 'unknown')}"
+                )
+
+            # Stagger between VPSes (skip after last one)
+            if stagger_seconds > 0 and i < total - 1:
+                time.sleep(stagger_seconds)
+
+        # Storage usage check
+        active_dir = self.backups_dir / "active"
+        if active_dir.exists():
+            total_usage = sum(
+                f.stat().st_size for f in active_dir.rglob("*") if f.is_file()
+            )
+            budget_80pct = 12 * 1024 * 1024 * 1024  # 12GB = 80% of 15GB budget
+            if total_usage > budget_80pct:
+                self.notifier.send(
+                    f"⚠️ Backup storage warning: {total_usage / 1024 / 1024:.0f}MB used "
+                    f"(budget: 15GB)"
+                )
+
+        # Log summary
+        log_path = self.backups_dir / "backup.log"
+        timestamp = datetime.now(timezone.utc).isoformat()
+        with open(log_path, "a") as f:
+            f.write(f"{timestamp} | {successes}/{total} OK | {failures} failed\n")
+
+        print(f"[backup] Complete: {successes}/{total} OK, {failures} failed")
+
+
+if __name__ == "__main__":
+    # Entry point for cron: python3 -m backup
+    from api_client import ApiClient
+    from notifier import Notifier
+
+    api = ApiClient(config.CF_WORKER_URL, config.WORKER_TOKEN)
+    notifier = Notifier(config.OWNER_TELEGRAM_BOT_TOKEN, config.OWNER_TELEGRAM_CHAT_ID)
+    orchestrator = BackupOrchestrator(api, notifier)
+    orchestrator.run_all()
+```
+
+- [ ] **Step 4: Add `get_active_vps_list` to ApiClient**
+
+Add this method to `api_client.py` after the existing `get_recyclable_vps` method:
+
+```python
+    def get_active_vps_list(self) -> list:
+        """Get all active VPSes for backup. Returns list of VPS dicts."""
+        resp = requests.get(
+            f"{self.base_url}/api/vps?status=active",
+            headers=self.headers,
+            timeout=10,
+        )
+        resp.raise_for_status()
+        return resp.json().get("vps_list", [])
+```
+
+- [ ] **Step 5: Run tests to verify they pass**
+
+```bash
+python3 -m pytest tests/test_backup.py -v
+```
+
+Expected: All 7 tests PASS.
+
+- [ ] **Step 6: Commit**
+
+```bash
+git add onboarding-pipeline/pi5-worker/backup.py onboarding-pipeline/pi5-worker/tests/test_backup.py onboarding-pipeline/pi5-worker/api_client.py
+git commit -m "feat(plan-b): backup orchestrator — VPS→Pi5 weekly backup with tier-aware Qdrant/Mem0"
+```
+
+---
+
+### Task 12: Restore Helper (Pi5 → VPS)
+
+**Spec:** `docs/superpowers/specs/2026-03-27-customer-backup-strategy-design.md` — Section 7: Restore Flows
+
+**Files:**
+- Create: `onboarding-pipeline/pi5-worker/restore.py`
+- Create: `onboarding-pipeline/pi5-worker/tests/test_restore.py`
+
+This module restores a customer's data from a Pi5 backup (or PC backup that's been copied to Pi5) onto a freshly provisioned VPS. Used for: VPS crash recovery, Contabo account re-provision, or corruption rollback.
+
+- [ ] **Step 1: Write the failing test**
+
+Create `tests/test_restore.py`:
+```python
+import unittest
+from unittest.mock import patch, MagicMock
+import os
+import json
+import tempfile
+import shutil
+
+os.environ.setdefault("CF_WORKER_URL", "http://test")
+os.environ.setdefault("WORKER_TOKEN", "test")
+os.environ.setdefault("OWNER_TELEGRAM_BOT_TOKEN", "test")
+os.environ.setdefault("OWNER_TELEGRAM_CHAT_ID", "test")
+os.environ.setdefault("DEEPSEEK_API_KEY", "test")
+os.environ.setdefault("OPENAI_API_KEY", "test")
+os.environ.setdefault("BOT_POOL_DIR", "/tmp/test-pool")
+os.environ.setdefault("CONTABO_CLIENT_ID", "test")
+os.environ.setdefault("CONTABO_CLIENT_SECRET", "test")
+os.environ.setdefault("CONTABO_API_USER", "test")
+os.environ.setdefault("CONTABO_API_PASSWORD", "test")
+
+from restore import RestoreHelper
+
+
+class TestRestoreTier2(unittest.TestCase):
+    """Test restoring a Tier 2 customer (clawd + Qdrant + Mem0)."""
+
+    def setUp(self):
+        self.mock_notifier = MagicMock()
+        self.backups_dir = tempfile.mkdtemp()
+        self.helper = RestoreHelper(self.mock_notifier, self.backups_dir)
+        # Create fake backup files
+        customer_dir = os.path.join(self.backups_dir, "active", "T1043")
+        os.makedirs(customer_dir)
+        for fname in ["clawd.tar.gz", "qdrant-snapshot.tar.gz", "mem0.db"]:
+            open(os.path.join(customer_dir, fname), "w").close()
+        meta = {"tier": 2, "customer_id": "T1043", "status": "success"}
+        with open(os.path.join(customer_dir, "backup-meta.json"), "w") as f:
+            json.dump(meta, f)
+
+    def tearDown(self):
+        shutil.rmtree(self.backups_dir)
+
+    @patch("restore.subprocess.run")
+    def test_restore_tier2_full(self, mock_run):
+        """Tier 2 restore: SCP clawd + Qdrant + Mem0, extract, restore snapshot."""
+        mock_run.return_value = MagicMock(returncode=0, stdout="")
+
+        result = self.helper.restore(customer_id="T1043", target_ip="203.0.113.50")
+
+        self.assertTrue(result["success"])
+        # Should have: SCP clawd, SCP qdrant, SCP mem0, extract tar, restore qdrant snapshot, restart
+        self.assertGreaterEqual(mock_run.call_count, 4)
+
+    @patch("restore.subprocess.run")
+    def test_restore_scp_failure(self, mock_run):
+        """If SCP fails, restore returns error."""
+        mock_run.return_value = MagicMock(returncode=1, stderr="No route to host")
+
+        result = self.helper.restore(customer_id="T1043", target_ip="203.0.113.50")
+
+        self.assertFalse(result["success"])
+        self.assertIn("error", result)
+
+
+class TestRestoreTier1(unittest.TestCase):
+    """Test restoring a Tier 1 customer (clawd only, no Qdrant/Mem0)."""
+
+    def setUp(self):
+        self.mock_notifier = MagicMock()
+        self.backups_dir = tempfile.mkdtemp()
+        self.helper = RestoreHelper(self.mock_notifier, self.backups_dir)
+        customer_dir = os.path.join(self.backups_dir, "active", "T1044")
+        os.makedirs(customer_dir)
+        open(os.path.join(customer_dir, "clawd.tar.gz"), "w").close()
+        meta = {"tier": 1, "customer_id": "T1044", "status": "success"}
+        with open(os.path.join(customer_dir, "backup-meta.json"), "w") as f:
+            json.dump(meta, f)
+
+    def tearDown(self):
+        shutil.rmtree(self.backups_dir)
+
+    @patch("restore.subprocess.run")
+    def test_restore_tier1_clawd_only(self, mock_run):
+        """Tier 1 restore: only SCP clawd + extract. No Qdrant/Mem0."""
+        mock_run.return_value = MagicMock(returncode=0, stdout="")
+
+        result = self.helper.restore(customer_id="T1044", target_ip="203.0.113.51")
+
+        self.assertTrue(result["success"])
+        all_commands = " ".join(str(c) for c in mock_run.call_args_list)
+        self.assertNotIn("qdrant", all_commands.lower())
+        self.assertNotIn("mem0", all_commands.lower())
+
+
+class TestRestoreMissingBackup(unittest.TestCase):
+    """Test restore when no backup exists for the customer."""
+
+    def setUp(self):
+        self.mock_notifier = MagicMock()
+        self.backups_dir = tempfile.mkdtemp()
+        self.helper = RestoreHelper(self.mock_notifier, self.backups_dir)
+
+    def tearDown(self):
+        shutil.rmtree(self.backups_dir)
+
+    def test_restore_no_backup_returns_error(self):
+        """If no backup exists for customer, returns error immediately."""
+        result = self.helper.restore(customer_id="T9999", target_ip="1.1.1.1")
+
+        self.assertFalse(result["success"])
+        self.assertIn("no backup found", result["error"].lower())
+
+
+if __name__ == "__main__":
+    unittest.main()
+```
+
+- [ ] **Step 2: Run test to verify it fails**
+
+```bash
+python3 -m pytest tests/test_restore.py -v
+```
+
+Expected: FAIL — `restore` module not found.
+
+- [ ] **Step 3: Implement restore.py**
+
+```python
+"""Restore helper: Pi5 → VPS data restore.
+
+Spec: docs/superpowers/specs/2026-03-27-customer-backup-strategy-design.md — Section 7
+
+Restores a customer's data from Pi5 backup onto a target VPS.
+Used for: VPS crash recovery, Contabo re-provision, corruption rollback.
+"""
+
+import json
+import subprocess
+from pathlib import Path
+
+import config
+from notifier import Notifier
+
+
+class RestoreHelper:
+    def __init__(self, notifier: Notifier, backups_dir: str = None):
+        self.notifier = notifier
+        self.backups_dir = Path(backups_dir or str(config.BACKUPS_DIR))
+        self.ssh_key = str(config.SSH_KEY_PATH)
+        self.ssh_opts = [
+            "-o", "StrictHostKeyChecking=no",
+            "-o", "UserKnownHostsFile=/dev/null",
+            "-o", "ConnectTimeout=15",
+            "-i", self.ssh_key,
+        ]
+
+    def _ssh_cmd(self, ip: str, command: str, timeout: int = 120) -> subprocess.CompletedProcess:
+        """Run a command on a remote VPS via SSH."""
+        return subprocess.run(
+            ["ssh", *self.ssh_opts, f"deploy@{ip}", command],
+            capture_output=True, text=True, timeout=timeout,
+        )
+
+    def _scp_to(self, local_path: str, ip: str, remote_path: str, timeout: int = 300) -> subprocess.CompletedProcess:
+        """SCP a file from Pi5 to VPS."""
+        return subprocess.run(
+            ["scp", *self.ssh_opts, local_path, f"deploy@{ip}:{remote_path}"],
+            capture_output=True, text=True, timeout=timeout,
+        )
+
+    def restore(self, customer_id: str, target_ip: str,
+                source_dir: str = None) -> dict:
+        """Restore customer data from backup to target VPS.
+
+        Args:
+            customer_id: e.g. "T1043"
+            target_ip: IP of the target VPS
+            source_dir: override backup source (e.g. PC copy). Defaults to
+                        /backups/active/{customer_id}/
+
+        Returns:
+            dict with success (bool), customer_id, and optionally error
+        """
+        backup_dir = Path(source_dir) if source_dir else (
+            self.backups_dir / "active" / customer_id
+        )
+
+        # Check backup exists
+        if not backup_dir.exists():
+            return {
+                "success": False,
+                "customer_id": customer_id,
+                "error": f"No backup found at {backup_dir}",
+            }
+
+        # Read meta to determine tier
+        meta_path = backup_dir / "backup-meta.json"
+        tier = 1  # default fallback
+        if meta_path.exists():
+            try:
+                meta = json.loads(meta_path.read_text())
+                tier = meta.get("tier", 1)
+            except (json.JSONDecodeError, KeyError):
+                pass
+
+        clawd_tar = backup_dir / "clawd.tar.gz"
+        qdrant_snap = backup_dir / "qdrant-snapshot.tar.gz"
+        mem0_db = backup_dir / "mem0.db"
+
+        print(f"[restore] {customer_id}: Restoring to {target_ip} (Tier {tier})")
+
+        # Step 1: SCP clawd.tar.gz to VPS
+        if not clawd_tar.exists():
+            return {
+                "success": False,
+                "customer_id": customer_id,
+                "error": "No backup found — clawd.tar.gz missing",
+            }
+
+        result = self._scp_to(str(clawd_tar), target_ip, "/tmp/clawd-backup.tar.gz")
+        if result.returncode != 0:
+            return {
+                "success": False,
+                "customer_id": customer_id,
+                "error": f"SCP clawd.tar.gz failed: {result.stderr[:200]}",
+            }
+
+        # Step 2: Extract clawd workspace
+        result = self._ssh_cmd(
+            target_ip,
+            "rm -rf ~/clawd && tar -xzf /tmp/clawd-backup.tar.gz -C ~/",
+            timeout=300,
+        )
+        if result.returncode != 0:
+            return {
+                "success": False,
+                "customer_id": customer_id,
+                "error": f"Extract clawd failed: {result.stderr[:200]}",
+            }
+
+        # Step 3: Restore Qdrant snapshot (Tier 2+)
+        if tier >= 2 and qdrant_snap.exists():
+            result = self._scp_to(str(qdrant_snap), target_ip, "/tmp/qdrant-restore.snapshot")
+            if result.returncode != 0:
+                return {
+                    "success": False,
+                    "customer_id": customer_id,
+                    "error": f"SCP Qdrant snapshot failed: {result.stderr[:200]}",
+                }
+            # Restore via Qdrant API
+            result = self._ssh_cmd(
+                target_ip,
+                'curl -s -X PUT "http://localhost:6333/collections/mem0/snapshots/recover" '
+                '-H "Content-Type: application/json" '
+                '-d \'{"location": "/tmp/qdrant-restore.snapshot"}\'',
+            )
+            if result.returncode != 0:
+                return {
+                    "success": False,
+                    "customer_id": customer_id,
+                    "error": f"Qdrant restore failed: {result.stderr[:200]}",
+                }
+
+        # Step 4: Restore mem0.db (Tier 2+)
+        if tier >= 2 and mem0_db.exists():
+            result = self._scp_to(str(mem0_db), target_ip, "~/mem0.db")
+            if result.returncode != 0:
+                return {
+                    "success": False,
+                    "customer_id": customer_id,
+                    "error": f"SCP mem0.db failed: {result.stderr[:200]}",
+                }
+
+        # Step 5: Restart services
+        self._ssh_cmd(target_ip, "sudo systemctl restart openclaw")
+
+        # Step 6: Clean up /tmp on VPS
+        self._ssh_cmd(target_ip, "rm -f /tmp/clawd-backup.tar.gz /tmp/qdrant-restore.snapshot")
+
+        print(f"[restore] {customer_id}: Restore complete to {target_ip}")
+        self.notifier.send(f"✅ {customer_id}: Restored to {target_ip} from backup")
+
+        return {"success": True, "customer_id": customer_id}
+
+
+if __name__ == "__main__":
+    import sys
+
+    if len(sys.argv) < 3:
+        print("Usage: python3 -m restore <CUSTOMER_ID> <TARGET_IP> [SOURCE_DIR]")
+        sys.exit(1)
+
+    customer_id = sys.argv[1]
+    target_ip = sys.argv[2]
+    source_dir = sys.argv[3] if len(sys.argv) > 3 else None
+
+    notifier = Notifier(config.OWNER_TELEGRAM_BOT_TOKEN, config.OWNER_TELEGRAM_CHAT_ID)
+    helper = RestoreHelper(notifier)
+    result = helper.restore(customer_id, target_ip, source_dir)
+
+    if not result["success"]:
+        print(f"FAILED: {result['error']}")
+        sys.exit(1)
+    print("OK")
+```
+
+- [ ] **Step 4: Run tests to verify they pass**
+
+```bash
+python3 -m pytest tests/test_restore.py -v
+```
+
+Expected: All 4 tests PASS.
+
+- [ ] **Step 5: Commit**
+
+```bash
+git add onboarding-pipeline/pi5-worker/restore.py onboarding-pipeline/pi5-worker/tests/test_restore.py
+git commit -m "feat(plan-b): restore helper — Pi5→VPS data restore with tier-aware Qdrant/Mem0"
+```
+
+---
+
+### Task 13: PC Pull Script + Pi5 Cron Setup
+
+**Spec:** `docs/superpowers/specs/2026-03-27-customer-backup-strategy-design.md` — Sections 4, 6
+
+**Files:**
+- Create: `scripts/nexgen-backup-pull.sh` (runs on admin PC)
+- Pi5 cron entry (manual setup step)
+
+This task creates the PC-side pull script and sets up the Pi5 cron for weekly backups.
+
+- [ ] **Step 1: Create PC-side pull script**
+
+Create `scripts/nexgen-backup-pull.sh`:
+```bash
+#!/bin/bash
+# nexgen-backup-pull.sh — Runs on admin PC at 23:00 HKT
+# Pulls latest backups from Pi5 to PC for versioned cold storage.
+#
+# Usage: ./nexgen-backup-pull.sh
+# Schedule: Windows Task Scheduler or cron at 23:00 HKT
+#
+# Spec: docs/superpowers/specs/2026-03-27-customer-backup-strategy-design.md
+set -euo pipefail
+
+# === Configuration ===
+PI5_USER="${PI5_USER:-pi}"
+PI5_IP="${PI5_IP:?Set PI5_IP environment variable (e.g. 192.168.1.100)}"
+PI5_SSH_KEY="${PI5_SSH_KEY:-$HOME/.ssh/id_rsa}"
+PC_BACKUP_DIR="${PC_BACKUP_DIR:-$HOME/nexgen-backups}"
+RETENTION_DAYS="${RETENTION_DAYS:-28}"
+
+SSH_OPTS="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=15 -i ${PI5_SSH_KEY}"
+
+# === Date-stamped target ===
+TODAY=$(date +%Y-%m-%d)
+WEEKLY_DIR="${PC_BACKUP_DIR}/weekly/${TODAY}"
+LOG_FILE="${PC_BACKUP_DIR}/pull.log"
+
+mkdir -p "${WEEKLY_DIR}"
+mkdir -p "${PC_BACKUP_DIR}/churn"
+
+log() {
+    echo "$(date '+%Y-%m-%d %H:%M:%S') | $1" | tee -a "${LOG_FILE}"
+}
+
+# === Step 1: Rsync active backups ===
+log "Pulling active backups from Pi5 (${PI5_IP})..."
+if rsync -avz -e "ssh ${SSH_OPTS}" \
+    "${PI5_USER}@${PI5_IP}:/backups/active/" \
+    "${WEEKLY_DIR}/" 2>>"${LOG_FILE}"; then
+    log "Active backups synced to ${WEEKLY_DIR}"
+else
+    log "ERROR: Failed to rsync active backups from Pi5"
+    exit 1
+fi
+
+# === Step 2: Mirror churn archives ===
+log "Mirroring churn archives..."
+if rsync -avz -e "ssh ${SSH_OPTS}" \
+    "${PI5_USER}@${PI5_IP}:/backups/churn/" \
+    "${PC_BACKUP_DIR}/churn/" 2>>"${LOG_FILE}"; then
+    log "Churn archives synced"
+else
+    log "WARNING: Failed to rsync churn archives (non-fatal)"
+fi
+
+# === Step 3: Cleanup old weeklies ===
+log "Cleaning up backups older than ${RETENTION_DAYS} days..."
+find "${PC_BACKUP_DIR}/weekly" -maxdepth 1 -type d -mtime +${RETENTION_DAYS} -exec rm -rf {} \; 2>>"${LOG_FILE}"
+REMAINING=$(ls -d "${PC_BACKUP_DIR}/weekly"/*/ 2>/dev/null | wc -l)
+log "Cleanup done. ${REMAINING} weekly snapshots retained."
+
+log "Pull complete."
+```
+
+- [ ] **Step 2: Make script executable and verify syntax**
+
+```bash
+chmod +x scripts/nexgen-backup-pull.sh
+bash -n scripts/nexgen-backup-pull.sh
+# Expected: no output (syntax OK)
+```
+
+- [ ] **Step 3: Set up Pi5 cron for weekly backup**
+
+SSH into Pi5 and add the cron entry:
+
+```bash
+# On Pi5:
+crontab -e
+
+# Add this line (03:00 HKT = 19:00 UTC on the day before):
+# Run backup every Sunday at 03:00 HKT (UTC+8 = 19:00 UTC Saturday)
+0 19 * * 6 cd /home/pi/onboarding-pipeline/pi5-worker && /usr/bin/python3 -m backup >> /home/pi/backups/cron.log 2>&1
+```
+
+Verify:
+```bash
+crontab -l | grep backup
+# Expected: the cron line above
+```
+
+- [ ] **Step 4: Test PC pull script manually**
+
+On admin PC:
+```bash
+# Set Pi5 IP
+export PI5_IP=192.168.1.100  # your Pi5's IP
+export PI5_SSH_KEY=~/.ssh/nexgen_pi5
+
+# Run manually
+./scripts/nexgen-backup-pull.sh
+
+# Verify files landed
+ls ~/nexgen-backups/weekly/$(date +%Y-%m-%d)/
+# Expected: customer directories (T1043/, T1044/, etc.) with backup files
+```
+
+- [ ] **Step 5: Commit**
+
+```bash
+git add scripts/nexgen-backup-pull.sh
+git commit -m "feat(plan-b): PC pull script + Pi5 backup cron setup"
+```
+
+---
+
+### Task 14: Backup E2E Test (during P2)
+
+**Spec:** `docs/superpowers/specs/2026-03-27-customer-backup-strategy-design.md` — Section 9
+
+**Files:** No new files — this task validates the backup system end-to-end on a real VPS.
+
+**Prerequisite:** Task 9 (E2E test) must pass first — you need at least one deployed customer VPS to test backup against.
+
+- [ ] **Step 1: Test Qdrant snapshot API on live VPS**
+
+```bash
+# SSH into the test VPS
+ssh -i ~/.ssh/nexgen_automation deploy@{TEST_VPS_IP}
+
+# Create snapshot
+curl -s -X POST http://localhost:6333/collections/mem0/snapshots | jq .
+# Expected: {"result":{"name":"mem0-XXXXX.snapshot"}}
+
+# Verify file exists
+ls -la /qdrant/snapshots/mem0/
+# Expected: snapshot file present
+```
+
+- [ ] **Step 2: Run single VPS backup manually**
+
+On Pi5:
+```bash
+cd ~/onboarding-pipeline/pi5-worker
+
+# Run backup for just the test VPS
+python3 -c "
+import config
+from api_client import ApiClient
+from notifier import Notifier
+from backup import BackupOrchestrator
+
+api = ApiClient(config.CF_WORKER_URL, config.WORKER_TOKEN)
+notifier = Notifier(config.OWNER_TELEGRAM_BOT_TOKEN, config.OWNER_TELEGRAM_CHAT_ID)
+orch = BackupOrchestrator(api, notifier)
+result = orch.backup_single_vps({
+    'vps_id': 'TEST_VPS_ID',
+    'contabo_ip': 'TEST_VPS_IP',
+    'customer_id': 'T_TEST',
+    'tier': 2,
+})
+print(result)
+"
+
+# Verify files on Pi5
+ls -la ~/backups/active/T_TEST/
+# Expected: clawd.tar.gz, qdrant-snapshot.tar.gz, mem0.db, backup-meta.json
+cat ~/backups/active/T_TEST/backup-meta.json | jq .
+# Expected: valid JSON with status=success
+```
+
+- [ ] **Step 3: Test PC pull**
+
+On admin PC:
+```bash
+export PI5_IP=your_pi5_ip
+./scripts/nexgen-backup-pull.sh
+
+ls ~/nexgen-backups/weekly/$(date +%Y-%m-%d)/T_TEST/
+# Expected: same files as on Pi5
+```
+
+- [ ] **Step 4: Full restore to fresh VPS**
+
+```bash
+# On Pi5 — provision a fresh test VPS (or use a second test VPS)
+# Then restore:
+cd ~/onboarding-pipeline/pi5-worker
+python3 -m restore T_TEST {FRESH_VPS_IP}
+
+# SSH into the restored VPS and verify:
+ssh deploy@{FRESH_VPS_IP}
+ls ~/clawd/
+# Expected: soul.md, memory.md, tool.md, openclaw.json, etc.
+curl -s http://localhost:6333/collections/mem0 | jq '.result.points_count'
+# Expected: > 0 (vectors restored)
+ls ~/mem0.db
+# Expected: file exists
+```
+
+- [ ] **Step 5: Record test results**
+
+Update the test VPS setup log with backup test results. If all 4 steps pass, backup system is verified for production.
+
+---
+
 ## Post-completion
 
 Plan B is complete when:
@@ -2596,6 +3680,7 @@ Plan B is complete when:
 7. Owner receives Telegram notifications
 8. Customer receives bot messages
 9. Cancel job handler works (wipe → cancel → D1 update)
+10. Backup system verified: VPS→Pi5 weekly backup, PC pull script, full restore tested on real VPS
 
 **Cost per deployment (Agent SDK):** $0 marginal cost — runs on Claude Max plan ($100/mo flat). No per-token charges. The Max plan also covers your personal Claude Code usage.
 
