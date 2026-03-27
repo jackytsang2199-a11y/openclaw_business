@@ -13,3 +13,12 @@ await env.DB.exec("CREATE TABLE IF NOT EXISTS health (worker_id TEXT PRIMARY KEY
 
 await env.DB.exec("DROP TABLE IF EXISTS vps_instances");
 await env.DB.exec("CREATE TABLE IF NOT EXISTS vps_instances (vps_id TEXT PRIMARY KEY, contabo_contract_id TEXT, contabo_ip TEXT, customer_id TEXT, status TEXT NOT NULL, tier INTEGER, reinstall_count INTEGER DEFAULT 0, billing_start TEXT, cancel_date TEXT, cancel_deadline TEXT, created_at TEXT NOT NULL, updated_at TEXT NOT NULL)");
+
+await env.DB.exec("DROP TABLE IF EXISTS api_usage");
+await env.DB.exec("CREATE TABLE IF NOT EXISTS api_usage (id INTEGER PRIMARY KEY AUTOINCREMENT, customer_id TEXT NOT NULL, gateway_token TEXT NOT NULL UNIQUE, tier INTEGER NOT NULL, monthly_budget_hkd REAL, current_month TEXT NOT NULL, current_spend_hkd REAL DEFAULT 0, warned_at TEXT, blocked_at TEXT, total_requests INTEGER DEFAULT 0, total_tokens_in INTEGER DEFAULT 0, total_tokens_out INTEGER DEFAULT 0, created_at TEXT NOT NULL, updated_at TEXT NOT NULL)");
+
+await env.DB.exec("DROP TABLE IF EXISTS usage_history");
+await env.DB.exec("CREATE TABLE IF NOT EXISTS usage_history (id INTEGER PRIMARY KEY AUTOINCREMENT, customer_id TEXT NOT NULL, month TEXT NOT NULL, spend_hkd REAL NOT NULL, requests INTEGER NOT NULL, tokens_in INTEGER NOT NULL, tokens_out INTEGER NOT NULL, budget_hkd REAL, created_at TEXT NOT NULL)");
+
+await env.DB.exec("DROP TABLE IF EXISTS audit_log");
+await env.DB.exec("CREATE TABLE IF NOT EXISTS audit_log (id INTEGER PRIMARY KEY AUTOINCREMENT, action TEXT NOT NULL, customer_id TEXT NOT NULL, details TEXT, actor_ip TEXT, created_at TEXT NOT NULL)");
