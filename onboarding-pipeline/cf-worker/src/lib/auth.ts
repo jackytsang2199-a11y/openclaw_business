@@ -44,3 +44,10 @@ export function notFound(message: string): Response {
     headers: { "Content-Type": "application/json" },
   });
 }
+
+export function tooManyRequests(message: string): Response {
+  return new Response(JSON.stringify({ error: message }), {
+    status: 429,
+    headers: { "Content-Type": "application/json" },
+  });
+}

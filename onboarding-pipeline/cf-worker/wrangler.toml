@@ -1,0 +1,31 @@
+name = "nexgen-api"
+main = "src/index.ts"
+compatibility_date = "2025-03-01"
+
+# Custom domain: api.3nexgen.com (configured in Cloudflare DNS)
+routes = [
+  { pattern = "api.3nexgen.com/*", zone_name = "3nexgen.com" }
+]
+
+# D1 database binding
+[[d1_databases]]
+binding = "DB"
+database_name = "nexgen-jobs"
+database_id = "3456a3ee-7d15-4db2-9af1-27c274a31322"
+
+# Environment variables (non-secret defaults)
+[vars]
+VARIANT_TIER_MAP = '{"placeholder_variant_1":1,"placeholder_variant_2":2,"placeholder_variant_3":3}'
+OWNER_TELEGRAM_CHAT_ID = "340067089"
+AI_GATEWAY_URL = "https://gateway.ai.cloudflare.com/v1/1f795f0b317d0782747c02367903dbe8/nexgen-api-proxy"
+DEEPSEEK_INPUT_RATE = "0.000001"
+DEEPSEEK_OUTPUT_RATE = "0.000002"
+OPENAI_INPUT_RATE = "0.000003"
+OPENAI_OUTPUT_RATE = "0.000006"
+USD_TO_HKD = "7.8"
+
+# Secrets (set via `wrangler secret put`):
+# LEMONSQUEEZY_WEBHOOK_SECRET — HMAC signing secret from Lemon Squeezy
+# WORKER_TOKEN              — Pi5 authenticates with this
+# CONFIRM_API_KEY           — You authenticate manual confirms with this
+# OWNER_TELEGRAM_BOT_TOKEN  — Your personal bot token (for alerts)
