@@ -20,9 +20,15 @@ export default {
       return handleWebhook(request, env);
     }
 
-    // Route: Manual confirm (FPS/PayMe)
-    if (method === "POST" && path === "/api/confirm") {
-      return handleConfirm(request, env);
+    // Route: Order submission (public — no auth)
+    if (method === "POST" && path === "/api/orders") {
+      return handleCreateOrder(request, env);
+    }
+
+    // Route: Manual payment confirm (admin only)
+    const confirmMatch = path.match(/^\/api\/confirm\/(\d+)$/);
+    if (method === "POST" && confirmMatch) {
+      return handleConfirm(request, env, confirmMatch[1]);
     }
 
     // Route: Pi5 polls for next job
@@ -31,7 +37,7 @@ export default {
     }
 
     // Route: Pi5 updates job status
-    const jobMatch = path.match(/^\/api\/jobs\/(T\d+)$/);
+    const jobMatch = path.match(/^\/api\/jobs\/(\d+)$/);
     if (method === "PATCH" && jobMatch) {
       return handleUpdateJob(request, env, jobMatch[1]);
     }
@@ -41,19 +47,18 @@ export default {
       return handleHealthPing(request, env);
     }
 
-    // Route: Order submission (public — no auth)
-    if (method === "POST" && path === "/api/orders") {
-      return handleCreateOrder(request, env);
-    }
-
     // Catch-all
     return json({ error: "Not found", endpoints: [
+      "POST /api/orders",
       "POST /api/webhook/lemonsqueezy",
-      "POST /api/confirm",
+      "POST /api/confirm/:orderId",
       "GET  /api/jobs/next",
       "PATCH /api/jobs/:id",
       "POST /api/health",
-      "POST /api/orders",
+      "GET  /api/vps/recyclable",
+      "POST /api/vps",
+      "PATCH /api/vps/:id",
+      "GET  /api/vps?status=:status",
     ]}, 404);
   },
 };
