@@ -12,6 +12,7 @@ adaptive decisions — this is the "AI is the operator" architecture.
 
 import subprocess
 import os
+import secrets
 import anyio
 from pathlib import Path
 from typing import Optional
@@ -115,6 +116,36 @@ class Deployer:
             return None
         return {"token": bot_token, "username": bot_username or "unknown"}
 
+    def _generate_gateway_token(self) -> str:
+        """Generate a 64-character hex gateway token."""
+        return secrets.token_hex(32)
+
+    def _build_client_env(
+        self,
+        job_id: str,
+        tier: int,
+        bot_token: str,
+        telegram_user_id: str,
+        gateway_token: str,
+    ) -> str:
+        """Build client.env content with gateway config instead of raw API keys."""
+        return (
+            f"CLIENT_ID={job_id}\n"
+            f"TIER={tier}\n"
+            f"AI_GATEWAY_URL={config.AI_GATEWAY_URL}\n"
+            f"AI_GATEWAY_TOKEN={gateway_token}\n"
+            f"TELEGRAM_BOT_TOKEN={bot_token}\n"
+            f"TELEGRAM_ALLOWED_USERS={telegram_user_id}\n"
+        )
+
+    def _register_gateway_token(self, job_id: str, gateway_token: str, tier: int):
+        """Register the gateway token with the CF Worker usage API."""
+        self.api.register_gateway_token(
+            customer_id=job_id,
+            gateway_token=gateway_token,
+            tier=tier,
+        )
+
     async def _run_agent_deployment(
         self,
         job_id: str,
@@ -129,14 +160,15 @@ class Deployer:
         """
         from claude_code_sdk import query, ClaudeCodeOptions, ResultMessage
 
-        # Build client.env content (never written to disk until the agent does it)
-        client_env = (
-            f"CLIENT_ID={job_id}\n"
-            f"TIER={tier}\n"
-            f"DEEPSEEK_API_KEY={config.DEEPSEEK_API_KEY}\n"
-            f"OPENAI_API_KEY={config.OPENAI_API_KEY}\n"
-            f"TELEGRAM_BOT_TOKEN={bot_token}\n"
-            f"TELEGRAM_ALLOWED_USERS={telegram_user_id}\n"
+        # Build client.env content with gateway token (no raw API keys)
+        gateway_token = self._generate_gateway_token()
+        self._register_gateway_token(job_id, gateway_token, tier)
+        client_env = self._build_client_env(
+            job_id=job_id,
+            tier=tier,
+            bot_token=bot_token,
+            telegram_user_id=telegram_user_id,
+            gateway_token=gateway_token,
         )
 
         prompt = build_deployment_prompt(

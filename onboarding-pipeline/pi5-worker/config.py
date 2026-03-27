@@ -23,9 +23,8 @@ OPENCLAW_INSTALL_DIR = Path(os.environ.get("OPENCLAW_INSTALL_DIR", str(Path.home
 ARCHIVES_DIR = Path(os.environ.get("ARCHIVES_DIR", str(Path.home() / "archives")))
 SSH_KEY_PATH = Path(os.environ.get("SSH_KEY_PATH", str(Path.home() / ".ssh" / "nexgen_automation")))
 
-# API Keys
-DEEPSEEK_API_KEY = os.environ["DEEPSEEK_API_KEY"]
-OPENAI_API_KEY = os.environ["OPENAI_API_KEY"]
+# AI Gateway (real API keys stored in CF Secrets Store, not on Pi5)
+AI_GATEWAY_URL = os.environ.get("AI_GATEWAY_URL", "https://api.3nexgen.com/api/ai")
 
 # Agent SDK (uses Claude Max plan via ~/.claude/ OAuth — no API key needed)
 AGENT_MAX_TURNS = int(os.environ.get("AGENT_MAX_TURNS", "50"))
