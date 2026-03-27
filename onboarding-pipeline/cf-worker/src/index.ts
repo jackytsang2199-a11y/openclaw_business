@@ -4,6 +4,7 @@ import { handleConfirm } from "./handlers/confirm";
 import { handleGetNextJob, handleUpdateJob } from "./handlers/jobs";
 import { handleHealthPing, checkPi5Health } from "./handlers/health";
 import { handleCreateOrder } from "./handlers/orders";
+import { handleGetRecyclableVps, handleCreateVps, handleUpdateVps, handleListVps } from "./handlers/vps";
 import { json } from "./lib/auth";
 
 export default {
@@ -45,6 +46,27 @@ export default {
     // Route: Pi5 health ping
     if (method === "POST" && path === "/api/health") {
       return handleHealthPing(request, env);
+    }
+
+    // Route: VPS recyclable check
+    if (method === "GET" && path === "/api/vps/recyclable") {
+      return handleGetRecyclableVps(request, env);
+    }
+
+    // Route: VPS list by status
+    if (method === "GET" && path === "/api/vps") {
+      return handleListVps(request, env);
+    }
+
+    // Route: VPS create
+    if (method === "POST" && path === "/api/vps") {
+      return handleCreateVps(request, env);
+    }
+
+    // Route: VPS update
+    const vpsMatch = path.match(/^\/api\/vps\/(.+)$/);
+    if (method === "PATCH" && vpsMatch) {
+      return handleUpdateVps(request, env, vpsMatch[1]);
     }
 
     // Catch-all
