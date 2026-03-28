@@ -651,3 +651,57 @@ Group by logical change:
 ```bash
 git push origin main
 ```
+
+---
+
+## Appendix: Pi5 Operational Setup Commands
+
+### Dashboard Cron (every 15 minutes)
+
+```bash
+# On Pi5, as the service user:
+chmod +x ~/nexgen-worker/scripts/nexgen-dashboard-cron.sh
+
+# Add to crontab:
+(crontab -l 2>/dev/null; echo "*/15 * * * * ~/nexgen-worker/scripts/nexgen-dashboard-cron.sh") | crontab -
+
+# Verify:
+crontab -l | grep dashboard
+
+# Test manually:
+~/nexgen-worker/scripts/nexgen-dashboard-cron.sh
+cat ~/nexgen-dashboard.md
+```
+
+### Required .env Variables for Dashboard
+
+The dashboard reads from `~/nexgen-worker/.env`:
+
+```
+CF_WORKER_URL=https://api.3nexgen.com
+WORKER_TOKEN=<pi5 worker token>
+CONFIRM_API_KEY=<admin API key for usage endpoints>
+SSH_KEY_PATH=~/.ssh/nexgen_automation
+BACKUPS_DIR=~/backups
+```
+
+### Reading Dashboard from OpenClaw
+
+Your personal OpenClaw assistant can read the dashboard:
+
+> "Read the file ~/nexgen-dashboard.md and summarize the status"
+
+The dashboard updates every 15 minutes via cron. It shows:
+- Pi5 worker service status
+- VPS instances health (gateway, watchdog, Qdrant, SearXNG, disk, memory)
+- API usage per customer (spend, budget, blocked status)
+- Backup status and age warnings
+
+### VPS Recycling (Not Yet Tested Live)
+
+The recycling flow (cancel VPS -> enter pool -> revoke + reinstall for new customer) has code in `vps_lifecycle.py` but has NOT been tested against the live Contabo API. Before relying on it:
+
+1. Test `contabo-cancel.sh` with a disposable VPS
+2. Verify the cancel endpoint returns a termination deadline
+3. Test `contabo-revoke.sh` — this endpoint is unverified per the Contabo API guide
+4. If revoke fails, fallback is manual panel cancellation revoke + Telegram alert to owner
