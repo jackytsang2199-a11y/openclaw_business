@@ -64,7 +64,7 @@
 | 1 | Contabo 首單手動下單 | VPS | 未開始 | 清 fraud verification，之後 API provisioning 才能用 |
 | 2 | Contabo API credentials 更新到 Pi5 `.env` | VPS | 未開始 | 目前係 placeholder |
 | 3 | VPS E2E Mem0 capture 測試 | Pipeline | Blocked | VPS 161.97.82.155 unreachable，需要新 VPS 測試 |
-| 4 | Update deployer.py — remove real key injection | Code | 未開始 | 改為只用 gateway token |
+| 4 | ~~Update deployer.py — remove real key injection~~ | Code | ✅ | gateway_token only, no os.environ real keys |
 | 5 | Website final build + deploy | Website | 未開始 | Lovable → Cloudflare Pages |
 | 6 | Payment integration（Lemon Squeezy） | Payment | 未開始 | 需要 webhook → CF Worker `/api/confirm` |
 
@@ -74,7 +74,7 @@
 |---|------|----------|--------|-------|
 | 7 | VPS recycling pool E2E test | Pipeline | 未測試 | revoke + reinstall flow |
 | 8 | Backup/restore E2E test | Pipeline | 未測試 | 需要 active VPS 做 backup cycle |
-| 9 | Pin Qdrant Docker image to v1.14.0 | Scripts | 未開始 | 兼容 mem0ai client v1.13.0 |
+| 9 | ~~Pin Qdrant Docker image to v1.14.0~~ | Scripts | ✅ | qdrant/qdrant:v1.14.0 in 05-setup-qdrant.sh |
 | 10 | Telegram 客服 bot + Knowledge Base | Customer | 未開始 | FAQ + pricing + troubleshooting |
 | 11 | 商業登記 | Legal | 未開始 | HK business registration |
 | 12 | 客人交付 message template | Onboarding | 未開始 | 包含 bot setup guide、gateway info |
@@ -205,6 +205,6 @@ openclaw_setup_business/
 | CF Worker endpoints | 19 |
 | Admin usage endpoints | 8 |
 | Website design iterations | 14 |
-| Critical remaining tasks | 6 |
+| Critical remaining tasks | 5 |
 | Startup cost | ~HK$300-400 |
 | 目標：第一個客 | Phase 1（pending Contabo + website） |

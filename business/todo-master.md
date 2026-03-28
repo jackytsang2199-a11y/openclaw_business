@@ -76,8 +76,8 @@
 | N10 | Mem0 "404 no body" proxy bug fix | Bug | ✅ | Missing /v1 in OpenAI base URL |
 | N11 | Contabo first manual order | VPS | ⏳ | Clear fraud verification before API works |
 | N12 | Lemon Squeezy → CF Worker webhook | Payment | ⏳ | Webhook → /api/confirm → D1 job |
-| N13 | Update deployer.py — gateway token only | Code | ⏳ | Remove real key injection |
-| N14 | Pin Qdrant Docker to v1.14.0 | Scripts | ⏳ | Compatibility with mem0ai client |
+| N13 | Update deployer.py — gateway token only | Code | ✅ | _build_client_env uses gateway_token, not os.environ |
+| N14 | Pin Qdrant Docker to v1.14.0 | Scripts | ✅ | qdrant/qdrant:v1.14.0 in 05-setup-qdrant.sh |
 
 ---
 
@@ -126,9 +126,9 @@
 
 | 狀態 | 數量 |
 |------|------|
-| ✅ Completed | 22 |
+| ✅ Completed | 24 |
 | ❌ Cancelled/Replaced | 12 |
 | 🔄 In Progress | 1 |
-| ⏳ Pending | 27 |
+| ⏳ Pending | 25 |
 | ⏸️ Deferred | 3 |
 | **Total** | **65** (original 53 + 14 new - 2 merged) |

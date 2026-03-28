@@ -45,7 +45,9 @@ cat > ~/.openclaw/env << ENV_EOF
 AI_GATEWAY_URL=$AI_GATEWAY_URL
 AI_GATEWAY_TOKEN=$AI_GATEWAY_TOKEN
 DEEPSEEK_API_KEY=$DEEPSEEK_API_KEY
+DEEPSEEK_BASE_URL=${AI_GATEWAY_URL}/deepseek
 OPENAI_API_KEY=$OPENAI_API_KEY
+OPENAI_BASE_URL=${AI_GATEWAY_URL}/openai
 ENV_EOF
 chmod 600 ~/.openclaw/env
 log "Env file written (proxy-only — all keys are gateway tokens)."
