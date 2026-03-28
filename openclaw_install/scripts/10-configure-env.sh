@@ -15,19 +15,15 @@ fi
 source "$CLIENT_ENV"
 
 # Validate required vars
-for var in CLIENT_ID TIER AI_GATEWAY_URL AI_GATEWAY_TOKEN TELEGRAM_BOT_TOKEN TELEGRAM_ALLOWED_USERS; do
+for var in CLIENT_ID TIER AI_GATEWAY_URL AI_GATEWAY_TOKEN DEEPSEEK_API_KEY TELEGRAM_BOT_TOKEN TELEGRAM_ALLOWED_USERS; do
   if [ -z "${!var:-}" ]; then
     error "Missing required variable: $var in client.env"
   fi
 done
 
-# Mem0 keys are optional — only needed for Tier 2+ (injected into openclaw.json, NOT env file)
-# The env file uses gateway token for chat routing; openclaw.json has real keys for Mem0
-DEEPSEEK_API_KEY="${DEEPSEEK_API_KEY:-}"
-OPENAI_API_KEY="${OPENAI_API_KEY:-}"
-if [ "$TIER" -ge 2 ] && { [ -z "$DEEPSEEK_API_KEY" ] || [ -z "$OPENAI_API_KEY" ]; }; then
-  error "Tier 2+ requires DEEPSEEK_API_KEY and OPENAI_API_KEY for Mem0 (local embeddings)"
-fi
+# In proxy-only mode, DEEPSEEK_API_KEY and OPENAI_API_KEY are both the gateway token.
+# Real API keys live in CF Worker secrets — never on customer VPS.
+OPENAI_API_KEY="${OPENAI_API_KEY:-$AI_GATEWAY_TOKEN}"
 
 log "Configuring for client: $CLIENT_ID (Tier $TIER)"
 
@@ -41,18 +37,18 @@ docker ps --filter name=searxng --format '{{.Names}}' | grep -q searxng || error
 GATEWAY_TOKEN="${AI_GATEWAY_TOKEN}"
 log "Using pre-registered gateway token."
 
-# Write env file — gateway proxy URLs for OpenClaw chat routing (cost tracking)
-# Mem0 real API keys are in openclaw.json, NOT here
+# Write env file — loaded by systemd EnvironmentFile drop-in into gateway process
+# ALL keys are gateway tokens — real API keys live only in CF Worker secrets.
+# DEEPSEEK_API_KEY is the gateway token; OpenClaw sends it as Bearer to the proxy,
+# which validates it and swaps for the real DeepSeek key.
 cat > ~/.openclaw/env << ENV_EOF
 AI_GATEWAY_URL=$AI_GATEWAY_URL
 AI_GATEWAY_TOKEN=$AI_GATEWAY_TOKEN
-DEEPSEEK_API_KEY=${GATEWAY_TOKEN}
-DEEPSEEK_BASE_URL=${AI_GATEWAY_URL}/deepseek
-OPENAI_API_KEY=${GATEWAY_TOKEN}
-OPENAI_BASE_URL=${AI_GATEWAY_URL}/openai
+DEEPSEEK_API_KEY=$DEEPSEEK_API_KEY
+OPENAI_API_KEY=$OPENAI_API_KEY
 ENV_EOF
 chmod 600 ~/.openclaw/env
-log "Gateway proxy URLs + token written to ~/.openclaw/env"
+log "Env file written (proxy-only — all keys are gateway tokens)."
 
 # Build openclaw.json with client-specific values using python3 (jq not available)
 python3 << PYEOF
@@ -65,9 +61,8 @@ tier = int("$TIER")
 client_id = "$CLIENT_ID"
 bot_token = "$TELEGRAM_BOT_TOKEN"
 allowed_users = "$TELEGRAM_ALLOWED_USERS".split(",")
-deepseek_key = "$DEEPSEEK_API_KEY"
-openai_key = "$OPENAI_API_KEY"
 gateway_token = "$GATEWAY_TOKEN"
+gateway_url = "$AI_GATEWAY_URL"
 home = os.path.expanduser("~")
 
 # Telegram config
@@ -77,6 +72,18 @@ cfg["session"]["identityLinks"]["owner"] = [f"telegram:{uid}" for uid in allowed
 
 # Gateway token
 cfg["gateway"]["auth"]["token"] = gateway_token
+
+# Route DeepSeek chat through CF Worker proxy (for cost tracking)
+# OpenClaw sends DEEPSEEK_API_KEY (= gateway token) as Bearer to this URL,
+# proxy validates and swaps for real DeepSeek key.
+if "models" not in cfg:
+    cfg["models"] = {}
+if "providers" not in cfg["models"]:
+    cfg["models"]["providers"] = {}
+cfg["models"]["providers"]["deepseek"] = {
+    "baseUrl": f"{gateway_url}/deepseek",
+    "models": []
+}
 
 # Mem0 plugin config (Tier 2+)
 if tier >= 2:
@@ -97,7 +104,8 @@ if tier >= 2:
                     "config": {
                         "model": "text-embedding-3-small",
                         "embeddingDims": 1536,
-                        "apiKey": openai_key
+                        "apiKey": gateway_token,
+                        "baseURL": f"{gateway_url}/openai"
                     }
                 },
                 "vectorStore": {
@@ -105,14 +113,15 @@ if tier >= 2:
                     "config": {
                         "url": "http://localhost:6333",
                         "collectionName": f"client-{client_id}-memories",
-                        "embeddingModelDims": 1536
+                        "dimension": 1536
                     }
                 },
                 "llm": {
-                    "provider": "deepseek",
+                    "provider": "openai",
                     "config": {
                         "model": "deepseek-chat",
-                        "apiKey": deepseek_key
+                        "apiKey": gateway_token,
+                        "baseURL": f"{gateway_url}/deepseek"
                     }
                 },
                 "historyDbPath": f"{home}/clawd/mem0-history.db"

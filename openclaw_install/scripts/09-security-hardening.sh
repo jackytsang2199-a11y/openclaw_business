@@ -7,10 +7,13 @@ error() { echo "[$SCRIPT_NAME] ERROR: $1" >&2; exit 1; }
 export DEBIAN_FRONTEND=noninteractive
 
 # UFW setup (idempotent)
+# CRITICAL: Use '22/tcp' not 'OpenSSH' — the OpenSSH UFW application profile
+# may not exist on all Ubuntu images (e.g. Contabo). 'ufw allow OpenSSH' fails
+# silently with '|| true' and locks out SSH permanently. See: 2026-03-28 incident.
 log "Configuring UFW..."
 sudo ufw default deny incoming 2>/dev/null || true
 sudo ufw default allow outgoing 2>/dev/null || true
-sudo ufw allow OpenSSH 2>/dev/null || true
+sudo ufw allow 22/tcp 2>/dev/null || true
 sudo ufw --force enable 2>/dev/null || true
 
 # SSH hardening (idempotent)

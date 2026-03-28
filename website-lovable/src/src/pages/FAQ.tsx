@@ -28,7 +28,7 @@ const categories = [
       },
       {
         q: "支援甚麼設備？",
-        a: "支援 Raspberry Pi 5、任何 Linux VPS（如 DigitalOcean、Vultr）。我們也提供硬件代購服務。",
+        a: "支援 Raspberry Pi 5 及任何 Linux VPS。我們也提供硬件代購服務。",
       },
     ],
   },
@@ -45,7 +45,7 @@ const categories = [
       },
       {
         q: "接受甚麼付款方式？",
-        a: "目前接受 FPS 轉數快、PayMe、銀行轉帳和 PayPal（海外客戶）。信用卡自動扣款功能即將推出。",
+        a: "目前接受 Stripe、PayPal 及銀行轉帳。",
       },
     ],
   },
@@ -92,8 +92,9 @@ const categories = [
 const FAQ = () => (
   <section className="container py-20 max-w-3xl mx-auto">
     <div className="text-center space-y-4 mb-12">
-      <h1 className="text-3xl md:text-5xl">常見問題</h1>
-      <p className="text-muted-foreground text-lg">
+      <h1 className="text-3xl md:text-5xl">有問題？</h1>
+      <p className="text-lg text-muted-foreground mt-2">我們已經準備好答案</p>
+      <p className="text-muted-foreground">
         找不到答案？
         <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="text-primary font-medium hover:underline ml-1">
           WhatsApp 問我們
@@ -104,18 +105,18 @@ const FAQ = () => (
     <div className="space-y-10">
       {categories.map((cat) => (
         <div key={cat.title}>
-          <h2 className="text-xl mb-4">{cat.title}</h2>
+          <h2 className="text-2xl md:text-3xl mb-4">{cat.title}</h2>
           <Accordion type="single" collapsible className="space-y-2">
             {cat.faqs.map((faq, i) => (
               <AccordionItem
                 key={i}
                 value={`${cat.title}-${i}`}
-                className="rounded-2xl border border-border bg-card px-6 shadow-sm"
+                className="rounded-2xl border border-border bg-card px-6 shadow-sm hover:-translate-y-0.5 hover:shadow-lg transition-all duration-200"
               >
-                <AccordionTrigger className="text-left font-medium py-4 hover:no-underline">
+                <AccordionTrigger className="text-left font-medium py-4 hover:no-underline text-base">
                   {faq.q}
                 </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground leading-relaxed pb-4">
+                <AccordionContent className="text-muted-foreground leading-relaxed pb-4 text-base">
                   {faq.a}
                 </AccordionContent>
               </AccordionItem>

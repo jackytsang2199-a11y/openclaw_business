@@ -112,8 +112,8 @@ class TestGatewayTokenIntegration(unittest.TestCase):
         # Verify it's valid hex
         int(token, 16)
 
-    def test_client_env_contains_gateway_config(self):
-        """client.env has AI_GATEWAY_URL and AI_GATEWAY_TOKEN, no raw API keys."""
+    def test_client_env_contains_gateway_and_keys(self):
+        """client.env has gateway config + real DEEPSEEK key for all tiers."""
         token = "a" * 64
         env_content = self.deployer._build_client_env(
             job_id="1001",
@@ -124,11 +124,24 @@ class TestGatewayTokenIntegration(unittest.TestCase):
         )
         self.assertIn("AI_GATEWAY_URL=", env_content)
         self.assertIn(f"AI_GATEWAY_TOKEN={token}", env_content)
-        self.assertNotIn("DEEPSEEK_API_KEY", env_content)
-        self.assertNotIn("OPENAI_API_KEY", env_content)
+        self.assertIn("DEEPSEEK_API_KEY=", env_content)
+        self.assertIn("OPENAI_API_KEY=", env_content)
         self.assertIn("CLIENT_ID=1001", env_content)
         self.assertIn("TIER=2", env_content)
         self.assertIn("TELEGRAM_BOT_TOKEN=123:FAKE", env_content)
+
+    def test_tier1_has_deepseek_no_openai(self):
+        """Tier 1 includes DEEPSEEK_API_KEY but not OPENAI_API_KEY."""
+        token = "a" * 64
+        env_content = self.deployer._build_client_env(
+            job_id="1002",
+            tier=1,
+            bot_token="456:FAKE",
+            telegram_user_id="888",
+            gateway_token=token,
+        )
+        self.assertIn("DEEPSEEK_API_KEY=", env_content)
+        self.assertNotIn("OPENAI_API_KEY", env_content)
 
     def test_register_gateway_token_calls_api(self):
         """Deployer calls API to register gateway token during deploy."""

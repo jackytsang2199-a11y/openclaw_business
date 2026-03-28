@@ -22,17 +22,18 @@ Currently, every customer VPS receives the same master DeepSeek and OpenAI API k
 
 ## 2. Solution: Centralized API Proxy
 
-Route all customer API traffic through a Cloudflare AI Gateway, fronted by a CF Worker that enforces per-client cost limits.
+Route all customer API traffic through a CF Worker that authenticates per-client tokens, enforces cost limits, and forwards to provider APIs with injected real API keys.
 
 ### Architecture
 
+> **Implementation note (2026-03-28):** Originally designed with CF AI Gateway (BYOK) as intermediary. Changed to direct provider proxy because CF AI Gateway was not available in the account. Same security model — real API keys stored as CF Worker secrets, never on customer VPS.
+
 ```
 Customer VPS (OpenClaw)
-  → CF Worker (rate limiter + cost tracker)
-    → CF AI Gateway (BYOK — injects real API key)
-      → DeepSeek API / OpenAI API
-      ← response with token counts
-    ← CF Worker reads tokens, updates D1 spend
+  → CF Worker (auth + cost tracker + key injection)
+    → DeepSeek API / OpenAI API (directly, with real key)
+    ← response with token counts
+  ← CF Worker reads tokens, updates D1 spend
   ← response to customer (with budget warning header if applicable)
 ```
 
@@ -40,17 +41,17 @@ Customer VPS (OpenClaw)
 
 | Component | Responsibility |
 |---|---|
-| **CF AI Gateway** | Key storage (BYOK via Secrets Store), request forwarding, caching, fallback routing |
-| **CF Worker** | Per-client authentication, cost tracking, budget enforcement, admin API |
-| **D1** | `api_usage` table (per-client monthly spend), `audit_log` table |
+| **CF Worker** | Per-client authentication, cost tracking, budget enforcement, admin API, **API key injection** |
+| **CF Worker Secrets** | Real API keys (DeepSeek, OpenAI) — stored via `wrangler secret put`, never in source |
+| **D1** | `api_usage` table (per-client monthly spend), `usage_history`, `audit_log` table |
 | **Customer VPS** | Gateway token + gateway URL only. No real API keys. |
 | **Pi5** | Deployment orchestration only. No involvement in day-to-day API traffic. |
 
 ### Why this architecture
 
 - **Reliability:** Customer API traffic goes through Cloudflare's edge (99.9%+ uptime), not through the Pi5's home network. If the Pi5 goes down, existing customers keep working.
-- **Security:** Real API keys exist only in Cloudflare Secrets Store. Customer VPS never has them.
-- **Cost:** Cloudflare AI Gateway is free (100K logs/month). No extra servers needed.
+- **Security:** Real API keys exist only in CF Worker secrets (encrypted at rest). Customer VPS never has them.
+- **Cost:** Zero additional cost — CF Worker free tier (100K requests/day). No extra servers needed.
 - **Control:** CF Worker has full programmatic control over every request — per-client limits, logging, blocking.
 
 ---
@@ -66,13 +67,12 @@ Customer VPS sends:
   POST https://api.3nexgen.com/api/ai/deepseek/chat/completions
   Header: Authorization: Bearer {gateway_token}
 
-CF Worker then forwards to AI Gateway:
-  POST https://gateway.ai.cloudflare.com/v1/{account_id}/{gateway_id}/deepseek/chat/completions
-  Header: cf-aig-authorization: Bearer {secrets_store_key}
-  Header: cf-aig-metadata: {"customer_id": "1001"}   ← set by Worker, NOT by customer
+CF Worker then forwards directly to provider:
+  POST https://api.deepseek.com/chat/completions
+  Header: Authorization: Bearer {real_api_key_from_worker_secrets}
 ```
 
-The customer VPS never communicates with the AI Gateway directly. All traffic goes through the CF Worker at `api.3nexgen.com`, which authenticates the customer, checks budget, then forwards to the AI Gateway.
+The customer VPS never communicates with provider APIs directly. All traffic goes through the CF Worker at `api.3nexgen.com`, which authenticates the customer, checks budget, injects the real API key, and forwards to the provider.
 
 ### Token → identity mapping
 
@@ -179,8 +179,9 @@ POST /api/ai/{provider}/chat/completions
 6. If monthly_budget_hkd is NULL → skip enforcement (track only, no limit)
    If monthly_budget_hkd is not NULL:
    a. If current_spend_hkd >= monthly_budget_hkd → 429 "Monthly usage limit reached"
-7. Set cf-aig-metadata header: {"customer_id": customer_id, "tier": tier}
-8. Forward request to CF AI Gateway
+7. Resolve provider base URL (deepseek → api.deepseek.com, openai → api.openai.com)
+   If unknown provider → 400 "Unknown provider"
+8. Inject real API key from Worker secrets, forward to provider API
 9. Read response usage: prompt_tokens, completion_tokens
 10. Calculate cost in HKD
 11. UPDATE api_usage:

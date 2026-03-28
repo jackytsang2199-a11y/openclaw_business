@@ -4,66 +4,78 @@
 
 @layer base {
   :root {
-    /* Warm cream light theme for ClawHK */
-    --background: 28 100% 98%;
-    --foreground: 350 22% 14%;
+    /* 60% — Clean, neutral light surfaces */
+    --background: 0 0% 98%;
+    --foreground: 222 47% 11%;
 
-    --card: 25 100% 97%;
-    --card-foreground: 350 22% 14%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
 
-    --popover: 25 100% 97%;
-    --popover-foreground: 350 22% 14%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
 
-    --primary: 14 55% 50%;
-    --primary-foreground: 28 100% 98%;
+    --secondary: 210 20% 96%;
+    --secondary-foreground: 215 16% 47%;
 
-    --secondary: 25 20% 94%;
-    --secondary-foreground: 340 7% 40%;
+    --muted: 210 20% 96%;
+    --muted-foreground: 215 16% 47%;
 
-    --muted: 25 15% 91%;
-    --muted-foreground: 340 7% 55%;
+    --section-alt: 210 15% 95%;
 
-    --accent: 15 55% 89%;
-    --accent-foreground: 14 55% 50%;
+    /* 30% — Dark slate for hero, dark sections, footer */
+    --dark-surface: 222 47% 6%;
+    --dark-surface-elevated: 222 40% 10%;
+    --dark-section: 222 47% 8%;
+    --dark-section-foreground: 210 40% 96%;
 
+    /* 10% — Single accent: blue */
+    --primary: 217 91% 60%;
+    --primary-foreground: 0 0% 100%;
+    --primary-light: 217 91% 95%;
+    --ring: 217 91% 60%;
+
+    --accent: 217 91% 95%;
+    --accent-foreground: 217 91% 50%;
+
+    --success: 142 60% 40%;
     --destructive: 0 72% 51%;
-    --destructive-foreground: 28 100% 98%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 350 22% 14% / 0.08;
-    --input: 350 22% 14% / 0.08;
-    --ring: 14 55% 50%;
+    --border: 222 47% 11% / 0.08;
+    --input: 222 47% 11% / 0.08;
 
     --radius: 1rem;
 
-    --sidebar-background: 28 100% 98%;
-    --sidebar-foreground: 340 7% 40%;
-    --sidebar-primary: 14 55% 50%;
-    --sidebar-primary-foreground: 28 100% 98%;
-    --sidebar-accent: 25 20% 94%;
-    --sidebar-accent-foreground: 340 7% 40%;
-    --sidebar-border: 350 22% 14% / 0.06;
-    --sidebar-ring: 14 55% 50%;
+    /* Hero gradient — dark slate */
+    --hero-gradient: linear-gradient(135deg, #1E293B 0%, #0F172A 50%, #020617 100%);
 
-    /* Custom tokens */
+    /* Accent system — for tag badges only */
+    --accent-teal: 172 50% 42%;
+    --accent-teal-light: 172 40% 94%;
+    --accent-amber: 36 90% 52%;
+    --accent-amber-light: 36 60% 94%;
+
+    /* Sidebar (keep functional) */
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 215 16% 47%;
+    --sidebar-primary: 217 91% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 210 20% 96%;
+    --sidebar-accent-foreground: 215 16% 47%;
+    --sidebar-border: 222 47% 11% / 0.06;
+    --sidebar-ring: 217 91% 60%;
+
     --whatsapp: 142 70% 45%;
-
-    /* Alternating section bg — noticeably darker cream */
-    --section-alt: 25 30% 93%;
-
-    /* Hero gradient */
-    --hero-gradient: linear-gradient(135deg, #E8D5C4 0%, #F5C6AA 30%, #E6A889 60%, #D4826A 100%);
-
-    /* FOMO dark */
-    --fomo-bg: #1A1215;
-
-    /* Footer dark */
-    --footer-bg: #2A1A1D;
   }
 }
 
 @layer base {
   * {
     @apply border-border;
+  }
+
+  *:focus-visible {
+    @apply ring-2 ring-primary ring-offset-2 ring-offset-background outline-none;
   }
 
   body {
@@ -73,7 +85,7 @@
 
   h1 {
     font-family: 'Noto Sans TC', 'Inter', system-ui, sans-serif;
-    @apply font-extrabold;
+    @apply font-bold;
     line-height: 1.3;
   }
 
@@ -100,5 +112,35 @@
 
   code, .font-mono {
     font-family: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+  }
+}
+
+@layer components {
+  /* Button press feedback */
+  .btn-press {
+    @apply active:scale-[0.97] transition-all duration-150;
+  }
+
+  /* Card hover — stronger */
+  .card-hover {
+    @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-xl;
+  }
+
+  /* Glass morphism */
+  .glass {
+    @apply bg-white/[0.08] backdrop-blur-xl border border-white/[0.12];
+  }
+
+  /* Geometric pattern overlay for hero */
+  .hero-pattern {
+    background-image:
+      radial-gradient(circle at 20% 80%, rgba(255,255,255,0.06) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(255,255,255,0.04) 0%, transparent 50%),
+      radial-gradient(circle at 50% 50%, rgba(0,0,0,0.08) 0%, transparent 70%);
+  }
+
+  /* Decorative line */
+  .deco-line {
+    @apply w-12 h-1 rounded-full bg-primary mx-auto;
   }
 }

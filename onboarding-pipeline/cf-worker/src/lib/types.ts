@@ -6,7 +6,8 @@ export interface Env {
   OWNER_TELEGRAM_BOT_TOKEN: string;
   OWNER_TELEGRAM_CHAT_ID: string;
   VARIANT_TIER_MAP: string;
-  AI_GATEWAY_URL: string;
+  DEEPSEEK_API_KEY: string;
+  OPENAI_API_KEY: string;
   DEEPSEEK_INPUT_RATE: string;
   DEEPSEEK_OUTPUT_RATE: string;
   OPENAI_INPUT_RATE: string;

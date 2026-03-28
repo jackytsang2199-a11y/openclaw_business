@@ -67,16 +67,30 @@ export async function handleAiProxy(
     }
   }
 
-  // 5. Forward to AI Gateway
-  const gatewayUrl = `${env.AI_GATEWAY_URL}/${provider}/${subpath}`;
-  const gatewayResponse = await fetch(gatewayUrl, {
+  // 5. Forward directly to provider API with real key
+  // OpenAI SDK sends paths without /v1 (e.g. /chat/completions, /embeddings)
+  // because the SDK's default baseURL already includes /v1.
+  // When customers override baseURL to our proxy, /v1 is stripped from the path.
+  // We must include /v1 in the upstream base URLs to compensate.
+  const providerBaseUrls: Record<string, string> = {
+    deepseek: "https://api.deepseek.com/v1",
+    openai: "https://api.openai.com/v1",
+  };
+  const baseUrl = providerBaseUrls[provider];
+  if (!baseUrl) {
+    return new Response(JSON.stringify({ error: `Unknown provider: ${provider}` }), {
+      status: 400,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
+  const apiKey = provider === "openai" ? env.OPENAI_API_KEY : env.DEEPSEEK_API_KEY;
+  const providerUrl = `${baseUrl}/${subpath}`;
+  const gatewayResponse = await fetch(providerUrl, {
     method: request.method,
     headers: {
       "Content-Type": "application/json",
-      "cf-aig-metadata": JSON.stringify({
-        customer_id: usage.customer_id,
-        tier: usage.tier,
-      }),
+      "Authorization": `Bearer ${apiKey}`,
     },
     body: request.body,
   });

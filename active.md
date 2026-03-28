@@ -1,84 +1,194 @@
 # ClawHK 蟹助手 — 項目狀態
 
-> **最後更新：** 2026-03-13
+> **最後更新：** 2026-03-28
+> **階段：** Phase 0 → Phase 1 過渡中（技術基建已驗證，準備 soft launch）
 
 ---
 
-## 當前階段：Phase 0 準備中
+## 已完成項目
 
-### 計劃討論：✅ 完成
+### 業務規劃 ✅ 100%
+- [x] 14-section 商業計劃 v1 完成（所有 section confirmed）
+- [x] 三層 Decoy Effect 定價（新手上路 $148/月 → 智能管家 $248/月 → 全能大師 $388/月）
+- [x] API 定價研究（7 個 provider，HK 可用性分析）
+- [x] 法律分析完成（HK 限制地區 — DeepSeek 直接可用，Azure OpenAI 為合規 GPT 通道）
+- [x] 安裝自動化策略決定（Option C: Hybrid — 80% bash + 20% Claude Agent SDK）
 
-所有 business plan topics 已討論完畢。Plan v1 有 14 個 section，全部 confirmed 或 deferred。
+### 客戶 Onboarding Pipeline ✅ 95%
+- [x] CF Worker API gateway 部署到 `api.3nexgen.com`（19 個 endpoints）
+- [x] Per-client gateway tokens（64-char hex，D1 `api_usage` table 追蹤）
+- [x] Proxy-only 架構 — **零真實 API key 在客戶 VPS 上**
+- [x] AI cost tracking per-client（HKD，monthly budget enforcement：90% warn，100% block）
+- [x] 3 個 API streams 全部經 proxy：DeepSeek chat + OpenAI embeddings + Mem0 LLM extraction
+- [x] Pi5 worker Python modules（deployer, api_client, notifier, playbook, worker, vps_lifecycle, backup, restore）
+- [x] 35 tests 全部通過（Windows + Pi5 ARM64）
+- [x] Claude Agent SDK 驗證（CLI v2.1.85，OAuth token via Max plan）
+- [x] E2E pipeline test（Job T1043，Tier 2，Hetzner VPS — 到 Phase 3 timeout 前核心 stack 已運行）
+- [x] Contabo provisioning scripts（create, cancel, revoke, reinstall, destroy）
+- [x] 8 admin usage endpoints（list, get, update, bulk budgets, reset, revoke, rotate, create）
+- [x] Gateway token generation in deployer（_generate_gateway_token, _register_gateway_token）
+- [x] Bot management 改為 customer-provided（客戶自己建 Telegram bot，簡化流程）
+- [x] 11 個 E2E bugs 修復（SDK package name, rate_limit_event patch, systemd config, SSH path 等）
+- [x] proxy.ts bug fix — OpenAI `/v1` path missing（Mem0 "404 no body" root cause）
+- [x] 10-configure-env.sh — vectorStore `dimension` key fix（was `embeddingModelDims`）
 
-| Section | Topic | 狀態 |
-|---------|-------|------|
-| §1 | 業務定位 + 競爭差異化 | ✅ |
-| §2 | 服務 Tier（Decoy Effect 定價） | ✅ |
-| §3 | 技術架構（Remote 工具 / 安裝流程 / 平台 / VPS） | ✅ |
-| §4 | API 供應策略（三層架構，唔搞中轉） | ✅ |
-| §5 | 推廣策略（IG + Threads + LIHKG + TG + WA） | ✅ |
-| §6 | AI 客服系統 + Notification + Client Management | ✅ |
-| §7 | Website / Landing Page | ✅ |
-| §8 | Payment 收款方式 | ✅ |
-| §9 | Business Entity 商業登記 | ✅ |
-| §10 | 客人 Onboarding Flow（3 Routes） | ✅ |
-| §11 | 財務預估 | ✅ |
-| §12 | 啟動 Roadmap | ✅ |
-| §13 | 風險同應對 | ✅ |
-| §14 | 討論進度 Tracker | ✅ |
+### VPS 安裝系統 ✅ 100%
+- [x] 14 個 modular install scripts（00-swap 到 13-clawteam）
+- [x] 5-layer QA suite（health, ports, API, Telegram, full integration — 28 checks）
+- [x] Discovery run 完成（1 小時，12 issues found + fixed）
+- [x] CLAUDE.md installer playbook（完整部署指南 + troubleshooting table）
+- [x] T001 + T002 test deployments on Hetzner
 
-### Deferred Topics（等實測數據）
+### 基礎設施 ✅
+- [x] Domain `3nexgen.com` 買咗（Cloudflare）
+- [x] CF Worker 部署 + D1 database
+- [x] Pi5 as deployment orchestrator（systemd service ready，未 enable）
+- [x] PC-side backup script（rsync from Pi5）
 
-| Topic | 等咩 |
-|-------|------|
-| Pricing 微調 | DeepSeek 實際 API 成本 |
-| Add-on / Topup 包裝 | API 成本 + 客戶使用數據 |
-
----
-
-## 下一步行動（建議順序）
-
-### 1. API 測試（最優先）
-- [ ] 開 DeepSeek API account → 測試實際成本
-- [ ] 確認 VPN → Anthropic/OpenAI 可行性
-- 呢個決定咗成本結構，影響所有定價
-
-### 2. 技術準備
-- [ ] 寫 automated setup script（基於現有 Pi5 guide）
-- [ ] 測試 Tailscale auth key pre-authorize
-- [ ] 測試 Hetzner VPS provision + 安裝 flow
-
-### 3. 基礎設施
-- [ ] 買 domain + 起 landing page（Cloudflare）
-- [ ] 開 TG 客服 bot + 寫 Knowledge Base
-- [ ] 建 Google Sheet client tracker
-
-### 4. Marketing 準備
-- [ ] 開 IG business account + Threads
-- [ ] 準備 10 個 Reels 內容
-- [ ] 開 TG Group "OpenClaw HK"
+### 網站 🔄 70%
+- [x] Lovable website 初版建好（React + Vite + Tailwind + shadcn/ui）
+- [x] 14 次設計 iteration（01-13 series + E/F variants）
+- [x] 設計方向確定（Contabo-inspired dark mode, crab theme）
+- [x] Copy voice 確定（13-prompt-F2-copy-rewrite.md）
+- [ ] Final Lovable build with latest copy
+- [ ] Deploy to Cloudflare Pages
 
 ---
 
-## 項目文件索引
+## 剩餘工作（Remaining Tasks）
+
+### 🔴 Critical — Before First Customer
+
+| # | Task | Category | Status | Notes |
+|---|------|----------|--------|-------|
+| 1 | Contabo 首單手動下單 | VPS | 未開始 | 清 fraud verification，之後 API provisioning 才能用 |
+| 2 | Contabo API credentials 更新到 Pi5 `.env` | VPS | 未開始 | 目前係 placeholder |
+| 3 | VPS E2E Mem0 capture 測試 | Pipeline | Blocked | VPS 161.97.82.155 unreachable，需要新 VPS 測試 |
+| 4 | Update deployer.py — remove real key injection | Code | 未開始 | 改為只用 gateway token |
+| 5 | Website final build + deploy | Website | 未開始 | Lovable → Cloudflare Pages |
+| 6 | Payment integration（Lemon Squeezy） | Payment | 未開始 | 需要 webhook → CF Worker `/api/confirm` |
+
+### 🟡 Important — Before Soft Launch
+
+| # | Task | Category | Status | Notes |
+|---|------|----------|--------|-------|
+| 7 | VPS recycling pool E2E test | Pipeline | 未測試 | revoke + reinstall flow |
+| 8 | Backup/restore E2E test | Pipeline | 未測試 | 需要 active VPS 做 backup cycle |
+| 9 | Pin Qdrant Docker image to v1.14.0 | Scripts | 未開始 | 兼容 mem0ai client v1.13.0 |
+| 10 | Telegram 客服 bot + Knowledge Base | Customer | 未開始 | FAQ + pricing + troubleshooting |
+| 11 | 商業登記 | Legal | 未開始 | HK business registration |
+| 12 | 客人交付 message template | Onboarding | 未開始 | 包含 bot setup guide、gateway info |
+| 13 | Monitoring dashboard（Pi5） | Ops | 未開始 | Job status, VPS health, cost tracking |
+
+### 🟢 Phase 1 — Growth
+
+| # | Task | Category | Status | Notes |
+|---|------|----------|--------|-------|
+| 14 | IG business account + Threads | Marketing | 未開始 | |
+| 15 | 10 個 Reels 內容 | Marketing | 未開始 | |
+| 16 | Telegram Group "OpenClaw HK" | Marketing | 未開始 | |
+| 17 | LIHKG 推廣帖 | Marketing | 未開始 | |
+| 18 | WhatsApp Business 接入研究 | Customer | 未開始 | |
+| 19 | SDK patch review（claude-code-sdk updates past v0.0.25）| Maintenance | 待觀察 | rate_limit_event patch 可能不再需要 |
+| 20 | Clean up D1 test data（T_E2E_PROXY test spend） | Cleanup | 低優先 | |
+
+---
+
+## 技術架構摘要（Current State）
+
+### Proxy-Only Architecture（已驗證 ✅）
+```
+Customer VPS (零 real API keys)
+    ↓ Bearer gateway_token
+CF Worker @ api.3nexgen.com
+    ├── Auth: D1 token lookup → customer_id
+    ├── Cost: Calculate HKD, update D1
+    ├── Budget: 90% warn header, 100% block
+    └── Forward with real API key (Worker secrets)
+         ├── /api/ai/deepseek/* → api.deepseek.com/v1/*
+         └── /api/ai/openai/*   → api.openai.com/v1/*
+```
+
+### 3 API Streams（全部經 proxy）
+| Stream | Provider | Purpose | VPS Sends |
+|--------|----------|---------|-----------|
+| Chat | DeepSeek | OpenClaw 對話 | gateway_token as DEEPSEEK_API_KEY |
+| Embeddings | OpenAI | Mem0 vector memory | gateway_token as apiKey |
+| LLM Extract | DeepSeek (via OpenAI client) | Mem0 fact extraction | gateway_token as apiKey |
+
+### Deployment Pipeline
+```
+Lemon Squeezy webhook → CF Worker /api/confirm → D1 job queue
+    ↓ (Pi5 polls every 30s)
+Pi5 Worker → Contabo API provision → Agent SDK deploy → QA gates → deliver
+```
+
+---
+
+## 項目文件索引（Updated）
 
 ```
 openclaw_setup_business/
-├── active.md                    ← 你而家睇緊嘅嘢
-├── business/
-│   ├── openclaw-setup-business-plan-v1.md   ← 主 plan（14 sections）
-│   ├── installation-automation-strategy.md  ← 安裝自動化策略
-│   └── todo-master.md                       ← 全部 48 個 todo（按 Phase 排）
+├── active.md                           ← 你而家睇緊嘅嘢
+├── CLAUDE.md                           ← Master AI guidance
+│
+├── business/                           ← 商業策略
+│   ├── openclaw-setup-business-plan-v1.md  ← 主 plan（14 sections）
+│   ├── installation-automation-strategy.md ← 安裝自動化策略（Option C: Hybrid）
+│   ├── api-pricing-research-2026-03.md     ← API 定價研究（7 providers）
+│   ├── pricing-analysis.md                 ← 成本分析 + tier margins
+│   ├── todo-master.md                      ← 原始 48 tasks（部分已完成）
+│   └── archive/                            ← 已過時文件
+│
+├── docs/superpowers/
+│   ├── plans/                              ← Implementation plans
+│   │   ├── 2026-03-26-plan-b-pi5-worker.md     ← Plan B MAIN（已實現）
+│   │   ├── 2026-03-27-plan-pipeline-v2.md       ← Pipeline v2 refinements
+│   │   ├── 2026-03-28-plan-per-client-api-gateway.md ← API gateway（已實現）
+│   │   └── archive/                              ← Plan A（已過時）
+│   └── specs/                              ← Design specs
+│       ├── 2026-03-26-customer-onboarding-pipeline-design.md
+│       ├── 2026-03-27-contabo-vps-billing-strategy-design.md
+│       ├── 2026-03-27-customer-backup-strategy-design.md
+│       ├── 2026-03-27-pipeline-v2-bot-and-recycling-design.md
+│       ├── 2026-03-28-per-client-api-gateway-design.md
+│       └── archive/
+│
 ├── legal/
-│   └── legal-analysis-hk-ai-reseller.md     ← API resell 法律分析
-├── marketing/
-│   └── templates/                           ← 推廣素材（待建）
-└── technical/
-    ├── guides/
-    │   ├── pi5-openclaw-setup-guide.md      ← Pi5 安裝完整指南
-    │   └── searxng_setup.md                 ← SearXNG 設定文檔
-    └── inventory/
-        └── pi5-setup-inventory.md           ← Pi5 硬件清單
+│   └── legal-analysis-hk-ai-reseller.md    ← CRITICAL: HK 限制 + 合規通道
+│
+├── onboarding-pipeline/                    ← Customer onboarding automation
+│   ├── cf-worker/                          ← CF Worker（TypeScript，已部署）
+│   ├── pi5-worker/                         ← Pi5 Python worker（已部署，未 enable）
+│   ├── plan-b-implementation-report.md     ← Implementation status
+│   ├── contabo-api-guide.md                ← Contabo API reference
+│   └── telegram-bot-creation/              ← Bot setup guide
+│
+├── openclaw_install/                       ← VPS installation system
+│   ├── scripts/                            ← 14 install scripts (00-13)
+│   ├── qa/                                 ← 5-layer QA suite (28 checks)
+│   ├── provision/                          ← Contabo provisioning scripts
+│   ├── discovery/                          ← E2E run documentation (12 issues)
+│   └── clients/T001, T002/                 ← Test deployment records
+│
+├── Pi5/
+│   └── Pi5_remote_management.md            ← Pi5 SSH + ops guide
+│
+├── technical/
+│   ├── guides/openclaw-stack-reference.md  ← Full stack technical reference
+│   └── inventory/pi5-setup-inventory.md    ← Hardware + software BOM
+│
+├── website-lovable/                        ← Website（React + Vite + Tailwind）
+│   ├── 00-knowledge-file.md                ← Lovable knowledge base
+│   ├── 05-build-strategy.md                ← Lovable workflow guide
+│   ├── 08-13-prompt-*.md                   ← Current design iterations
+│   ├── src/                                ← Website source code
+│   └── archive/                            ← Outdated v1 prompts
+│
+├── scripts/
+│   └── nexgen-backup-pull.sh               ← PC → Pi5 backup sync
+│
+└── marketing/templates/                    ← 待建
 ```
 
 ---
@@ -88,9 +198,13 @@ openclaw_setup_business/
 | 指標 | 數值 |
 |------|------|
 | Plan sections | 14（全部 confirmed） |
-| 待做 tasks | 48（31 in Phase 0） |
-| Deferred topics | 2 |
-| 預計 startup cost | ~HK$300-400 |
-| 目標：第一個客 | Phase 1（Week 3-4） |
-| 目標：10 客 | Soft launch |
-| 目標：30 客 | 3 個月 |
+| Pipeline tests | 35（全部 passing） |
+| Install scripts | 14（00-13） |
+| QA checks | 28（5 layers） |
+| E2E bugs fixed | 11（pipeline）+ 12（installer） |
+| CF Worker endpoints | 19 |
+| Admin usage endpoints | 8 |
+| Website design iterations | 14 |
+| Critical remaining tasks | 6 |
+| Startup cost | ~HK$300-400 |
+| 目標：第一個客 | Phase 1（pending Contabo + website） |

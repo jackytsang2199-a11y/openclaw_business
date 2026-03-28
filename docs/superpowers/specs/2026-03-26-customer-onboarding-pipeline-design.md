@@ -40,11 +40,14 @@ An end-to-end automated pipeline that takes a customer from payment to a working
 |  Inbound endpoints:                               |
 |  - POST /api/webhook/lemonsqueezy (HMAC verified) |
 |  - POST /api/confirm (secret API key required)    |
+|    Requires: {id, amount_hkd, payment_method,    |
+|    reference} to prevent accidental double-confirm |
 |                                                   |
 |  Pi5 polling endpoints (outbound from Pi5):       |
 |  - GET  /api/jobs/next (returns oldest ready job) |
 |  - PATCH /api/jobs/:id (update job status)        |
 |  - POST /api/health (Pi5 alive ping)              |
+|  All Pi5 endpoints require X-Worker-Token header  |
 |                                                   |
 |  Internal: reads/writes CF D1                     |
 |  Health monitor: tracks Pi5 ping, alerts on miss  |
@@ -177,8 +180,10 @@ CREATE TABLE jobs (
   email TEXT NOT NULL,
   payment_method TEXT,           -- lemon_squeezy | fps | payme
   bot_username TEXT,             -- NexGenAI_T1043_bot
+  lemon_squeezy_order_id TEXT UNIQUE,  -- webhook deduplication
   server_ip TEXT,
   error_log TEXT,
+  re_queue_count INTEGER DEFAULT 0,   -- stale job re-queue tracker (max 2)
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL
 );
@@ -191,6 +196,8 @@ CREATE TABLE id_counter (
 ```
 
 **Security note:** Bot tokens and API keys are NEVER stored in CF D1. Only non-sensitive metadata. All secrets live on Pi5 in `clients/T{ID}/` folders.
+
+**Timezone note:** All timestamps stored in UTC. Churn events (grace period day count, auto-delete schedules) evaluated in `Asia/Hong_Kong` timezone. Customer-facing messages display HKT.
 
 ---
 
@@ -306,8 +313,10 @@ Job picked up (status: ready → provisioning)
 |   - Create client.env with bot token + API keys
 |   - Read tier-config.yaml → get script list for tier
 |   - Phase 1 scripts (00-03) → GATE CHECK (node, docker, swap)
-|   - Phase 2 scripts (04-07) → GATE CHECK (QA layers 1-3)
-|   - Phase 3 scripts (08-13) → GATE CHECK (QA layers 4-5)
+|   - Phase 2 scripts (04-08) → GATE CHECK (QA layers 1-3, tier-aware)
+|   -   NOTE: Gate checks skip Qdrant/SearXNG/Mem0 checks for Tier 1
+|   -   Agent reads tier-config.yaml to determine applicable QA checks
+|   - Phase 3 scripts (09-13) → GATE CHECK (QA layers 4-5, tier-aware)
 |   - Status: installing → qa
 |
 +-- Step 4: Final QA
@@ -322,8 +331,10 @@ Job picked up (status: ready → provisioning)
 |   - Notify your OpenClaw: "T1043 complete"
 |
 +-- On Failure (any step):
-    - Agent retries up to 3 times per script
-    - If unrecoverable: status → failed
+    - Agent retries once per script (2 attempts total, per CLAUDE.md playbook)
+    - If second attempt fails: status → failed
+    - Return bot to bot-pool/available/ and reset display name via API
+    - Send customer message: "We're experiencing a delay. Our team is looking into it. Contact @NexGenAI_Support_bot or support@3nexgen.com"
     - Notify your OpenClaw: "T1043 failed — {error}"
     - You investigate manually
 ```
@@ -368,18 +379,24 @@ Auto-reply during provisioning was considered but rejected: it would require sha
 
 FPS/PayMe have no webhook/auto-charge capability. Manual monthly payment collection doesn't scale. Strategy: accept FPS/PayMe to reduce friction for first purchase (important for HK market), require card subscription for month 2 onward.
 
-### Lemon Squeezy Metadata
+### Lemon Squeezy Integration
+
+Each tier is a separate Lemon Squeezy product variant. Tier is derived server-side from `variant_id` — never trust client metadata for tier selection.
 
 Checkout session includes custom metadata:
 ```json
 {
   "display_name": "My AI",
-  "telegram_user_id": "340067089",
-  "tier": 2
+  "telegram_user_id": "340067089"
 }
 ```
 
-Webhook delivers this metadata back on payment success → CF Worker creates job with all details.
+CF Worker maps `variant_id` → tier (configured in Worker env vars):
+```
+VARIANT_TIER_MAP={"var_abc123":1,"var_def456":2,"var_ghi789":3}
+```
+
+Webhook delivers variant_id + metadata → CF Worker resolves tier from variant_id → creates job.
 
 ### FPS/PayMe Lifecycle
 
@@ -454,12 +471,14 @@ Customer requests immediate deletion at any point:
 Contabo snapshots auto-delete after 30 days — unsuitable for 90-day retention. Instead, export only what matters:
 
 ```bash
-# Before destroying VPS, agent exports:
+# Before destroying VPS, agent exports customer data ONLY (no API keys):
 scp deploy@{VPS_IP}:~/qdrant-storage/    → Pi5 archives/T1043/qdrant/
 scp deploy@{VPS_IP}:~/mem0.db            → Pi5 archives/T1043/mem0.db
 scp deploy@{VPS_IP}:~/openclaw.json      → Pi5 archives/T1043/openclaw.json
 scp deploy@{VPS_IP}:~/soul.md            → Pi5 archives/T1043/soul.md
-scp deploy@{VPS_IP}:~/client.env         → Pi5 archives/T1043/client.env
+# NOTE: client.env and .env are NOT archived — they contain shared API keys
+# (DeepSeek, OpenAI) that the customer does not own. Bot token is already
+# stored in Pi5 bot-pool/assigned/ folder.
 ```
 
 **Total size per customer: ~50-200MB** (mostly Qdrant vectors). Pi5 with a 256GB+ NVMe can hold hundreds of customer archives.
@@ -531,7 +550,7 @@ Note: Contabo first-time orders may take longer due to fraud verification. Subse
 
 | Scenario | Handling |
 |---|---|
-| Script failure | Agent retries 3x (per CLAUDE.md playbook) |
+| Script failure | Agent retries once (2 attempts total, per CLAUDE.md playbook) |
 | Agent SDK crash | Job stays 'provisioning' >45 min → worker marks 'stale' |
 | Stale job recovery | **Check Contabo API for existing VPS with label `nexgen-T{ID}` before re-provisioning.** Reuse if found, destroy + re-provision if broken. Prevents orphaned VPSes. |
 | Contabo API down | Agent waits 5 min, retries 3x, then fails job |
@@ -540,7 +559,7 @@ Note: Contabo first-time orders may take longer due to fraud verification. Subse
 
 ### Stale Job Cleanup
 
-Worker checks on each poll: any job in `provisioning` or `installing` for >45 minutes → check for orphaned VPS → mark as `stale` → re-queue (max 2 re-queues, then `failed`).
+Worker checks on each poll: any job in `provisioning` or `installing` for >45 minutes → check for orphaned VPS → mark as `stale` → increment `re_queue_count` → re-queue to `ready`. If `re_queue_count` >= 2 → mark as `failed`, notify your OpenClaw.
 
 ---
 

@@ -11,13 +11,14 @@ You are the **NexGen VPS Installer**. You provision and configure OpenClaw stack
 Before starting any installation:
 
 1. **`.env` file** must contain:
-   - `HETZNER_TOKEN` (read+write permissions)
+   - `HETZNER_TOKEN` or Contabo API credentials (provider-dependent)
    - `SSH_KEY_NAME` and `SSH_KEY_PATH`
    - `DEFAULT_LOCATION`, `DEFAULT_SERVER_TYPE`, `DEFAULT_IMAGE`
-   - `DEEPSEEK_API_KEY`
-   - `OPENAI_API_KEY`
    - `{CLIENT_ID}_TELEGRAM_BOT_TOKEN`
    - `{CLIENT_ID}_TELEGRAM_ALLOWED_USERS`
+
+   **Note:** Real API keys (DeepSeek, OpenAI) are NOT in `.env` or `client.env`.
+   They live exclusively in CF Worker secrets. Customer VPS receives only gateway tokens.
 
 2. **SSH key** at `SSH_KEY_PATH` must exist and be readable.
 
@@ -60,8 +61,9 @@ Run in 3 phases with gate checks between each. Retry once on script failure; hal
 cat > /tmp/client.env << EOF
 CLIENT_ID={CLIENT_ID}
 TIER={TIER}
-DEEPSEEK_API_KEY=$DEEPSEEK_API_KEY
-OPENAI_API_KEY=$OPENAI_API_KEY
+AI_GATEWAY_URL=https://api.3nexgen.com/api/ai
+AI_GATEWAY_TOKEN={GATEWAY_TOKEN_FROM_D1}
+DEEPSEEK_API_KEY={GATEWAY_TOKEN_FROM_D1}
 TELEGRAM_BOT_TOKEN=${CLIENT_ID}_TELEGRAM_BOT_TOKEN_VALUE
 TELEGRAM_ALLOWED_USERS=${CLIENT_ID}_TELEGRAM_ALLOWED_USERS_VALUE
 EOF
@@ -159,7 +161,7 @@ For systemd commands over SSH, scripts already set `XDG_RUNTIME_DIR` and `DBUS_S
 | 07-setup-searxng.sh | SearXNG (Docker) + JSON API enable | Tier 2+ |
 | 08-setup-watchdogs.sh | Gateway watchdog script + systemd | Tier 2+ |
 | 09-security-hardening.sh | UFW + SSH hardening + fail2ban | All |
-| 10-configure-env.sh | Injects keys, generates gateway token, starts services | All |
+| 10-configure-env.sh | Injects gateway tokens (proxy-only, no real API keys), configures openclaw.json, starts services | All |
 | 11-setup-chromium.sh | Google Chrome headless + CDP | Tier 3 |
 | 12-setup-acpx.sh | Claude Code CLI | Tier 3 |
 | 13-setup-clawteam.sh | ClawTeam multi-agent CLI | Tier 3 |
@@ -182,6 +184,8 @@ For systemd commands over SSH, scripts already set `XDG_RUNTIME_DIR` and `DBUS_S
 | `((PASS++))` in bash | Script exits with code 1 | Use `PASS=$((PASS+1))` with `set -e` |
 | apt upgrade conffile prompt | Hangs on sshd_config prompt, kills SSH | Use `sudo DEBIAN_FRONTEND=noninteractive` (not just `export`) + `--force-confold` |
 | Host key changed after destroy/recreate | SSH refuses connection | `ssh-keygen -R <IP>` or use `-o UserKnownHostsFile=/dev/null` |
+| **UFW locks out SSH (CRITICAL)** | Port 22 unreachable after `ufw enable` | Use `ufw allow 22/tcp` NOT `ufw allow OpenSSH`. The OpenSSH UFW profile may not exist on Contabo/non-standard Ubuntu images. `ufw allow OpenSSH` fails silently with `\|\| true`, then `ufw enable` blocks all incoming including SSH. **Unrecoverable without VNC or OS reinstall.** |
+| Contabo defaultUser is admin | SSH as deploy fails | Set `"defaultUser": "root"` + `"rootPassword": <secret_id>` in Contabo API create/reinstall calls. cloud-init creates deploy user separately. |
 
 ## Tier Feature Matrix
 

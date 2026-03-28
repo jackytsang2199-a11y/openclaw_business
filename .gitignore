@@ -1,6 +1,21 @@
-# Node modules inside website source
+# Node modules
 website-lovable/src/node_modules/
+onboarding-pipeline/cf-worker/node_modules/
+
+# Build artifacts
+onboarding-pipeline/cf-worker/.wrangler/
+__pycache__/
 
 # Website source has its own .git (jackytsang2199-a11y/openclaw_website-1797296e)
 website-lovable/src/.git/
 website-lovable/src/.git_backup/
+
+# Secrets — NEVER commit
+onboarding-pipeline/.secrets/
+*.secrets
+.env
+.env.local
+onboarding-pipeline/pi5-worker/.env
+openclaw_install/.env
+openclaw_install/clients/*/server-info.env
+*.session

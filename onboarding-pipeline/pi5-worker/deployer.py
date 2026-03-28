@@ -130,24 +130,23 @@ class Deployer:
     ) -> str:
         """Build client.env content.
 
-        Includes:
-        - AI_GATEWAY_URL/TOKEN for OpenClaw chat (routed through CF Worker proxy)
-        - Real DEEPSEEK/OPENAI keys for Mem0 (runs locally, needs direct API access)
+        Proxy-only: ALL API keys are the gateway token. Real keys live
+        exclusively in CF Worker secrets — never on customer VPS.
+        The install script (10-configure-env.sh) sets base URLs to point
+        at the CF Worker proxy, which validates the token and swaps for
+        the real key before forwarding to the provider.
         """
         env = (
             f"CLIENT_ID={job_id}\n"
             f"TIER={tier}\n"
             f"AI_GATEWAY_URL={config.AI_GATEWAY_URL}\n"
             f"AI_GATEWAY_TOKEN={gateway_token}\n"
+            f"DEEPSEEK_API_KEY={gateway_token}\n"
             f"TELEGRAM_BOT_TOKEN={bot_token}\n"
             f"TELEGRAM_ALLOWED_USERS={telegram_user_id}\n"
         )
-        # Mem0 needs real API keys for local embeddings + LLM extraction (Tier 2+)
         if tier >= 2:
-            env += (
-                f"DEEPSEEK_API_KEY={os.environ.get('DEEPSEEK_API_KEY', '')}\n"
-                f"OPENAI_API_KEY={os.environ.get('OPENAI_API_KEY', '')}\n"
-            )
+            env += f"OPENAI_API_KEY={gateway_token}\n"
         return env
 
     def _register_gateway_token(self, job_id: str, gateway_token: str, tier: int):

@@ -18,12 +18,9 @@
 
 ## Pre-work (before Task 1)
 
-- [ ] **P1: Verify Plan A is deployed**
+- [x] **P1: Verify Plan A is deployed**
 
-```bash
-curl -H "X-Worker-Token: YOUR_TOKEN" https://api.3nexgen.com/api/jobs/next
-# Expected: {"job":null}
-```
+**Status (2026-03-28):** Plan A deployed at `api.3nexgen.com` with 19 endpoints including per-client API gateway, usage tracking, and VPS lifecycle management.
 
 - [ ] **P2: Create Contabo account and validate API**
 
@@ -53,58 +50,23 @@ curl -H "Authorization: Bearer ACCESS_TOKEN" \
 
 First-time orders may trigger fraud verification (hours-long delay). Place one VPS manually via web panel to clear this. Destroy it after verification passes.
 
-- [x] **P4a: Create bot pool (automated via `replenish_bots.py`)**
+- [x] **P4: Bot management (ARCHITECTURE CHANGED)**
 
-Script: `onboarding-pipeline/telegram-bot-creation/replenish_bots.py`
-Uses Pyrogram + Telegram Desktop public API credentials (no my.telegram.org registration needed).
+> **Update (2026-03-28):** Bot pool architecture replaced by customer-provided bots. Customers create their own Telegram bot via BotFather and provide the token in the order form. The deployer reads `bot_token` directly from job data — no server-side pool management needed.
 
-```bash
-cd onboarding-pipeline/telegram-bot-creation
-pip install -r requirements.txt
+4 pre-created test bots (T1043-T1046) remain on Pi5 at `~/bot-pool/available/` for testing only.
 
-# First run — prompts for phone + OTP, creates nexgen_session.session
-python3 replenish_bots.py --start 1043 --count 20
-```
+~~P4b (replenish to 20) and P4c (verify pool) are no longer needed.~~
 
-**Current status (2026-03-26):** 4 bots created (T1043–T1046). Sufficient for development + E2E testing. BotFather rate limit active — replenish remaining bots before launch.
+- [x] **P5: Install Python 3.11+ on Pi5**
 
-- [ ] **P4b: Replenish pool to 20 before launch**
-
-```bash
-# Resume after rate limit expires
-python3 replenish_bots.py --start 1047 --count 16
-```
-
-- [ ] **P4c: Verify pool**
-
-```bash
-ls ~/bot-pool/available/ | wc -l
-# Expected: 20 (4 now, 16 after P4b)
-```
-
-**Display name flow (Option A hybrid):**
-- Bots are pre-created with default names ("NexGen AI T1043" etc.)
-- Usernames (`@NexGenAI_T1043_bot`) are permanent and cannot be changed — customers never see these (they interact via display name in chat)
-- When customer fills the order form, they choose a **custom display name** for their bot
-- After payment confirmation, the pipeline calls `Bot.setMyName()` to rename the bot to the customer's chosen name **before** deployment begins
-- If rename fails (API error, rate limit), deployment continues with default name — owner is notified to rename manually
-
-**Replenishment:** When pool drops below 20, owner gets alert with command to run:
-`python3 replenish_bots.py --start NEXT_NUMBER --count 20`
-
-- [ ] **P5: Install Python 3.11+ on Pi5**
-
-```bash
-# On Pi5 via SSH
-python3 --version
-# Expected: Python 3.11+ (Raspberry Pi OS Bookworm ships 3.11)
-
-pip3 install --user requests
-```
+**Status (2026-03-28):** Python 3.13.5 installed on Pi5.
 
 - [ ] **P6: Add Contabo credentials to .env**
 
-Update `f:\openclaw_setup_business\openclaw_install\.env`:
+**Status (2026-03-28):** Placeholders in Pi5 `.env`. Real credentials needed after Contabo account setup.
+
+Update Pi5 `~/nexgen-worker/.env`:
 ```bash
 # Contabo (Production)
 CONTABO_CLIENT_ID=your_contabo_oauth_client_id
@@ -113,7 +75,9 @@ CONTABO_API_USER=your_contabo_api_username
 CONTABO_API_PASSWORD=your_contabo_api_password
 ```
 
-- [ ] **P7: Install Claude Code CLI + Agent SDK on Pi5 (Max plan auth)**
+- [x] **P7: Install Claude Code CLI + Agent SDK on Pi5 (Max plan auth)**
+
+**Status (2026-03-28):** Claude Code CLI v2.1.85, claude-code-sdk v0.0.25 (patched), Python 3.13.5, all installed and verified on Pi5.
 
 The deployer uses the Claude Agent SDK to run an AI operator that follows the CLAUDE.md playbook. This is the core differentiator — the AI interprets QA output, debugs failures, and makes adaptive decisions instead of blindly running scripts.
 
@@ -157,7 +121,6 @@ onboarding-pipeline/
   pi5-worker/
     config.py              — Configuration (env vars, paths, URLs, Agent SDK settings)
     api_client.py          — CF Worker API client (poll, update, health, VPS lifecycle)
-    bot_pool.py            — Bot pool filesystem operations
     notifier.py            — Telegram notifications to owner
     playbook.py            — Builds deployment prompts from CLAUDE.md playbook for Agent SDK
     deployer.py            — Orchestrates deployment: recycle-or-provision → install+QA (Agent SDK) → deliver
@@ -168,7 +131,6 @@ onboarding-pipeline/
     requirements.txt       — Python dependencies (requests, claude-agent-sdk, anyio)
     .env.example           — Template for Pi5 .env file
     tests/
-      test_bot_pool.py
       test_api_client.py
       test_deployer.py
       test_vps_lifecycle.py

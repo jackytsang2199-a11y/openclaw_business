@@ -32,15 +32,30 @@ const techSections = [
   },
   {
     name: "Docker",
-    headline: "容器化一鍵部署 — 企業級標準",
-    body: "整套系統以 Docker 容器化部署。環境完全隔離，安全穩定，一鍵啟動。需要遷移？打包整個系統搬到新伺服器，資料完整保留。這是企業用的部署標準。",
+    headline: "容器化一鍵部署 — 穩定可靠",
+    body: "整套系統以 Docker 容器化部署。環境完全隔離，安全穩定，一鍵啟動。你的系統獨立運行，需要搬遷時一鍵打包，資料完整保留。",
+  },
+  {
+    name: "ACPX",
+    headline: "ACP 協議運行環境",
+    body: "Agent Communication Protocol 即時通訊層，支援多智能體間的即時訊息傳遞與任務分配。",
+  },
+  {
+    name: "ClawTeam",
+    headline: "多智能體協作框架",
+    body: "基於 venv 隔離環境 + tmux 3.5a 多進程管理，多個 AI 智能體分工並行，同時處理複雜任務。",
+  },
+  {
+    name: "Gateway Watchdog",
+    headline: "自動恢復守護進程",
+    body: "24/7 連線監控系統，自動偵測斷線並重新連接，支援多節點故障轉移，確保服務永不中斷。",
   },
 ];
 
 const Technology = () => (
   <section className="container py-20">
     <div className="text-center space-y-4 mb-16">
-      <h1 className="text-3xl md:text-5xl">我們的獨家技術生態系統</h1>
+      <h1 className="text-3xl md:text-5xl">我們的技術生態系統</h1>
       <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
         經過數月研究與深度整合，每個組件都經過嚴格測試。這不是原版 OpenClaw — 這是完整的 AI 生態系統。
       </p>
@@ -50,11 +65,11 @@ const Technology = () => (
       {techSections.map((tech) => (
         <div
           key={tech.name}
-          className="rounded-2xl border border-border bg-card p-8 space-y-4 shadow-sm"
+          className="rounded-2xl border border-border bg-card p-8 space-y-4 shadow-sm hover:-translate-y-0.5 hover:shadow-lg transition-all duration-200"
         >
           <p className="text-xs text-primary font-semibold uppercase tracking-wider">{tech.name}</p>
-          <h2 className="text-xl md:text-2xl">{tech.headline}</h2>
-          <p className="text-muted-foreground leading-relaxed">{tech.body}</p>
+          <h2 className="text-2xl md:text-3xl">{tech.headline}</h2>
+          <p className="text-muted-foreground leading-relaxed text-base">{tech.body}</p>
         </div>
       ))}
     </div>

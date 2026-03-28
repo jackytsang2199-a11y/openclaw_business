@@ -1,0 +1,15 @@
+[Unit]
+Description=NexGen Onboarding Pipeline Worker
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/jacky999/nexgen-worker
+ExecStart=/home/jacky999/nexgen-worker/venv/bin/python3 /home/jacky999/nexgen-worker/worker.py
+Restart=always
+RestartSec=10
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target

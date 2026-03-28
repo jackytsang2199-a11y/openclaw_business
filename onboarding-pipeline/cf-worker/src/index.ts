@@ -86,19 +86,19 @@ export default {
     }
 
     // Route: Admin — reset customer spend
-    const resetMatch = path.match(/^\/api\/usage\/(\d+)\/reset$/);
+    const resetMatch = path.match(/^\/api\/usage\/([^/]+)\/reset$/);
     if (method === "POST" && resetMatch) {
       return handleResetUsage(request, env, resetMatch[1]);
     }
 
     // Route: Admin — revoke customer token
-    const revokeMatch = path.match(/^\/api\/usage\/(\d+)\/revoke$/);
+    const revokeMatch = path.match(/^\/api\/usage\/([^/]+)\/revoke$/);
     if (method === "POST" && revokeMatch) {
       return handleRevokeToken(request, env, revokeMatch[1]);
     }
 
     // Route: Admin — rotate customer token
-    const rotateMatch = path.match(/^\/api\/usage\/(\d+)\/rotate$/);
+    const rotateMatch = path.match(/^\/api\/usage\/([^/]+)\/rotate$/);
     if (method === "POST" && rotateMatch) {
       return handleRotateToken(request, env, rotateMatch[1]);
     }
@@ -114,7 +114,7 @@ export default {
     }
 
     // Route: Admin — get/update single customer usage
-    const usageMatch = path.match(/^\/api\/usage\/(\d+)$/);
+    const usageMatch = path.match(/^\/api\/usage\/([^/]+)$/);
     if (method === "GET" && usageMatch) {
       return handleGetUsage(request, env, usageMatch[1]);
     }

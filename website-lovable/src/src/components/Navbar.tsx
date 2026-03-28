@@ -1,11 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import NexGenLogo from "@/components/NexGenLogo";
 import { Link, useLocation } from "react-router-dom";
 import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 
 const WHATSAPP_URL = "https://wa.me/85200000000";
-const TELEGRAM_URL = "https://t.me/clawhk";
+const TELEGRAM_URL = "https://t.me/nexgenOpenClaw";
 
 const navLinks = [
   { to: "/", label: "首頁" },
@@ -29,71 +30,56 @@ const TelegramIcon = ({ className = "h-5 w-5" }: { className?: string }) => (
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
-  const isHome = location.pathname === "/";
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 80);
-    };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  const overHero = isHome && !scrolled;
 
   return (
-    <header
-      className={`sticky top-0 z-50 w-full transition-all duration-300 ${
-        overHero
-          ? "bg-black/15 backdrop-blur-md border-b border-transparent"
-          : "bg-background border-b shadow-[0_1px_0_rgba(0,0,0,0.06)]"
-      }`}
-    >
+    <header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-border transition-all duration-300">
       <div className="container flex h-16 items-center justify-between">
-        <Link to="/" className={`flex items-center gap-2 text-lg font-bold transition-colors ${overHero ? "text-white" : "text-foreground"}`}>
-          <span className="text-2xl">🦀</span>
-          <span>蟹助手</span>
+        <Link to="/" className="flex items-center gap-2 text-lg font-bold text-foreground">
+          <NexGenLogo className="h-7 w-7" />
+          <span>NexGen</span>
         </Link>
 
         {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-8">
-          {navLinks.map((link) => (
-            <Link
-              key={link.to}
-              to={link.to}
-              className={`text-sm font-medium transition-colors ${
-                overHero
-                  ? location.pathname === link.to ? "text-white font-bold" : "text-white/80 hover:text-white"
-                  : location.pathname === link.to ? "text-primary font-bold" : "text-muted-foreground hover:text-primary"
-              }`}
-            >
-              {link.label}
-            </Link>
-          ))}
+          {navLinks.map((link) => {
+            const isActive = location.pathname === link.to;
+            return (
+              <Link
+                key={link.to}
+                to={link.to}
+                aria-current={isActive ? "page" : undefined}
+                className={`relative text-sm font-semibold transition-colors py-1 ${
+                  isActive ? "text-primary" : "text-foreground/70 hover:text-primary"
+                }`}
+              >
+                {link.label}
+                {isActive && (
+                  <span className="absolute -bottom-0.5 left-0 right-0 h-0.5 rounded-full bg-primary" />
+                )}
+              </Link>
+            );
+          })}
         </nav>
 
         {/* Desktop CTA — icon pill */}
         <div className="hidden md:flex items-center">
-          <div className={`flex items-center rounded-full border overflow-hidden transition-colors ${
-            overHero ? "border-white/30 bg-white/[0.12] backdrop-blur-sm" : "border-border bg-secondary/50"
-          }`}>
+          <div className="flex items-center rounded-full border border-border bg-secondary/50 overflow-hidden transition-colors">
             <a
               href={WHATSAPP_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className={`p-2.5 transition-colors ${overHero ? "text-white/80 hover:text-[#25D366]" : "text-muted-foreground hover:text-[#25D366]"}`}
+              className="p-2.5 text-muted-foreground hover:text-[#25D366] transition-colors"
               aria-label="WhatsApp"
             >
               <WhatsAppIcon className="h-5 w-5" />
             </a>
-            <div className={`w-px h-5 ${overHero ? "bg-white/30" : "bg-border"}`} />
+            <div className="w-px h-5 bg-border" />
             <a
               href={TELEGRAM_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className={`p-2.5 transition-colors ${overHero ? "text-white/80 hover:text-[#26A5E4]" : "text-muted-foreground hover:text-[#26A5E4]"}`}
+              className="p-2.5 text-muted-foreground hover:text-[#26A5E4] transition-colors"
               aria-label="Telegram"
             >
               <TelegramIcon className="h-5 w-5" />
@@ -104,7 +90,7 @@ const Navbar = () => {
         {/* Mobile hamburger */}
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger asChild className="md:hidden">
-            <Button variant="ghost" size="icon" className={overHero ? "text-white hover:bg-white/15" : ""}>
+            <Button variant="ghost" size="icon">
               <Menu className="h-5 w-5" />
               <span className="sr-only">開啟選單</span>
             </Button>
@@ -112,18 +98,22 @@ const Navbar = () => {
           <SheetContent side="right" className="w-72 bg-background border-border">
             <SheetTitle className="sr-only">導航選單</SheetTitle>
             <nav className="flex flex-col gap-6 mt-8">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.to}
-                  to={link.to}
-                  onClick={() => setOpen(false)}
-                  className={`text-lg font-medium transition-colors hover:text-primary ${
-                    location.pathname === link.to ? "text-primary font-bold" : "text-muted-foreground"
-                  }`}
-                >
-                  {link.label}
-                </Link>
-              ))}
+              {navLinks.map((link) => {
+                const isActive = location.pathname === link.to;
+                return (
+                  <Link
+                    key={link.to}
+                    to={link.to}
+                    onClick={() => setOpen(false)}
+                    aria-current={isActive ? "page" : undefined}
+                    className={`text-lg font-semibold transition-colors hover:text-primary ${
+                      isActive ? "text-primary" : "text-muted-foreground"
+                    }`}
+                  >
+                    {link.label}
+                  </Link>
+                );
+              })}
               <div className="flex items-center gap-4 mt-4">
                 <a
                   href={WHATSAPP_URL}
