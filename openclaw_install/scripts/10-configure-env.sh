@@ -21,7 +21,8 @@ for var in CLIENT_ID TIER AI_GATEWAY_URL AI_GATEWAY_TOKEN TELEGRAM_BOT_TOKEN TEL
   fi
 done
 
-# Mem0 keys are optional — only needed for Tier 2+ (direct API access for local embeddings)
+# Mem0 keys are optional — only needed for Tier 2+ (injected into openclaw.json, NOT env file)
+# The env file uses gateway token for chat routing; openclaw.json has real keys for Mem0
 DEEPSEEK_API_KEY="${DEEPSEEK_API_KEY:-}"
 OPENAI_API_KEY="${OPENAI_API_KEY:-}"
 if [ "$TIER" -ge 2 ] && { [ -z "$DEEPSEEK_API_KEY" ] || [ -z "$OPENAI_API_KEY" ]; }; then
@@ -40,15 +41,18 @@ docker ps --filter name=searxng --format '{{.Names}}' | grep -q searxng || error
 GATEWAY_TOKEN="${AI_GATEWAY_TOKEN}"
 log "Using pre-registered gateway token."
 
-# Write env file — gateway config for OpenClaw chat, raw keys for Mem0
+# Write env file — gateway proxy URLs for OpenClaw chat routing (cost tracking)
+# Mem0 real API keys are in openclaw.json, NOT here
 cat > ~/.openclaw/env << ENV_EOF
 AI_GATEWAY_URL=$AI_GATEWAY_URL
 AI_GATEWAY_TOKEN=$AI_GATEWAY_TOKEN
-DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY:-}
-OPENAI_API_KEY=${OPENAI_API_KEY:-}
+DEEPSEEK_API_KEY=${GATEWAY_TOKEN}
+DEEPSEEK_BASE_URL=${AI_GATEWAY_URL}/deepseek
+OPENAI_API_KEY=${GATEWAY_TOKEN}
+OPENAI_BASE_URL=${AI_GATEWAY_URL}/openai
 ENV_EOF
 chmod 600 ~/.openclaw/env
-log "Gateway config + Mem0 keys written to ~/.openclaw/env"
+log "Gateway proxy URLs + token written to ~/.openclaw/env"
 
 # Build openclaw.json with client-specific values using python3 (jq not available)
 python3 << PYEOF
