@@ -128,8 +128,13 @@ class Deployer:
         telegram_user_id: str,
         gateway_token: str,
     ) -> str:
-        """Build client.env content with gateway config instead of raw API keys."""
-        return (
+        """Build client.env content.
+
+        Includes:
+        - AI_GATEWAY_URL/TOKEN for OpenClaw chat (routed through CF Worker proxy)
+        - Real DEEPSEEK/OPENAI keys for Mem0 (runs locally, needs direct API access)
+        """
+        env = (
             f"CLIENT_ID={job_id}\n"
             f"TIER={tier}\n"
             f"AI_GATEWAY_URL={config.AI_GATEWAY_URL}\n"
@@ -137,6 +142,13 @@ class Deployer:
             f"TELEGRAM_BOT_TOKEN={bot_token}\n"
             f"TELEGRAM_ALLOWED_USERS={telegram_user_id}\n"
         )
+        # Mem0 needs real API keys for local embeddings + LLM extraction (Tier 2+)
+        if tier >= 2:
+            env += (
+                f"DEEPSEEK_API_KEY={os.environ.get('DEEPSEEK_API_KEY', '')}\n"
+                f"OPENAI_API_KEY={os.environ.get('OPENAI_API_KEY', '')}\n"
+            )
+        return env
 
     def _register_gateway_token(self, job_id: str, gateway_token: str, tier: int):
         """Register the gateway token with the CF Worker usage API."""

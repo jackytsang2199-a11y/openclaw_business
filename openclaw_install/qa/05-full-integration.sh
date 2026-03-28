@@ -48,11 +48,19 @@ fi
 # 3. Verify SearXNG returns real search results
 check "SearXNG returns results" "curl -sf 'http://localhost:8888/search?q=hello+world&format=json' | python3 -c 'import json,sys; d=json.load(sys.stdin); assert len(d.get(\"results\",[])) > 0, \"No results\"'"
 
-# 4. Verify all env vars are non-placeholder
-check "DEEPSEEK_API_KEY is set" "grep -q '^DEEPSEEK_API_KEY=sk-' ~/.openclaw/env"
-check "OPENAI_API_KEY is set" "grep -q '^OPENAI_API_KEY=sk-' ~/.openclaw/env"
+# 4. Verify env vars and config are non-placeholder
+TIER=$(grep '^TIER=' ~/client.env 2>/dev/null | cut -d= -f2 || echo "1")
+
+check "AI_GATEWAY_URL is set" "grep -q '^AI_GATEWAY_URL=https://' ~/.openclaw/env"
+check "AI_GATEWAY_TOKEN is set" "grep -q '^AI_GATEWAY_TOKEN=.' ~/.openclaw/env"
 check "Bot token is real" "python3 -c \"import json,os; cfg=json.load(open(os.path.expanduser('~/.openclaw/openclaw.json'))); assert 'PLACEHOLDER' not in cfg['channels']['telegram']['botToken']\""
 check "Gateway token is real" "python3 -c \"import json,os; cfg=json.load(open(os.path.expanduser('~/.openclaw/openclaw.json'))); assert 'PLACEHOLDER' not in cfg['gateway']['auth']['token']\""
+
+# Tier 2+: Verify Mem0 keys exist for local embeddings
+if [ "$TIER" -ge 2 ]; then
+  check "DEEPSEEK_API_KEY for Mem0" "grep -q '^DEEPSEEK_API_KEY=sk-' ~/.openclaw/env"
+  check "OPENAI_API_KEY for Mem0" "grep -q '^OPENAI_API_KEY=sk-' ~/.openclaw/env"
+fi
 
 # 5. Verify gateway journal has no crash loops (last 5 minutes)
 RECENT_RESTARTS=$(journalctl --user -u openclaw-gateway.service --since "5 min ago" 2>/dev/null | grep -c "Started OpenClaw" || true)
