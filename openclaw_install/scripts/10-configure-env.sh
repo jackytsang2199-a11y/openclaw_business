@@ -154,6 +154,16 @@ log "openclaw.json updated with client credentials."
 touch ~/.openclaw/agents/main/soul.md
 log "soul.md created (empty — customize after setup)."
 
+# Ensure gateway service loads env vars (OpenClaw model auth reads DEEPSEEK_API_KEY from process env, not ~/.openclaw/env)
+DROPIN_DIR="$HOME/.config/systemd/user/openclaw-gateway.service.d"
+mkdir -p "$DROPIN_DIR"
+cat > "$DROPIN_DIR/env.conf" << EOF
+[Service]
+EnvironmentFile=/home/deploy/.openclaw/env
+EOF
+systemctl --user daemon-reload
+log "Gateway EnvironmentFile drop-in created."
+
 # Restart all services
 log "Starting/restarting services..."
 systemctl --user restart openclaw-gateway.service
