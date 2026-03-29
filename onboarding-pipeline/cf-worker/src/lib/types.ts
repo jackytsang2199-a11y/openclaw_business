@@ -12,6 +12,9 @@ export interface Env {
   DEEPSEEK_OUTPUT_RATE: string;
   OPENAI_INPUT_RATE: string;
   OPENAI_OUTPUT_RATE: string;
+  ZHIPU_INPUT_RATE: string;
+  ZHIPU_OUTPUT_RATE: string;
+  ZHIPU_API_KEY: string;
   USD_TO_HKD: string;
 }
 

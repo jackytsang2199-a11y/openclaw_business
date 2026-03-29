@@ -24,12 +24,17 @@ function calculateCostHkd(
   let outputRate: number;
 
   if (provider === "openai") {
-    inputRate = parseFloat(env.OPENAI_INPUT_RATE || "0.000003");
-    outputRate = parseFloat(env.OPENAI_OUTPUT_RATE || "0.000006");
+    // text-embedding-3-small: $0.02/1M input, $0 output
+    inputRate = parseFloat(env.OPENAI_INPUT_RATE || "0.00000002");
+    outputRate = parseFloat(env.OPENAI_OUTPUT_RATE || "0");
+  } else if (provider === "zhipu") {
+    // GLM-4-Flash: FREE
+    inputRate = parseFloat(env.ZHIPU_INPUT_RATE || "0");
+    outputRate = parseFloat(env.ZHIPU_OUTPUT_RATE || "0");
   } else {
-    // Default to DeepSeek rates
-    inputRate = parseFloat(env.DEEPSEEK_INPUT_RATE || "0.000001");
-    outputRate = parseFloat(env.DEEPSEEK_OUTPUT_RATE || "0.000002");
+    // DeepSeek V3.2: $0.28/1M input, $0.42/1M output
+    inputRate = parseFloat(env.DEEPSEEK_INPUT_RATE || "0.00000028");
+    outputRate = parseFloat(env.DEEPSEEK_OUTPUT_RATE || "0.00000042");
   }
 
   return (tokensIn * inputRate + tokensOut * outputRate) * usdToHkd;
@@ -75,6 +80,7 @@ export async function handleAiProxy(
   const providerBaseUrls: Record<string, string> = {
     deepseek: "https://api.deepseek.com/v1",
     openai: "https://api.openai.com/v1",
+    zhipu: "https://open.bigmodel.cn/api/paas/v4",
   };
   const baseUrl = providerBaseUrls[provider];
   if (!baseUrl) {
@@ -84,7 +90,11 @@ export async function handleAiProxy(
     });
   }
 
-  const apiKey = provider === "openai" ? env.OPENAI_API_KEY : env.DEEPSEEK_API_KEY;
+  const apiKeyMap: Record<string, string> = {
+    openai: env.OPENAI_API_KEY,
+    zhipu: env.ZHIPU_API_KEY,
+  };
+  const apiKey = apiKeyMap[provider] || env.DEEPSEEK_API_KEY;
   const providerUrl = `${baseUrl}/${subpath}`;
   const gatewayResponse = await fetch(providerUrl, {
     method: request.method,

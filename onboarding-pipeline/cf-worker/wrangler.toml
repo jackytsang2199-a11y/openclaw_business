@@ -17,11 +17,15 @@ database_id = "3456a3ee-7d15-4db2-9af1-27c274a31322"
 [vars]
 VARIANT_TIER_MAP = '{"placeholder_variant_1":1,"placeholder_variant_2":2,"placeholder_variant_3":3}'
 OWNER_TELEGRAM_CHAT_ID = "340067089"
-DEEPSEEK_INPUT_RATE = "0.000001"
-DEEPSEEK_OUTPUT_RATE = "0.000002"
-# text-embedding-3-small: $0.02/1M tokens (we only use OpenAI for embeddings)
+# DeepSeek V3.2: $0.28/1M input, $0.42/1M output
+DEEPSEEK_INPUT_RATE = "0.00000028"
+DEEPSEEK_OUTPUT_RATE = "0.00000042"
+# OpenAI text-embedding-3-small: $0.02/1M input, $0 output (embeddings only)
 OPENAI_INPUT_RATE = "0.00000002"
 OPENAI_OUTPUT_RATE = "0"
+# Zhipu GLM-4-Flash: FREE
+ZHIPU_INPUT_RATE = "0"
+ZHIPU_OUTPUT_RATE = "0"
 USD_TO_HKD = "7.8"
 
 # Secrets (set via `wrangler secret put`):

@@ -48,6 +48,7 @@ DEEPSEEK_API_KEY=$DEEPSEEK_API_KEY
 DEEPSEEK_BASE_URL=${AI_GATEWAY_URL}/deepseek
 OPENAI_API_KEY=$OPENAI_API_KEY
 OPENAI_BASE_URL=${AI_GATEWAY_URL}/openai
+MEM0_TELEMETRY=false
 ENV_EOF
 chmod 600 ~/.openclaw/env
 log "Env file written (proxy-only — all keys are gateway tokens)."
@@ -121,9 +122,9 @@ if tier >= 2:
                 "llm": {
                     "provider": "openai",
                     "config": {
-                        "model": "deepseek-chat",
+                        "model": "glm-4-flash",
                         "apiKey": gateway_token,
-                        "baseURL": f"{gateway_url}/deepseek"
+                        "baseURL": f"{gateway_url}/zhipu"
                     }
                 },
                 "historyDbPath": f"{home}/clawd/mem0-history.db"
