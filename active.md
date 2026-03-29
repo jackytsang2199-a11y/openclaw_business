@@ -61,12 +61,12 @@
 
 | # | Task | Category | Status | Notes |
 |---|------|----------|--------|-------|
-| 1 | Contabo 首單手動下單 | VPS | 未開始 | 清 fraud verification，之後 API provisioning 才能用 |
+| 1 | ~~Contabo 首單手動下單~~ | VPS | ✅ | 已買，161.97.82.155 (deploy test VPS) + 另一台 |
 | 2 | Contabo API credentials 更新到 Pi5 `.env` | VPS | 未開始 | 目前係 placeholder |
-| 3 | VPS E2E Mem0 capture 測試 | Pipeline | Blocked | VPS 161.97.82.155 unreachable，需要新 VPS 測試 |
+| 3 | VPS E2E Mem0 capture 測試 | Pipeline | Ready | 161.97.82.155 available for testing |
 | 4 | ~~Update deployer.py — remove real key injection~~ | Code | ✅ | gateway_token only, no os.environ real keys |
-| 5 | Website final build + deploy | Website | 未開始 | Lovable → Cloudflare Pages |
-| 6 | Payment integration（Lemon Squeezy） | Payment | 未開始 | 需要 webhook → CF Worker `/api/confirm` |
+| 5 | Website final build + deploy | Website | 未開始 | Lovable → Cloudflare Pages（先 deploy 現有版本？）|
+| 6 | Payment integration（Lemon Squeezy） | Payment | 🔄 | Account created，需要 website URL 先完成 setup |
 
 ### 🟡 Important — Before Soft Launch
 
