@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600" width="1200" height="600">
+  <defs>
+    <marker id="arrowRed" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="#ef4444"/>
+    </marker>
+    <marker id="arrowGreen" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="#22c55e"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="600" fill="#0a0a0a" rx="12"/>
+
+  <!-- Divider -->
+  <line x1="600" y1="40" x2="600" y2="560" stroke="#333" stroke-width="1" stroke-dasharray="6,4"/>
+  <rect x="575" y="270" width="50" height="36" rx="18" fill="#222" stroke="#444" stroke-width="1"/>
+  <text x="600" y="294" text-anchor="middle" fill="#888" font-family="system-ui, sans-serif" font-size="15" font-weight="700">VS</text>
+
+  <!-- LEFT COLUMN: ChatGPT -->
+  <!-- Header -->
+  <rect x="80" y="40" width="400" height="48" rx="8" fill="#ef4444"/>
+  <text x="280" y="72" text-anchor="middle" fill="#fff" font-family="system-ui, sans-serif" font-size="22" font-weight="700">ChatGPT</text>
+
+  <!-- Box 1: Your conversations -->
+  <rect x="180" y="130" width="200" height="52" rx="10" fill="#1a1a1a" stroke="#555" stroke-width="1.5"/>
+  <text x="280" y="162" text-anchor="middle" fill="#e0e0e0" font-family="system-ui, sans-serif" font-size="16">你的對話</text>
+
+  <!-- Arrow down -->
+  <line x1="280" y1="182" x2="280" y2="240" stroke="#ef4444" stroke-width="2" marker-end="url(#arrowRed)"/>
+
+  <!-- Box 2: OpenAI servers (red highlight) -->
+  <rect x="150" y="248" width="260" height="60" rx="10" fill="#2a0a0a" stroke="#ef4444" stroke-width="2"/>
+  <text x="280" y="275" text-anchor="middle" fill="#ef4444" font-family="system-ui, sans-serif" font-size="17" font-weight="600">OpenAI 伺服器</text>
+  <text x="280" y="298" text-anchor="middle" fill="#ef444499" font-family="system-ui, sans-serif" font-size="12">美國第三方雲端</text>
+
+  <!-- Warning icon (triangle) -->
+  <path d="M268,350 L280,332 L292,350 Z" fill="none" stroke="#ef4444" stroke-width="1.8"/>
+  <text x="280" y="348" text-anchor="middle" fill="#ef4444" font-family="system-ui, sans-serif" font-size="11" font-weight="700">!</text>
+
+  <!-- Description text -->
+  <text x="280" y="390" text-anchor="middle" fill="#ccc" font-family="system-ui, sans-serif" font-size="15">數據儲存在第三方伺服器</text>
+  <text x="280" y="420" text-anchor="middle" fill="#888" font-family="system-ui, sans-serif" font-size="13">可能用於訓練模型</text>
+
+  <!-- Red X icons -->
+  <g transform="translate(180,460)" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round">
+    <line x1="0" y1="0" x2="10" y2="10"/><line x1="10" y1="0" x2="0" y2="10"/>
+  </g>
+  <text x="200" y="472" fill="#999" font-family="system-ui, sans-serif" font-size="13">無法控制數據去向</text>
+  <g transform="translate(180,495)" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round">
+    <line x1="0" y1="0" x2="10" y2="10"/><line x1="10" y1="0" x2="0" y2="10"/>
+  </g>
+  <text x="200" y="507" fill="#999" font-family="system-ui, sans-serif" font-size="13">對話記錄存於海外</text>
+
+  <!-- RIGHT COLUMN: 蟹助手 -->
+  <!-- Header -->
+  <rect x="720" y="40" width="400" height="48" rx="8" fill="#22c55e"/>
+  <text x="920" y="72" text-anchor="middle" fill="#fff" font-family="system-ui, sans-serif" font-size="22" font-weight="700">蟹助手</text>
+
+  <!-- Box 1: Your conversations -->
+  <rect x="820" y="130" width="200" height="52" rx="10" fill="#1a1a1a" stroke="#555" stroke-width="1.5"/>
+  <text x="920" y="162" text-anchor="middle" fill="#e0e0e0" font-family="system-ui, sans-serif" font-size="16">你的對話</text>
+
+  <!-- Arrow down -->
+  <line x1="920" y1="182" x2="920" y2="240" stroke="#22c55e" stroke-width="2" marker-end="url(#arrowGreen)"/>
+
+  <!-- Box 2: Your dedicated VPS (green highlight) -->
+  <rect x="790" y="248" width="260" height="60" rx="10" fill="#0a1a0a" stroke="#22c55e" stroke-width="2"/>
+  <text x="920" y="275" text-anchor="middle" fill="#22c55e" font-family="system-ui, sans-serif" font-size="17" font-weight="600">你的專屬 VPS</text>
+  <text x="920" y="298" text-anchor="middle" fill="#22c55e99" font-family="system-ui, sans-serif" font-size="12">獨立伺服器，完全屬於你</text>
+
+  <!-- Arrow down to proxy -->
+  <line x1="920" y1="308" x2="920" y2="340" stroke="#22c55e" stroke-width="1.5" marker-end="url(#arrowGreen)"/>
+
+  <!-- Shield + encrypted proxy -->
+  <rect x="845" y="348" width="150" height="36" rx="8" fill="#0f1f0f" stroke="#22c55e88" stroke-width="1"/>
+  <!-- Shield icon -->
+  <path d="M880,358 L880,374 Q880,380 888,382 Q896,380 896,374 L896,358 Q888,355 880,358 Z" fill="none" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="935" y="372" text-anchor="middle" fill="#22c55ecc" font-family="system-ui, sans-serif" font-size="13">加密代理</text>
+
+  <!-- Description text -->
+  <text x="920" y="418" text-anchor="middle" fill="#ccc" font-family="system-ui, sans-serif" font-size="15">數據只存在你的伺服器</text>
+  <text x="920" y="448" text-anchor="middle" fill="#888" font-family="system-ui, sans-serif" font-size="13">完全私密，不會用於訓練</text>
+
+  <!-- Green check icons -->
+  <g transform="translate(820,480)">
+    <polyline points="0,5 4,10 12,0" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="842" y="492" fill="#999" font-family="system-ui, sans-serif" font-size="13">數據完全由你掌控</text>
+  <g transform="translate(820,515)">
+    <polyline points="0,5 4,10 12,0" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="842" y="527" fill="#999" font-family="system-ui, sans-serif" font-size="13">對話記錄不離開你的 VPS</text>
+</svg>

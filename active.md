@@ -1,6 +1,6 @@
-# ClawHK 蟹助手 — 項目狀態
+# NexGen — 項目狀態
 
-> **最後更新：** 2026-03-28
+> **最後更新：** 2026-03-30
 > **階段：** Phase 0 → Phase 1 過渡中（技術基建已驗證，準備 soft launch）
 
 ---
@@ -43,7 +43,18 @@
 - [x] Domain `3nexgen.com` 買咗（Cloudflare）
 - [x] CF Worker 部署 + D1 database
 - [x] Pi5 as deployment orchestrator（systemd service ready，未 enable）
-- [x] PC-side backup script（rsync from Pi5）
+- [x] PC-side backup script（rsync→scp rewrite for Windows Git Bash compat）
+
+### 客戶 Onboarding 內容 ✅
+- [x] 客人交付 Telegram message template（香港書面語，onboarding-pipeline/templates/delivery-message.md）
+- [x] Telegram FAQ Knowledge Base（21 Q&A，marketing/telegram-faq.md）
+- [x] Website missing checklist 更新（actionable steps + execution order）
+- [x] Agent briefing docs（docs/agent-briefs/ — 3 files for AI agent onboarding）
+- [x] E2E test script: VPS recycling（tests/test_e2e_vps_lifecycle.py）
+- [x] E2E test script: Backup/restore（tests/test_e2e_backup_restore.py）
+- [x] Pi5 monitoring dashboard script（dashboard.sh + cron setup guide）
+- [x] OG image SVG（website-lovable/public/og-image.svg）
+- [x] Privacy diagram SVG（website-lovable/public/privacy-diagram.svg）
 
 ### 網站 🔄 70%
 - [x] Lovable website 初版建好（React + Vite + Tailwind + shadcn/ui）
@@ -72,13 +83,13 @@
 
 | # | Task | Category | Status | Notes |
 |---|------|----------|--------|-------|
-| 7 | VPS recycling pool E2E test | Pipeline | 未測試 | revoke + reinstall flow |
-| 8 | Backup/restore E2E test | Pipeline | 未測試 | 需要 active VPS 做 backup cycle |
+| 7 | ~~VPS recycling pool E2E test~~ | Pipeline | ✅ | test_e2e_vps_lifecycle.py ready to run on Pi5 |
+| 8 | ~~Backup/restore E2E test~~ | Pipeline | ✅ | test_e2e_backup_restore.py ready to run on Pi5 |
 | 9 | ~~Pin Qdrant Docker image to v1.14.0~~ | Scripts | ✅ | qdrant/qdrant:v1.14.0 in 05-setup-qdrant.sh |
-| 10 | Telegram 客服 bot + Knowledge Base | Customer | 未開始 | FAQ + pricing + troubleshooting |
+| 10 | ~~Telegram 客服 bot + Knowledge Base~~ | Customer | ✅ | marketing/telegram-faq.md (21 Q&A pairs) |
 | 11 | 商業登記 | Legal | 未開始 | HK business registration |
-| 12 | 客人交付 message template | Onboarding | 未開始 | 包含 bot setup guide、gateway info |
-| 13 | Monitoring dashboard（Pi5） | Ops | 未開始 | Job status, VPS health, cost tracking |
+| 12 | ~~客人交付 message template~~ | Onboarding | ✅ | onboarding-pipeline/templates/delivery-message.md |
+| 13 | ~~Monitoring dashboard（Pi5）~~ | Ops | ✅ | dashboard.sh + dashboard-cron-setup.md |
 
 ### 🟢 Phase 1 — Growth
 
@@ -205,6 +216,6 @@ openclaw_setup_business/
 | CF Worker endpoints | 19 |
 | Admin usage endpoints | 8 |
 | Website design iterations | 14 |
-| Critical remaining tasks | 5 |
+| Critical remaining tasks | 3（Contabo creds, website deploy, payment setup） |
 | Startup cost | ~HK$300-400 |
-| 目標：第一個客 | Phase 1（pending Contabo + website） |
+| 目標：第一個客 | Phase 1（pending website + payment） |

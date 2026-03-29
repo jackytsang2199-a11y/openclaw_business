@@ -1,6 +1,6 @@
 # ClawHK 蟹助手 — Master Todo List
 
-> **最後更新：** 2026-03-28
+> **最後更新：** 2026-03-30
 > **來源：** [openclaw-setup-business-plan-v1.md](openclaw-setup-business-plan-v1.md) 各 section + 實際開發進度
 > **排序：** 按 Phase → 按優先度
 > **狀態追蹤：** ✅ = done, 🔄 = in progress / partial, ⏸️ = deferred, ❌ = cancelled/replaced
@@ -33,12 +33,12 @@
 | 13 | 起 static site（landing + pricing + FAQ） | Website | 🔄 | Lovable built, 14 iterations, not deployed yet |
 | 14 | Deploy to Cloudflare Pages | Website | ⏳ | Pending final Lovable build |
 | 15 | 開 Telegram Bot 做客服 | 客服 | ⏳ | |
-| 16 | 寫 Knowledge Base（FAQ + pricing + troubleshooting） | 客服 | ⏳ | |
+| 16 | 寫 Knowledge Base（FAQ + pricing + troubleshooting） | 客服 | ✅ | marketing/telegram-faq.md |
 | 17 | 設定 notification → 你個人 Telegram | 客服 | ✅ | Owner notifications in Pi5 worker notifier.py |
 | 18 | Research WhatsApp Business API + OpenClaw 接入 | 客服 | ⏳ | Phase 1 |
 | 19 | ~~建 Google Sheet client tracker~~ | 客服 | ❌ | Replaced by D1 database in CF Worker |
 | 20 | ~~製作 Tailscale 安裝圖文教學（Route C 用）~~ | Onboarding | ❌ | Tailscale dropped |
-| 21 | 製作客人交付 message template | Onboarding | ⏳ | |
+| 21 | 製作客人交付 message template | Onboarding | ✅ | onboarding-pipeline/templates/delivery-message.md |
 | 22 | ~~製作 Pi5 預裝 checklist（Route B 用）~~ | Onboarding | ❌ | Pi5 is deployer, not customer device |
 | 23 | 開 IG business account | 推廣 | ⏳ | Phase 1 |
 | 24 | 開 Threads account（同 IG 連結） | 推廣 | ⏳ | Phase 1 |
@@ -60,7 +60,7 @@
 
 ---
 
-## New Tasks (Added During Development, Mar 25-28)
+## New Tasks (Added During Development, Mar 25-30)
 
 | # | 任務 | 類別 | 狀態 | Notes |
 |---|------|------|------|-------|
@@ -69,8 +69,8 @@
 | N3 | Pi5 worker deployment pipeline | 技術 | ✅ | 10 Python modules, 35 tests, systemd service |
 | N4 | Claude Agent SDK integration | 技術 | ✅ | Max plan OAuth, autonomous VPS deployment |
 | N5 | Contabo provisioning scripts | 技術 | ✅ | create, cancel, revoke, reinstall, destroy |
-| N6 | VPS recycling pool logic | 技術 | ✅ code, ⏳ test | Code complete, E2E test pending |
-| N7 | Backup/restore system | 技術 | ✅ code, ⏳ test | Tier-aware, code complete, E2E test pending |
+| N6 | VPS recycling pool logic | 技術 | ✅ | Code + E2E tests (tests/test_e2e_vps_lifecycle.py) |
+| N7 | Backup/restore system | 技術 | ✅ | Tier-aware, code + E2E tests (tests/test_e2e_backup_restore.py) |
 | N8 | Admin usage endpoints (8) | 技術 | ✅ | list, get, update, bulk, reset, revoke, rotate, create |
 | N9 | Proxy-only architecture validation | 技術 | ✅ | 3 API streams via proxy, verified with curl |
 | N10 | Mem0 "404 no body" proxy bug fix | Bug | ✅ | Missing /v1 in OpenAI base URL |
@@ -78,6 +78,11 @@
 | N12 | Lemon Squeezy → CF Worker webhook | Payment | ⏳ | Webhook → /api/confirm → D1 job |
 | N13 | Update deployer.py — gateway token only | Code | ✅ | _build_client_env uses gateway_token, not os.environ |
 | N14 | Pin Qdrant Docker to v1.14.0 | Scripts | ✅ | qdrant/qdrant:v1.14.0 in 05-setup-qdrant.sh |
+| N15 | Website missing checklist with execution order | Website | ✅ | website-lovable/06-missing-checklist.md updated |
+| N16 | nexgen-backup-pull.sh rewrite (rsync to scp) | Scripts | ✅ | scripts/nexgen-backup-pull.sh |
+| N17 | Agent briefing docs | Docs | ✅ | docs/agent-briefs/ (architecture, website, install-scripts) |
+| N18 | Pi5 monitoring dashboard script | 技術 | 🔄 | In progress |
+| N19 | 10-configure-env.sh gateway URL writeback | Scripts | ✅ | Already implemented (confirmed) |
 
 ---
 
@@ -122,13 +127,13 @@
 
 ---
 
-## 統計（Updated 2026-03-28）
+## 統計（Updated 2026-03-30）
 
 | 狀態 | 數量 |
 |------|------|
-| ✅ Completed | 24 |
+| ✅ Completed | 30 |
 | ❌ Cancelled/Replaced | 12 |
-| 🔄 In Progress | 1 |
-| ⏳ Pending | 25 |
+| 🔄 In Progress | 2 |
+| ⏳ Pending | 23 |
 | ⏸️ Deferred | 3 |
-| **Total** | **65** (original 53 + 14 new - 2 merged) |
+| **Total** | **70** (original 53 + 19 new - 2 merged) |

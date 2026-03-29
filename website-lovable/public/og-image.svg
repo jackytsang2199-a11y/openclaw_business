@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0a0a0a"/>
+      <stop offset="100%" stop-color="#141414"/>
+    </linearGradient>
+    <linearGradient id="crab" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fb923c"/>
+      <stop offset="100%" stop-color="#ea580c"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Subtle accent line -->
+  <rect x="0" y="0" width="1200" height="3" fill="#f97316" opacity="0.6"/>
+
+  <!-- Crab icon group — positioned left of center -->
+  <g transform="translate(280, 220)">
+    <!-- Body (main oval) -->
+    <ellipse cx="0" cy="0" rx="72" ry="52" fill="url(#crab)"/>
+    <!-- Body highlight -->
+    <ellipse cx="0" cy="-8" rx="48" ry="28" fill="#fb923c" opacity="0.5"/>
+
+    <!-- Left claw -->
+    <circle cx="-100" cy="-30" r="28" fill="url(#crab)"/>
+    <circle cx="-120" cy="-50" r="20" fill="url(#crab)"/>
+    <path d="M-72 -10 Q-86 -20 -100 -30" stroke="#ea580c" stroke-width="14" fill="none" stroke-linecap="round"/>
+
+    <!-- Right claw -->
+    <circle cx="100" cy="-30" r="28" fill="url(#crab)"/>
+    <circle cx="120" cy="-50" r="20" fill="url(#crab)"/>
+    <path d="M72 -10 Q86 -20 100 -30" stroke="#ea580c" stroke-width="14" fill="none" stroke-linecap="round"/>
+
+    <!-- Legs left -->
+    <line x1="-55" y1="30" x2="-100" y2="65" stroke="#ea580c" stroke-width="8" stroke-linecap="round"/>
+    <line x1="-48" y1="40" x2="-88" y2="82" stroke="#ea580c" stroke-width="8" stroke-linecap="round"/>
+    <line x1="-38" y1="46" x2="-70" y2="92" stroke="#ea580c" stroke-width="8" stroke-linecap="round"/>
+
+    <!-- Legs right -->
+    <line x1="55" y1="30" x2="100" y2="65" stroke="#ea580c" stroke-width="8" stroke-linecap="round"/>
+    <line x1="48" y1="40" x2="88" y2="82" stroke="#ea580c" stroke-width="8" stroke-linecap="round"/>
+    <line x1="38" y1="46" x2="70" y2="92" stroke="#ea580c" stroke-width="8" stroke-linecap="round"/>
+
+    <!-- Eyes -->
+    <circle cx="-22" cy="-28" r="10" fill="#0a0a0a"/>
+    <circle cx="22" cy="-28" r="10" fill="#0a0a0a"/>
+    <circle cx="-20" cy="-30" r="4" fill="#ffffff"/>
+    <circle cx="24" cy="-30" r="4" fill="#ffffff"/>
+  </g>
+
+  <!-- Main title -->
+  <text x="680" y="260" font-family="'Microsoft YaHei', 'PingFang SC', 'Noto Sans SC', 'Helvetica Neue', Arial, sans-serif"
+        font-size="96" font-weight="bold" fill="#ffffff" text-anchor="middle">
+    蟹助手
+  </text>
+
+  <!-- Tagline -->
+  <text x="680" y="330" font-family="'Microsoft YaHei', 'PingFang SC', 'Noto Sans SC', 'Helvetica Neue', Arial, sans-serif"
+        font-size="36" fill="#9ca3af" text-anchor="middle">
+    你的私人 AI 助手
+  </text>
+
+  <!-- Divider line -->
+  <rect x="610" y="360" width="140" height="2" rx="1" fill="#f97316" opacity="0.4"/>
+
+  <!-- Subtitle -->
+  <text x="680" y="400" font-family="'Helvetica Neue', Arial, sans-serif"
+        font-size="22" fill="#6b7280" text-anchor="middle" letter-spacing="2">
+    OpenClaw Installation Service
+  </text>
+
+  <!-- Domain -->
+  <text x="1140" y="590" font-family="'Helvetica Neue', Arial, sans-serif"
+        font-size="20" fill="#4b5563" text-anchor="end" letter-spacing="1">
+    3nexgen.com
+  </text>
+</svg>
