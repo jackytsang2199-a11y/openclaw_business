@@ -31,9 +31,9 @@ const Navbar = () => {
   const location = useLocation();
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-border transition-all duration-300">
+    <header className="sticky top-0 z-50 w-full bg-gray-950/80 backdrop-blur-md border-b border-white/10 transition-all duration-300">
       <div className="container flex h-16 items-center justify-between">
-        <Link to="/" className="flex items-center gap-2 text-lg font-bold text-foreground">
+        <Link to="/" className="flex items-center gap-2 text-lg font-bold text-white">
           <NexGenLogo className="h-7 w-7" />
           <span>NexGen</span>
         </Link>
@@ -48,7 +48,7 @@ const Navbar = () => {
                 to={link.to}
                 aria-current={isActive ? "page" : undefined}
                 className={`relative text-sm font-semibold transition-colors py-1 ${
-                  isActive ? "text-primary" : "text-foreground/70 hover:text-primary"
+                  isActive ? "text-primary" : "text-gray-400 hover:text-white"
                 }`}
               >
                 {link.label}
@@ -62,22 +62,22 @@ const Navbar = () => {
 
         {/* Desktop CTA — icon pill */}
         <div className="hidden md:flex items-center">
-          <div className="flex items-center rounded-full border border-border bg-secondary/50 overflow-hidden transition-colors">
+          <div className="flex items-center rounded-full border border-white/20 bg-white/10 overflow-hidden transition-colors">
             <a
               href={WHATSAPP_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="p-2.5 text-muted-foreground hover:text-[#25D366] transition-colors"
+              className="p-2.5 text-gray-400 hover:text-[#25D366] transition-colors"
               aria-label="WhatsApp"
             >
               <WhatsAppIcon className="h-5 w-5" />
             </a>
-            <div className="w-px h-5 bg-border" />
+            <div className="w-px h-5 bg-white/20" />
             <a
               href={TELEGRAM_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="p-2.5 text-muted-foreground hover:text-[#26A5E4] transition-colors"
+              className="p-2.5 text-gray-400 hover:text-[#26A5E4] transition-colors"
               aria-label="Telegram"
             >
               <TelegramIcon className="h-5 w-5" />
@@ -88,12 +88,12 @@ const Navbar = () => {
         {/* Mobile hamburger */}
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger asChild className="md:hidden">
-            <Button variant="ghost" size="icon">
+            <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
               <Menu className="h-5 w-5" />
               <span className="sr-only">開啟選單</span>
             </Button>
           </SheetTrigger>
-          <SheetContent side="right" className="w-72 bg-background border-border">
+          <SheetContent side="right" className="w-72 bg-gray-950 border-white/10">
             <SheetTitle className="sr-only">導航選單</SheetTitle>
             <nav className="flex flex-col gap-6 mt-8">
               {navLinks.map((link) => {

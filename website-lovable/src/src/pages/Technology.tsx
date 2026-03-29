@@ -68,6 +68,19 @@ const Technology = () => (
       ))}
     </div>
 
+    {/* Privacy diagram */}
+    <div className="max-w-4xl mx-auto text-center mt-20 space-y-6">
+      <h2 className="text-2xl md:text-4xl">數據私隱比較</h2>
+      <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+        了解蟹助手如何保護您的數據安全
+      </p>
+      <img
+        src="/privacy-diagram.svg"
+        alt="ChatGPT 與蟹助手數據流比較"
+        className="w-full max-w-4xl mx-auto rounded-lg"
+      />
+    </div>
+
     {/* Bottom CTA */}
     <div className="max-w-xl mx-auto text-center mt-16 space-y-4">
       <p className="text-muted-foreground text-lg">想了解更多？</p>

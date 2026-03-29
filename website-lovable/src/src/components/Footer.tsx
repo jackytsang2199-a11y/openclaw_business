@@ -67,11 +67,11 @@ const Footer = () => (
       <div className="border-t border-white/10 mt-8 pt-6 flex flex-col md:flex-row items-center justify-between gap-4 text-xs opacity-50">
         <span>© 2026 NexGen. All rights reserved.</span>
         <div className="flex items-center gap-3">
-          <a href="#" className="hover:opacity-80 transition-opacity">服務條款</a>
+          <Link to="/terms" className="hover:opacity-80 transition-opacity">服務條款</Link>
           <span>|</span>
-          <a href="#" className="hover:opacity-80 transition-opacity">私隱政策</a>
+          <Link to="/privacy" className="hover:opacity-80 transition-opacity">私隱政策</Link>
           <span>|</span>
-          <a href="#" className="hover:opacity-80 transition-opacity">退款政策</a>
+          <Link to="/refund" className="hover:opacity-80 transition-opacity">退款政策</Link>
         </div>
       </div>
     </div>
