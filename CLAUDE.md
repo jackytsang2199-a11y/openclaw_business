@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Repo Is
 
-Business planning, technical documentation, and **production automation code** for **ClawHK / 蟹助手 / 3NexGen** — a remote OpenClaw installation service targeting non-technical Hong Kong (Cantonese-speaking) users.
+Business planning, technical documentation, and **production automation code** for **NexGen** — a remote OpenClaw installation service targeting non-technical Hong Kong (Cantonese-speaking) users.
 
 The service installs a full production stack (not just vanilla OpenClaw) on customers' VPS, including Mem0+Qdrant memory, SearXNG search, watchdogs, and browser automation. All API traffic routes through a Cloudflare Worker proxy for per-client cost tracking and budget enforcement — **zero real API keys on customer VPS**.
 

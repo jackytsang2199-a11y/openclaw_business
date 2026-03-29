@@ -18,7 +18,7 @@ Replace ALL instances of the old brand across every file:
 | `🦀` emoji (everywhere) | Remove entirely, no replacement emoji |
 | `clawhk.com` | `3nexgen.com` |
 | `info@clawhk.com` | `info@3nexgen.com` |
-| `t.me/clawhk` | `t.me/nexgenai` |
+| `t.me/clawhk` | `t.me/nexgenOpenClaw` |
 
 Do NOT add a Chinese name. `NexGen` is the brand everywhere, English only.
 
