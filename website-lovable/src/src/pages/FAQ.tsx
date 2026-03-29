@@ -7,8 +7,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-
-const WHATSAPP_URL = "https://wa.me/85200000000";
+import { WHATSAPP_URL } from "@/lib/constants";
 
 const categories = [
   {

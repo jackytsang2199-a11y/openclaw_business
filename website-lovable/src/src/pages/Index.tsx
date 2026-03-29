@@ -10,8 +10,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-
-const WHATSAPP_URL = "https://wa.me/85200000000";
+import { WHATSAPP_URL } from "@/lib/constants";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
@@ -440,7 +439,7 @@ const Index = () => {
       {/* ── 4.5 Mid-page CTA Strip ── */}
       <section className="py-8 bg-primary/5 border-y border-primary/10">
         <div className="max-w-4xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-center gap-4">
-          <p className="text-base font-semibold text-foreground">由 HK$19/月起 — 每日不到 HK$1</p>
+          <p className="text-base font-semibold text-foreground">由 HK$148/月起 — 每日不到 HK$5</p>
           <Button asChild className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl px-6 btn-press">
             <Link to="/pricing">立即開始</Link>
           </Button>
@@ -612,7 +611,7 @@ const Index = () => {
             <p className="text-white/50 text-lg">即時遠程安裝，最快 30 分鐘完成</p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-2xl text-base px-8 py-4 shadow-xl shadow-primary/20 btn-press">
-                <Link to="/pricing">由 HK$19/月起 — 立即開始</Link>
+                <Link to="/pricing">由 HK$148/月起 — 立即開始</Link>
               </Button>
               <Button asChild variant="ghost" size="lg" className="border border-white/20 text-white/80 hover:bg-white/10 hover:text-white rounded-2xl text-base px-8 py-4 gap-2 btn-press">
                 <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer">

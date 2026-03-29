@@ -3,17 +3,16 @@ import { motion } from "framer-motion";
 import { MessageCircle, Check, X, Server, Brain, Search, Calendar, FileText, Plug, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-
-const WHATSAPP_URL = "https://wa.me/85200000000";
+import { WHATSAPP_URL } from "@/lib/constants";
 
 const tiers = [
   {
     emoji: "🌱",
     name: "新手上路",
-    installOriginal: 50,
-    installPromo: 25,
-    monthly: 19,
-    annual: 190,
+    installOriginal: 400,
+    installPromo: 200,
+    monthly: 148,
+    annual: 1508,
     suitedFor: "想試試 AI 助手",
     popular: false,
     premium: false,
@@ -32,10 +31,10 @@ const tiers = [
   {
     emoji: "⭐",
     name: "智能管家",
-    installOriginal: 100,
-    installPromo: 50,
-    monthly: 32,
-    annual: 320,
+    installOriginal: 800,
+    installPromo: 400,
+    monthly: 248,
+    annual: 2528,
     suitedFor: "大部分人選這個",
     popular: true,
     premium: false,
@@ -54,10 +53,10 @@ const tiers = [
   {
     emoji: "🚀",
     name: "全能大師",
-    installOriginal: 230,
-    installPromo: 115,
-    monthly: 49,
-    annual: 499,
+    installOriginal: 1800,
+    installPromo: 900,
+    monthly: 388,
+    annual: 3958,
     suitedFor: "需要最完整的體驗",
     popular: false,
     premium: true,

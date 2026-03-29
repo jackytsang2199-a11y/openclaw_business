@@ -4,9 +4,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
-
-const WHATSAPP_URL = "https://wa.me/85200000000";
-const TELEGRAM_URL = "https://t.me/nexgenOpenClaw";
+import { WHATSAPP_URL, TELEGRAM_URL } from "@/lib/constants";
 
 const navLinks = [
   { to: "/", label: "首頁" },

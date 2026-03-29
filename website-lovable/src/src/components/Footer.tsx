@@ -1,8 +1,6 @@
 import { Link } from "react-router-dom";
 import NexGenLogo from "@/components/NexGenLogo";
-
-const WHATSAPP_URL = "https://wa.me/85200000000";
-const TELEGRAM_URL = "https://t.me/nexgenOpenClaw";
+import { WHATSAPP_URL, TELEGRAM_URL } from "@/lib/constants";
 
 const WhatsAppIcon = () => (
   <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5">
@@ -58,9 +56,9 @@ const Footer = () => (
         <div className="space-y-3">
           <h4 className="text-sm font-medium">付款方式</h4>
           <div className="flex items-center gap-3 text-sm flex-wrap">
-            <span className="bg-white/10 px-3 py-1 rounded-md font-medium opacity-80">Stripe</span>
-            <span className="bg-white/10 px-3 py-1 rounded-md font-medium opacity-80">PayPal</span>
-            <span className="bg-white/10 px-3 py-1 rounded-md font-medium opacity-80">Bank Transfer</span>
+            <span className="bg-white/10 px-3 py-1 rounded-md font-medium opacity-80">FPS</span>
+            <span className="bg-white/10 px-3 py-1 rounded-md font-medium opacity-80">PayMe</span>
+            <span className="bg-white/10 px-3 py-1 rounded-md font-medium opacity-80">信用卡</span>
           </div>
           <p className="text-xs opacity-50 mt-2">info@3nexgen.com</p>
         </div>

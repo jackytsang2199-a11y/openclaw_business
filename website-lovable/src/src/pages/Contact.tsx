@@ -1,9 +1,7 @@
 import { Link } from "react-router-dom";
 import { MessageCircle, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-const WHATSAPP_URL = "https://wa.me/85200000000";
-const TELEGRAM_URL = "https://t.me/nexgenOpenClaw";
+import { WHATSAPP_URL, TELEGRAM_URL } from "@/lib/constants";
 
 const contacts = [
   {

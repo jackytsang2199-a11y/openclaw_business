@@ -1,8 +1,7 @@
 import { Link } from "react-router-dom";
 import { MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-const WHATSAPP_URL = "https://wa.me/85200000000";
+import { WHATSAPP_URL } from "@/lib/constants";
 
 const techSections = [
   {
@@ -19,11 +18,6 @@ const techSections = [
     name: "SearXNG",
     headline: "突破 AI 搜尋封鎖 — 全網搜尋引擎",
     body: "ChatGPT 的搜尋被大量網站封鎖 — Reddit、論壇、部分新聞網站都搜不到。SearXNG 是自架元搜尋引擎，bypass 所有 AI 搜尋封鎖，即時搜尋全網資訊。ChatGPT 搜不到的，它搜得到。",
-  },
-  {
-    name: "WireGuard",
-    headline: "軍事級 VPN 隧道 — 永不中斷",
-    body: "新一代 VPN 協議，加密強度媲美軍事級。內建多伺服器自動切換（東京 → 新加坡），VPN 斷線時 Watchdog 自動重連，確保 AI 服務 24/7 不中斷。你完全不需要處理。",
   },
   {
     name: "Chromium Headless",
