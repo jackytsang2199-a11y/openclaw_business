@@ -101,7 +101,7 @@ This is the most important script — it wires everything together:
 - Sets base URLs to point at CF Worker proxy
 - Starts all systemd services
 
-**Known TODO:** Needs gateway proxy URL writeback (`DEEPSEEK_BASE_URL`, `OPENAI_BASE_URL` to `~/.openclaw/env`)
+**Status:** Complete — writes `DEEPSEEK_BASE_URL` and `OPENAI_BASE_URL` (from `${AI_GATEWAY_URL}`) to `~/.openclaw/env`
 
 ## Known Issues (Fixed)
 

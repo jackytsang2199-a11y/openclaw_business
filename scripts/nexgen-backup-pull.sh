@@ -29,25 +29,25 @@ log() {
     echo "$(date '+%Y-%m-%d %H:%M:%S') | $1" | tee -a "${LOG_FILE}"
 }
 
-# === Step 1: Rsync active backups ===
+# === Step 1: SCP active backups ===
 log "Pulling active backups from Pi5 (${PI5_IP})..."
-if rsync -avz -e "ssh ${SSH_OPTS}" \
-    "${PI5_USER}@${PI5_IP}:/home/jacky999/backups/active/" \
+if scp -r ${SSH_OPTS} \
+    "${PI5_USER}@${PI5_IP}:/home/jacky999/backups/active/." \
     "${WEEKLY_DIR}/" 2>>"${LOG_FILE}"; then
-    log "Active backups synced to ${WEEKLY_DIR}"
+    log "Active backups copied to ${WEEKLY_DIR}"
 else
-    log "ERROR: Failed to rsync active backups from Pi5"
+    log "ERROR: Failed to scp active backups from Pi5"
     exit 1
 fi
 
-# === Step 2: Mirror churn archives ===
-log "Mirroring churn archives..."
-if rsync -avz -e "ssh ${SSH_OPTS}" \
-    "${PI5_USER}@${PI5_IP}:/home/jacky999/backups/churn/" \
+# === Step 2: Copy churn archives ===
+log "Copying churn archives..."
+if scp -r ${SSH_OPTS} \
+    "${PI5_USER}@${PI5_IP}:/home/jacky999/backups/churn/." \
     "${PC_BACKUP_DIR}/churn/" 2>>"${LOG_FILE}"; then
-    log "Churn archives synced"
+    log "Churn archives copied"
 else
-    log "WARNING: Failed to rsync churn archives (non-fatal)"
+    log "WARNING: Failed to scp churn archives (non-fatal)"
 fi
 
 # === Step 3: Cleanup old weeklies ===
