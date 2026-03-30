@@ -251,6 +251,55 @@ describe("AI Gateway Proxy", () => {
     expect(usage.total_tokens_in).toBe(1000);
   });
 
+  it("tracks tokens from streamed SSE responses", async () => {
+    await createUsageRecord("1001", "valid_token", 2, null);
+
+    // Simulate SSE stream response with usage in final chunk
+    const sseBody = [
+      'data: {"choices":[{"delta":{"content":"Hello"}}]}\n',
+      'data: {"choices":[{"delta":{"content":" world"}}]}\n',
+      'data: {"choices":[],"usage":{"prompt_tokens":500,"completion_tokens":200}}\n',
+      'data: [DONE]\n',
+    ].join("\n");
+
+    const mockFetch = vi.fn().mockImplementation((url: string, init: any) => {
+      // Verify stream_options was injected into the forwarded request
+      const body = JSON.parse(init.body);
+      expect(body.stream_options).toEqual({ include_usage: true });
+
+      return Promise.resolve(new Response(sseBody, {
+        status: 200,
+        headers: { "Content-Type": "text/event-stream" },
+      }));
+    });
+    vi.stubGlobal("fetch", mockFetch);
+
+    const req = new Request("http://localhost/api/ai/deepseek/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": "Bearer valid_token",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "deepseek-chat",
+        stream: true,
+        messages: [{ role: "user", content: "hello" }],
+      }),
+    });
+    const ctx = createExecutionContext();
+    const resp = await worker.fetch(req, env, ctx);
+    await waitOnExecutionContext(ctx);
+    expect(resp.status).toBe(200);
+
+    const usage = await env.DB.prepare(
+      "SELECT total_tokens_in, total_tokens_out, current_spend_hkd FROM api_usage WHERE customer_id = ?"
+    ).bind("1001").first() as any;
+
+    expect(usage.total_tokens_in).toBe(500);
+    expect(usage.total_tokens_out).toBe(200);
+    expect(usage.current_spend_hkd).toBeGreaterThan(0);
+  });
+
   it("resets monthly counters on new month", async () => {
     await createUsageRecord("1001", "valid_token", 2, 10.0);
     // Set to old month

@@ -149,12 +149,16 @@ class Deployer:
             env += f"OPENAI_API_KEY={gateway_token}\n"
         return env
 
+    # Monthly budget caps per tier (HKD)
+    TIER_BUDGETS = {1: 40.0, 2: 70.0, 3: 100.0}
+
     def _register_gateway_token(self, job_id: str, gateway_token: str, tier: int):
         """Register the gateway token with the CF Worker usage API."""
         self.api.register_gateway_token(
             customer_id=job_id,
             gateway_token=gateway_token,
             tier=tier,
+            monthly_budget_hkd=self.TIER_BUDGETS.get(tier),
         )
 
     async def _run_agent_deployment(

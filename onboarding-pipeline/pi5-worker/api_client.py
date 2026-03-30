@@ -90,16 +90,19 @@ class ApiClient:
         resp.raise_for_status()
         return resp.json().get("vps_list", [])
 
-    def register_gateway_token(self, customer_id: str, gateway_token: str, tier: int) -> dict:
+    def register_gateway_token(self, customer_id: str, gateway_token: str, tier: int, monthly_budget_hkd: float = None) -> dict:
         """Register a gateway token for a customer in the usage tracking system."""
+        payload = {
+            "customer_id": customer_id,
+            "gateway_token": gateway_token,
+            "tier": tier,
+        }
+        if monthly_budget_hkd is not None:
+            payload["monthly_budget_hkd"] = monthly_budget_hkd
         resp = requests.post(
             f"{self.base_url}/api/usage",
             headers={**self.headers, "Content-Type": "application/json"},
-            json={
-                "customer_id": customer_id,
-                "gateway_token": gateway_token,
-                "tier": tier,
-            },
+            json=payload,
             timeout=10,
         )
         resp.raise_for_status()

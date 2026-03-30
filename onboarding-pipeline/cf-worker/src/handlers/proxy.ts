@@ -40,6 +40,22 @@ function calculateCostHkd(
   return (tokensIn * inputRate + tokensOut * outputRate) * usdToHkd;
 }
 
+/** Extract usage from SSE stream — finds the last data chunk with usage info. */
+function extractUsageFromSSE(body: string): { prompt_tokens: number; completion_tokens: number } | null {
+  const lines = body.split("\n");
+  for (let i = lines.length - 1; i >= 0; i--) {
+    const line = lines[i];
+    if (!line.startsWith("data: ") || line === "data: [DONE]") continue;
+    try {
+      const parsed = JSON.parse(line.slice(6));
+      if (parsed.usage) return parsed.usage;
+    } catch {
+      continue;
+    }
+  }
+  return null;
+}
+
 export async function handleAiProxy(
   request: Request,
   env: Env,
@@ -73,10 +89,6 @@ export async function handleAiProxy(
   }
 
   // 5. Forward directly to provider API with real key
-  // OpenAI SDK sends paths without /v1 (e.g. /chat/completions, /embeddings)
-  // because the SDK's default baseURL already includes /v1.
-  // When customers override baseURL to our proxy, /v1 is stripped from the path.
-  // We must include /v1 in the upstream base URLs to compensate.
   const providerBaseUrls: Record<string, string> = {
     deepseek: "https://api.deepseek.com/v1",
     openai: "https://api.openai.com/v1",
@@ -96,13 +108,28 @@ export async function handleAiProxy(
   };
   const apiKey = apiKeyMap[provider] || env.DEEPSEEK_API_KEY;
   const providerUrl = `${baseUrl}/${subpath}`;
+
+  // Read request body and inject stream_options if streaming
+  let requestBody = await request.text();
+  let isStreaming = false;
+  try {
+    const parsed = JSON.parse(requestBody);
+    if (parsed.stream) {
+      isStreaming = true;
+      parsed.stream_options = { include_usage: true };
+      requestBody = JSON.stringify(parsed);
+    }
+  } catch {
+    // Not JSON — pass through as-is
+  }
+
   const gatewayResponse = await fetch(providerUrl, {
     method: request.method,
     headers: {
       "Content-Type": "application/json",
       "Authorization": `Bearer ${apiKey}`,
     },
-    body: request.body,
+    body: requestBody,
   });
 
   // 6. Read response and extract token usage
@@ -110,14 +137,23 @@ export async function handleAiProxy(
   let tokensIn = 0;
   let tokensOut = 0;
 
-  try {
-    const parsed = JSON.parse(responseBody);
-    if (parsed.usage) {
-      tokensIn = parsed.usage.prompt_tokens || 0;
-      tokensOut = parsed.usage.completion_tokens || 0;
+  if (isStreaming) {
+    // Parse SSE stream for usage in final chunk
+    const sseUsage = extractUsageFromSSE(responseBody);
+    if (sseUsage) {
+      tokensIn = sseUsage.prompt_tokens || 0;
+      tokensOut = sseUsage.completion_tokens || 0;
     }
-  } catch {
-    // If response isn't JSON or has no usage, track request but not tokens
+  } else {
+    try {
+      const parsed = JSON.parse(responseBody);
+      if (parsed.usage) {
+        tokensIn = parsed.usage.prompt_tokens || 0;
+        tokensOut = parsed.usage.completion_tokens || 0;
+      }
+    } catch {
+      // If response isn't JSON or has no usage, track request but not tokens
+    }
   }
 
   // 7. Calculate cost and update D1
