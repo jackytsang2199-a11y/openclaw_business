@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { MessageCircle, Check, X, Server, Brain, Search, Calendar, FileText, Plug, Eye } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Mail, Check, X, Server, Brain, Search, Calendar, FileText, Plug, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { WHATSAPP_URL } from "@/lib/constants";
 
 const tiers = [
   {
@@ -41,7 +41,7 @@ const tiers = [
     specs: { vps: "4 核 / 8GB", memory: true, search: true },
     features: {
       aiModel: "DeepSeek + GPT-4.1-mini",
-      messaging: "Telegram + WhatsApp",
+      messaging: "Telegram",
       memory: { has: true, label: "長期記憶", detail: "它會記住你" },
       search: { has: true, label: "即時搜尋", detail: "可以上網查資料" },
       recovery: { has: true, label: "自動恢復", detail: "斷線自動修復" },
@@ -134,7 +134,7 @@ const Pricing = () => {
           </div>
           <div className="space-y-4 text-muted-foreground leading-relaxed text-base max-w-2xl mx-auto">
             <p>
-              OpenClaw 是一個安裝在你自己伺服器上的 AI 智能體，透過 WhatsApp、Telegram 等通訊軟件與你對話。它不是雲端共用服務 — 運行在你自己的機器上，資料完全屬於你。
+              OpenClaw 是一個安裝在你自己伺服器上的 AI 智能體，透過 Telegram 與你對話。它不是雲端共用服務 — 運行在你自己的機器上，資料完全屬於你。
             </p>
             <p>
               OpenClaw 不只是聊天。它能搜尋全網資訊、管理檔案、排行程、操作瀏覽器，在你休息時自動完成任務。整個項目開源，社區持續開發新功能。你可以選擇使用 Claude、GPT 或本地模型 — 資料永遠留在你的伺服器上。
@@ -282,10 +282,10 @@ const Pricing = () => {
                       : "bg-transparent border border-primary/20 text-primary hover:bg-primary/[0.05]"
                   }`}
                 >
-                  <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer">
-                    <MessageCircle className="h-4 w-4" />
+                  <Link to="/contact">
+                    <Mail className="h-4 w-4" />
                     選擇此方案
-                  </a>
+                  </Link>
                 </Button>
               </motion.div>
             );
@@ -295,12 +295,12 @@ const Pricing = () => {
         {/* Bottom CTA */}
         <div className="text-center space-y-6 py-8 rounded-2xl bg-accent/30 border border-border px-6 mt-12">
           <h2 className="text-2xl md:text-3xl">不確定哪個方案適合你？</h2>
-          <p className="text-muted-foreground text-lg">WhatsApp 我們聊聊，免費建議，零壓力。</p>
+          <p className="text-muted-foreground text-lg">提交支援工單，免費建議，零壓力。</p>
           <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 gap-2 text-base px-8 rounded-2xl shadow-lg shadow-primary/20 btn-press">
-            <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer">
-              <MessageCircle className="h-5 w-5" />
-              WhatsApp 聯絡我們
-            </a>
+            <Link to="/contact">
+              <Mail className="h-5 w-5" />
+              提交支援工單
+            </Link>
           </Button>
         </div>
       </section>

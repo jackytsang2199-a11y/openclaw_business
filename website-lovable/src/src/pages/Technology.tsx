@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
-import { MessageCircle } from "lucide-react";
+import { Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { WHATSAPP_URL } from "@/lib/constants";
 
 const techSections = [
   {
@@ -89,10 +88,10 @@ const Technology = () => (
           <Link to="/pricing">查看收費方案 →</Link>
         </Button>
         <Button asChild variant="outline" size="lg" className="border-primary/20 text-primary hover:bg-primary/[0.05] rounded-2xl text-base px-8 gap-2">
-          <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer">
-            <MessageCircle className="h-5 w-5" />
-            WhatsApp 聯絡我們
-          </a>
+          <Link to="/contact">
+            <Mail className="h-5 w-5" />
+            提交支援工單
+          </Link>
         </Button>
       </div>
     </div>

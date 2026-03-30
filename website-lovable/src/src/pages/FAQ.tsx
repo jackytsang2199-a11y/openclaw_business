@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { MessageCircle } from "lucide-react";
+import { FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Accordion,
@@ -7,7 +7,6 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { WHATSAPP_URL } from "@/lib/constants";
 
 const categories = [
   {
@@ -74,11 +73,11 @@ const categories = [
     faqs: [
       {
         q: "如果系統出問題怎麼辦？",
-        a: "智能管家和全能大師方案包含自動恢復功能（Watchdog），系統會 24/7 監控並自動修復。如需人工支援，可透過 WhatsApp 聯絡我們。",
+        a: "智能管家和全能大師方案包含自動恢復功能（Watchdog），系統會 24/7 監控並自動修復。如需人工支援，可透過電郵提交支援工單 (support@3nexgen.com)。",
       },
       {
         q: "可以升級或降級方案嗎？",
-        a: "可以。隨時透過 WhatsApp 聯絡我們調整方案，差價按比例計算。",
+        a: "可以。隨時透過電郵提交支援工單，差價按比例計算。",
       },
       {
         q: "如果我想取消服務會怎樣？",
@@ -95,9 +94,9 @@ const FAQ = () => (
       <p className="text-lg text-muted-foreground mt-2">我們已經準備好答案</p>
       <p className="text-muted-foreground">
         找不到答案？
-        <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="text-primary font-medium hover:underline ml-1">
-          WhatsApp 問我們
-        </a>
+        <Link to="/contact" className="text-primary font-medium hover:underline ml-1">
+          提交支援工單
+        </Link>
       </p>
     </div>
 
@@ -129,10 +128,10 @@ const FAQ = () => (
     <div className="text-center space-y-4 mt-16 py-8 rounded-2xl bg-accent/30 border border-border px-6">
       <p className="text-lg text-muted-foreground">還有其他問題？</p>
       <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 gap-2 text-base px-8 rounded-2xl shadow-lg">
-        <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer">
-          <MessageCircle className="h-5 w-5" />
-          WhatsApp 聯絡我們
-        </a>
+        <Link to="/contact">
+          <FileText className="h-5 w-5" />
+          提交支援工單
+        </Link>
       </Button>
     </div>
   </section>

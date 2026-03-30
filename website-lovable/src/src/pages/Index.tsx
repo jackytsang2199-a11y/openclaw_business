@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useInView } from "framer-motion";
 import { Link } from "react-router-dom";
-import { MessageCircle, ChevronDown, Briefcase, BookOpen, Pen, UtensilsCrossed, FileText, Cpu, ArrowRight, Brain, Globe, Shield, Monitor, Pause, Play, Check, Send, MessageSquare, Zap, Lock, Users, Banknote, Calendar, Search, Plug, Eye } from "lucide-react";
+import { Mail, ChevronDown, Briefcase, BookOpen, Pen, UtensilsCrossed, FileText, Cpu, ArrowRight, Brain, Globe, Shield, Monitor, Pause, Play, Check, Send, Zap, Lock, Users, Banknote, Calendar, Search, Plug, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import NexGenLogo from "@/components/NexGenLogo";
 import {
@@ -10,7 +10,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { WHATSAPP_URL } from "@/lib/constants";
+import { SUPPORT_EMAIL } from "@/lib/constants";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
@@ -155,7 +155,7 @@ const useCases = [
 
 const beforeAfter = [
   { label: "時間", diy: "3-8 小時（不計 debug）", us: "30 分鐘遠程裝好" },
-  { label: "技術要求", diy: "Docker、VPN、API key、Linux…", us: "零。懂用 WhatsApp 就行" },
+  { label: "技術要求", diy: "Docker、VPN、API key、Linux…", us: "零。懂用 Telegram 就行" },
   { label: "長期記憶", diy: "❌ 自行設定 Qdrant + Mem0", us: "✅ 裝好即用" },
   { label: "即時搜尋", diy: "❌ 自行架設 SearXNG", us: "✅ 裝好即用" },
   { label: "斷線修復", diy: "❌ 手動 debug", us: "✅ Watchdog 自動 24/7" },
@@ -163,7 +163,7 @@ const beforeAfter = [
 ];
 
 const steps = [
-  { title: "選擇方案", desc: "查看哪個計劃適合你，透過 WhatsApp / Telegram 聯絡我們" },
+  { title: "選擇方案", desc: "查看哪個計劃適合你，透過電郵提交支援工單" },
   { title: "我們遠程安裝", desc: "你提供存取權限，我們遠程幫你安裝好。最快 30 分鐘。" },
   { title: "開始使用", desc: "在 Telegram 直接與你的 AI 對話，就這麼簡單" },
 ];
@@ -176,9 +176,7 @@ const trustItems = [
 ];
 
 const platforms = [
-  { name: "WhatsApp", icon: MessageCircle, color: "hover:text-[#25D366]" },
   { name: "Telegram", icon: Send, color: "hover:text-[#26A5E4]" },
-  { name: "Discord", icon: MessageSquare, color: "hover:text-[#5865F2]", comingSoon: true },
 ];
 
 const Index = () => {
@@ -221,7 +219,7 @@ const Index = () => {
               <motion.div variants={fadeUp} className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-8">
                 {[
                   "無需技術知識",
-                  "Telegram / WhatsApp 直接使用",
+                  "Telegram 直接使用",
                   "記得你的所有對話",
                 ].map((text) => (
                   <span key={text} className="flex items-center gap-2.5 text-base text-white/90">
@@ -541,7 +539,7 @@ const Index = () => {
                 我完全不懂技術，適合使用嗎？
               </AccordionTrigger>
               <AccordionContent className="text-base text-muted-foreground">
-                完全適合！整個安裝、設定、維護過程由我們的工程團隊處理。你只需要提供 Telegram ID，選擇方案並付款，最快 30 分鐘內即可開始使用。日後有任何問題，WhatsApp 聯絡我們即可。
+                完全適合！整個安裝、設定、維護過程由我們的工程團隊處理。你只需要提供 Telegram ID，選擇方案並付款，最快 30 分鐘內即可開始使用。日後有任何問題，透過電郵提交工單即可。
               </AccordionContent>
             </AccordionItem>
             <AccordionItem value="faq-2" className="bg-card rounded-xl px-6 border border-border/50 shadow-sm">
@@ -614,10 +612,10 @@ const Index = () => {
                 <Link to="/pricing">由 HK$148/月起 — 立即開始</Link>
               </Button>
               <Button asChild variant="ghost" size="lg" className="border border-white/20 text-white/80 hover:bg-white/10 hover:text-white rounded-2xl text-base px-8 py-4 gap-2 btn-press">
-                <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer">
-                  <MessageCircle className="h-5 w-5" />
-                  WhatsApp 聯絡我們
-                </a>
+                <Link to="/contact">
+                  <Mail className="h-5 w-5" />
+                  提交支援工單
+                </Link>
               </Button>
             </div>
           </motion.div>

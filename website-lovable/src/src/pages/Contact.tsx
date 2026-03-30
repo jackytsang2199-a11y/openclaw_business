@@ -1,74 +1,187 @@
+import { useState, FormEvent } from "react";
 import { Link } from "react-router-dom";
-import { MessageCircle, Send } from "lucide-react";
+import { Mail, Send, CheckCircle, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { WHATSAPP_URL, TELEGRAM_URL } from "@/lib/constants";
+import { SUPPORT_EMAIL } from "@/lib/constants";
 
-const contacts = [
-  {
-    icon: MessageCircle,
-    iconColor: "text-[#25D366]",
-    platform: "WhatsApp",
-    desc: "最快回覆，適合查詢和預約",
-    response: "通常 2 小時內",
-    url: WHATSAPP_URL,
-    highlight: true,
-  },
-  {
-    icon: Send,
-    iconColor: "text-[#26A5E4]",
-    platform: "Telegram",
-    desc: "技術問題和售後支援",
-    response: "通常 2 小時內",
-    url: TELEGRAM_URL,
-    highlight: false,
-  },
-];
+const Contact = () => {
+  const [orderNumber, setOrderNumber] = useState("");
+  const [email, setEmail] = useState("");
+  const [subject, setSubject] = useState("");
+  const [description, setDescription] = useState("");
+  const [submitted, setSubmitted] = useState(false);
 
-const Contact = () => (
-  <section className="container py-20">
-    <div className="max-w-3xl mx-auto text-center space-y-4 mb-12">
-      <h1 className="text-3xl md:text-5xl">隨時聯絡我們</h1>
-      <p className="text-base text-muted-foreground mt-2">真人團隊。真正解答。</p>
-    </div>
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
 
-    {/* Contact cards */}
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-2xl mx-auto mb-8">
-      {contacts.map((c) => (
-        <a
-          key={c.platform}
-          href={c.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={`rounded-2xl border p-8 space-y-4 text-center transition-all group shadow-sm hover:-translate-y-0.5 hover:shadow-lg duration-200 ${
-            c.highlight
-              ? "border-primary/30 bg-card hover:border-primary/50"
-              : "border-border bg-card hover:border-primary/20"
-          }`}
-        >
-          <c.icon className={`h-8 w-8 mx-auto ${c.iconColor}`} />
-          <h3 className="text-lg group-hover:text-primary transition-colors">{c.platform}</h3>
-          <p className="text-base text-muted-foreground">{c.desc}</p>
-          <p className="text-xs text-muted-foreground/70">{c.response}</p>
-        </a>
-      ))}
-    </div>
+    const bodyParts: string[] = [];
+    if (orderNumber.trim()) {
+      bodyParts.push(`訂單號碼：${orderNumber.trim()}`);
+    }
+    bodyParts.push(`回覆電郵：${email.trim()}`);
+    bodyParts.push("");
+    bodyParts.push(description.trim());
 
-    {/* FAQ teaser */}
-    <p className="text-center text-muted-foreground mb-16">
-      其他問題？查看<Link to="/faq" className="text-primary font-medium hover:underline ml-1">常見問題</Link>了解更多
-    </p>
+    const mailtoSubject = encodeURIComponent(subject.trim());
+    const mailtoBody = encodeURIComponent(bodyParts.join("\n"));
+    const mailtoLink = `mailto:${SUPPORT_EMAIL}?subject=${mailtoSubject}&body=${mailtoBody}`;
 
-    {/* Bottom CTA */}
-    <div className="text-center space-y-4 py-8 rounded-2xl bg-accent/30 border border-border px-6 max-w-2xl mx-auto">
-      <p className="text-lg text-muted-foreground">不確定自己是否需要？沒關係，先聊聊，免費諮詢，零壓力。</p>
-      <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 gap-2 text-base px-8 rounded-2xl shadow-lg">
-        <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer">
-          <MessageCircle className="h-5 w-5" />
-          WhatsApp 聯絡我們
-        </a>
-      </Button>
-    </div>
-  </section>
-);
+    window.location.href = mailtoLink;
+    setSubmitted(true);
+  };
+
+  return (
+    <section className="container py-20">
+      {/* Hero */}
+      <div className="max-w-3xl mx-auto text-center space-y-4 mb-12">
+        <h1 className="text-3xl md:text-5xl">提交支援工單</h1>
+        <p className="text-base text-muted-foreground mt-2">
+          填寫以下表格，我們會在 24 小時內透過電郵回覆。
+        </p>
+      </div>
+
+      {/* Ticket Form */}
+      <div className="max-w-xl mx-auto">
+        {submitted ? (
+          <div className="rounded-2xl border border-primary/30 bg-card p-10 text-center space-y-4">
+            <CheckCircle className="h-12 w-12 mx-auto text-primary" />
+            <h2 className="text-xl font-semibold">工單已提交</h2>
+            <p className="text-muted-foreground">
+              我們會盡快透過電郵回覆。
+            </p>
+            <Button
+              variant="outline"
+              className="mt-4 rounded-2xl"
+              onClick={() => {
+                setSubmitted(false);
+                setOrderNumber("");
+                setEmail("");
+                setSubject("");
+                setDescription("");
+              }}
+            >
+              提交另一個工單
+            </Button>
+          </div>
+        ) : (
+          <form
+            onSubmit={handleSubmit}
+            className="rounded-2xl border border-border bg-card p-8 space-y-6"
+          >
+            {/* Order Number (optional) */}
+            <div className="space-y-2">
+              <label
+                htmlFor="orderNumber"
+                className="block text-sm font-medium"
+              >
+                訂單號碼
+                <span className="text-muted-foreground ml-1 font-normal">
+                  （選填）
+                </span>
+              </label>
+              <input
+                id="orderNumber"
+                type="text"
+                value={orderNumber}
+                onChange={(e) => setOrderNumber(e.target.value)}
+                placeholder="例如：T1043"
+                className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/40 transition-colors"
+              />
+            </div>
+
+            {/* Email (required) */}
+            <div className="space-y-2">
+              <label htmlFor="email" className="block text-sm font-medium">
+                電郵地址
+                <span className="text-destructive ml-0.5">*</span>
+              </label>
+              <input
+                id="email"
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@example.com"
+                className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/40 transition-colors"
+              />
+            </div>
+
+            {/* Subject (required) */}
+            <div className="space-y-2">
+              <label htmlFor="subject" className="block text-sm font-medium">
+                主題
+                <span className="text-destructive ml-0.5">*</span>
+              </label>
+              <input
+                id="subject"
+                type="text"
+                required
+                value={subject}
+                onChange={(e) => setSubject(e.target.value)}
+                placeholder="例如：無法連接 AI 助手"
+                className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/40 transition-colors"
+              />
+            </div>
+
+            {/* Description (required) */}
+            <div className="space-y-2">
+              <label
+                htmlFor="description"
+                className="block text-sm font-medium"
+              >
+                問題描述
+                <span className="text-destructive ml-0.5">*</span>
+              </label>
+              <textarea
+                id="description"
+                required
+                rows={5}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="請詳細描述您遇到的問題..."
+                className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/40 transition-colors resize-y"
+              />
+            </div>
+
+            {/* Submit */}
+            <Button
+              type="submit"
+              size="lg"
+              className="w-full bg-primary text-primary-foreground hover:bg-primary/90 gap-2 text-base rounded-2xl shadow-lg"
+            >
+              <Send className="h-4 w-4" />
+              提交工單
+            </Button>
+          </form>
+        )}
+
+        {/* Info box */}
+        <div className="mt-8 rounded-xl border border-border bg-accent/30 p-5 flex items-start gap-3">
+          <Info className="h-5 w-5 text-muted-foreground shrink-0 mt-0.5" />
+          <div className="space-y-2 text-sm text-muted-foreground">
+            <p>
+              您也可以直接發送電郵至{" "}
+              <a
+                href={`mailto:${SUPPORT_EMAIL}`}
+                className="text-primary font-medium hover:underline"
+              >
+                {SUPPORT_EMAIL}
+              </a>
+            </p>
+            <p>
+              常見問題可能已有解答{" "}
+              <Link
+                to="/faq"
+                className="text-primary font-medium hover:underline"
+              >
+                查看 FAQ
+              </Link>
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
 
 export default Contact;
