@@ -70,7 +70,7 @@ describe("AI Gateway Proxy", () => {
     await waitOnExecutionContext(ctx);
     expect(resp.status).toBe(429);
     const body = await resp.json() as any;
-    expect(body.error).toContain("Monthly usage limit reached");
+    expect(body.error).toContain("每月用量已達上限");
   });
 
   it("passes through when budget is NULL (no limit)", async () => {
