@@ -263,18 +263,31 @@ Header: X-Worker-Token: <token>
 If no ping for 15 minutes, CF Worker alerts owner via Telegram.
 
 ### Business Dashboard
-Run from the **Windows PC** (not Pi5):
+Runs on **both Pi5 and Windows PC** — auto-detects mode:
+
 ```bash
-python3 scripts/nexgen-dashboard.py
+# On Pi5 (uses CF Worker API — needs CONFIRM_API_KEY in .env):
+python3 nexgen-dashboard.py
+
+# On Pi5 (force API mode):
+python3 nexgen-dashboard.py --api
+
+# On Windows PC (uses npx wrangler — full D1 access):
+python3 scripts/nexgen-dashboard.py --wrangler
 ```
 
-Shows 7 sections:
+**Pi5 setup:** Add `CONFIRM_API_KEY=<your key>` to `~/nexgen-worker/.env`. The dashboard auto-loads it.
+
+**API mode** shows: Usage & Budget, VPS Instances, Tier Config.
+**Wrangler mode** shows all 7 sections: + Job Queue, Pi5 Health, History, Audit Log.
+
+Shows 7 sections (wrangler) or 4 sections (API):
 1. **API Usage & Budget** — Per-customer spend, % of budget, blocked/warning status
 2. **VPS Instances** — IP, status, billing dates, recyclable pool count
-3. **Job Queue** — Active/pending/failed jobs with errors
-4. **Pi5 Health** — Last ping, online/offline
-5. **Monthly History** — Archived spend per month
-6. **Audit Log** — Recent admin actions
+3. **Job Queue** — Active/pending/failed jobs with errors (wrangler only)
+4. **Pi5 Health** — Last ping, online/offline (wrangler only)
+5. **Monthly History** — Archived spend per month (wrangler only)
+6. **Audit Log** — Recent admin actions (wrangler only)
 7. **Tier Config** — Budget caps, cost rates
 
 ---
