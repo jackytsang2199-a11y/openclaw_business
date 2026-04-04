@@ -36,7 +36,7 @@ const Onboarding = () => {
       <div className="max-w-2xl mx-auto px-4">
         <div className="rounded-2xl border border-border bg-card p-2 md:p-4">
           <iframe
-            src="https://tally.so/r/xXy6pr"
+            src="https://tally.so/r/MeYGv0"
             width="100%"
             height={800}
             frameBorder="0"
