@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { Mail, Check, X, Server, Brain, Search, Calendar, FileText, Plug, Eye } from "lucide-react";
+import { ShoppingCart, HelpCircle, Check, X, Server, Brain, Search, Calendar, Plug, Eye, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
+// TODO: Replace with real Lemon Squeezy variant URLs after product setup
 const tiers = [
   {
     emoji: "🌱",
@@ -13,6 +14,8 @@ const tiers = [
     installPromo: 200,
     monthly: 148,
     annual: 1508,
+    checkoutMonthly: "https://3nexgen.lemonsqueezy.com/checkout/buy/TODO_TIER1_MONTHLY",
+    checkoutAnnual: "https://3nexgen.lemonsqueezy.com/checkout/buy/TODO_TIER1_ANNUAL",
     suitedFor: "想試試 AI 助手",
     popular: false,
     premium: false,
@@ -35,6 +38,8 @@ const tiers = [
     installPromo: 400,
     monthly: 248,
     annual: 2528,
+    checkoutMonthly: "https://3nexgen.lemonsqueezy.com/checkout/buy/TODO_TIER2_MONTHLY",
+    checkoutAnnual: "https://3nexgen.lemonsqueezy.com/checkout/buy/TODO_TIER2_ANNUAL",
     suitedFor: "大部分人選這個",
     popular: true,
     premium: false,
@@ -57,6 +62,8 @@ const tiers = [
     installPromo: 900,
     monthly: 388,
     annual: 3958,
+    checkoutMonthly: "https://3nexgen.lemonsqueezy.com/checkout/buy/TODO_TIER3_MONTHLY",
+    checkoutAnnual: "https://3nexgen.lemonsqueezy.com/checkout/buy/TODO_TIER3_ANNUAL",
     suitedFor: "需要最完整的體驗",
     popular: false,
     premium: true,
@@ -282,10 +289,10 @@ const Pricing = () => {
                       : "bg-transparent border border-primary/20 text-primary hover:bg-primary/[0.05]"
                   }`}
                 >
-                  <Link to="/contact">
-                    <Mail className="h-4 w-4" />
-                    選擇此方案
-                  </Link>
+                  <a href={isAnnual ? tier.checkoutAnnual : tier.checkoutMonthly} target="_blank" rel="noopener noreferrer">
+                    <ShoppingCart className="h-4 w-4" />
+                    立即訂購
+                  </a>
                 </Button>
               </motion.div>
             );
@@ -294,8 +301,9 @@ const Pricing = () => {
 
         {/* Bottom CTA */}
         <div className="text-center space-y-6 py-8 rounded-2xl bg-accent/30 border border-border px-6 mt-12">
-          <h2 className="text-2xl md:text-3xl">不確定哪個方案適合你？</h2>
-          <p className="text-muted-foreground text-lg">提交支援工單，免費建議，零壓力。</p>
+          <HelpCircle className="h-8 w-8 mx-auto text-muted-foreground" />
+          <h2 className="text-2xl md:text-3xl">需要協助選擇？</h2>
+          <p className="text-muted-foreground text-lg">提交支援工單，我們會為您推薦最適合的方案。</p>
           <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 gap-2 text-base px-8 rounded-2xl shadow-lg shadow-primary/20 btn-press">
             <Link to="/contact">
               <Mail className="h-5 w-5" />
