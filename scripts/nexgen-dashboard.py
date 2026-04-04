@@ -19,7 +19,7 @@ if sys.platform == "win32":
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     os.environ.setdefault("PYTHONIOENCODING", "utf-8")
 
-WORKER_DIR = "onboarding-pipeline/cf-worker"
+WORKER_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "onboarding-pipeline", "cf-worker")
 
 
 def d1(sql: str) -> list:
@@ -54,7 +54,7 @@ def section(title: str):
 def main():
     now = datetime.now().strftime("%Y-%m-%d %H:%M")
     print("=" * 60)
-    print("  📊 NexGen 蟹助手 — Business Dashboard")
+    print("  📊 NexGen — Business Dashboard")
     print(f"  Generated: {now}")
     print("=" * 60)
 
