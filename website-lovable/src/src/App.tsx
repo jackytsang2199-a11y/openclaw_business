@@ -12,6 +12,8 @@ import Contact from "./pages/Contact";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
 import Refund from "./pages/Refund";
+import Onboarding from "./pages/Onboarding";
+import BotGuide from "./pages/BotGuide";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,6 +34,8 @@ const App = () => (
             <Route path="/terms" element={<Terms />} />
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/refund" element={<Refund />} />
+            <Route path="/onboarding" element={<Onboarding />} />
+            <Route path="/bot-guide" element={<BotGuide />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>

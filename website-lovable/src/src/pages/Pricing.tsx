@@ -299,6 +299,11 @@ const Pricing = () => {
           })}
         </div>
 
+        {/* Post-checkout note */}
+        <p className="text-center text-sm text-muted-foreground mt-4">
+          付款後，系統會引導您填寫設定資料。
+        </p>
+
         {/* Bottom CTA */}
         <div className="text-center space-y-6 py-8 rounded-2xl bg-accent/30 border border-border px-6 mt-12">
           <HelpCircle className="h-8 w-8 mx-auto text-muted-foreground" />
