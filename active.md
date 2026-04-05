@@ -42,7 +42,7 @@
 ### 基礎設施 ✅
 - [x] Domain `3nexgen.com` 買咗（Cloudflare）
 - [x] CF Worker 部署 + D1 database
-- [x] Pi5 as deployment orchestrator（systemd service ready，未 enable）
+- [x] Pi5 as deployment orchestrator（systemd enabled, active since 2026-03-28, PID 2986975）
 - [x] PC-side backup script（rsync→scp rewrite for Windows Git Bash compat）
 
 ### 客戶 Onboarding 內容 ✅
@@ -73,11 +73,11 @@
 | # | Task | Category | Status | Notes |
 |---|------|----------|--------|-------|
 | 1 | ~~Contabo 首單手動下單~~ | VPS | ✅ | 已買，161.97.82.155 (deploy test VPS) + 另一台 |
-| 2 | Contabo API credentials 更新到 Pi5 `.env` | VPS | 未開始 | 目前係 placeholder |
+| 2 | ~~Contabo API credentials 更新到 Pi5 `.env`~~ | VPS | ✅ | 已設定，API auth 已驗證（JWT token OK） |
 | 3 | VPS E2E Mem0 capture 測試 | Pipeline | Ready | 161.97.82.155 available for testing |
 | 4 | ~~Update deployer.py — remove real key injection~~ | Code | ✅ | gateway_token only, no os.environ real keys |
-| 5 | Website final build + deploy | Website | 未開始 | Lovable → Cloudflare Pages（先 deploy 現有版本？）|
-| 6 | Payment integration（Lemon Squeezy） | Payment | 🔄 | Account created，需要 website URL 先完成 setup |
+| 5 | Website deploy to Cloudflare Pages | Website | 未開始 | `npm run build` → CF Pages |
+| 6 | ~~Payment integration（Lemon Squeezy）~~ | Payment | ✅ | 9 products (3 tiers × 3 billing cycles), checkout URLs in code |
 
 ### 🟡 Important — Before Soft Launch
 
