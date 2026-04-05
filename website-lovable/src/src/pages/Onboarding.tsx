@@ -13,17 +13,17 @@ import {
 } from "@/components/ui/tooltip";
 import { SUPPORT_EMAIL } from "@/lib/constants";
 
-// Lemon Squeezy checkout URLs — monthly products live, quarterly/annual TODO
+// Lemon Squeezy checkout URLs — all 9 products (3 tiers × 3 billing cycles)
 const checkoutUrls: Record<string, string> = {
-  "starter-monthly": "https://3nexgen.lemonsqueezy.com/checkout/buy/b4d40f92-0f9b-4666-8556-e59dcbde6b01",
-  "starter-quarterly": "https://3nexgen.lemonsqueezy.com/checkout/buy/b4d40f92-0f9b-4666-8556-e59dcbde6b01", // TODO: create quarterly product
-  "starter-annual": "https://3nexgen.lemonsqueezy.com/checkout/buy/b4d40f92-0f9b-4666-8556-e59dcbde6b01", // TODO: create annual product
-  "pro-monthly": "https://3nexgen.lemonsqueezy.com/checkout/buy/a4ef4f6c-709d-4176-8802-68c189b33613",
-  "pro-quarterly": "https://3nexgen.lemonsqueezy.com/checkout/buy/a4ef4f6c-709d-4176-8802-68c189b33613", // TODO: create quarterly product
-  "pro-annual": "https://3nexgen.lemonsqueezy.com/checkout/buy/a4ef4f6c-709d-4176-8802-68c189b33613", // TODO: create annual product
-  "elite-monthly": "https://3nexgen.lemonsqueezy.com/checkout/buy/7251f5b3-193a-47a4-9023-78c27266079f",
-  "elite-quarterly": "https://3nexgen.lemonsqueezy.com/checkout/buy/7251f5b3-193a-47a4-9023-78c27266079f", // TODO: create quarterly product
-  "elite-annual": "https://3nexgen.lemonsqueezy.com/checkout/buy/7251f5b3-193a-47a4-9023-78c27266079f", // TODO: create annual product
+  "starter-monthly":   "https://3nexgen.lemonsqueezy.com/checkout/buy/b4d40f92-0f9b-4666-8556-e59dcbde6b01",
+  "starter-quarterly": "https://3nexgen.lemonsqueezy.com/checkout/buy/be7b4d15-c389-4cb0-bb91-9033da013c8c",
+  "starter-annual":    "https://3nexgen.lemonsqueezy.com/checkout/buy/3516ca39-a81d-4519-9eeb-9ba93dc1d939",
+  "pro-monthly":       "https://3nexgen.lemonsqueezy.com/checkout/buy/a4ef4f6c-709d-4176-8802-68c189b33613",
+  "pro-quarterly":     "https://3nexgen.lemonsqueezy.com/checkout/buy/39cbcd75-95da-4d53-9901-903fade1310d",
+  "pro-annual":        "https://3nexgen.lemonsqueezy.com/checkout/buy/6956f865-2f54-44d9-95bd-7f3c2e15ec26",
+  "elite-monthly":     "https://3nexgen.lemonsqueezy.com/checkout/buy/7251f5b3-193a-47a4-9023-78c27266079f",
+  "elite-quarterly":   "https://3nexgen.lemonsqueezy.com/checkout/buy/3c2314e9-e005-4e31-a98e-ddb763ea1bf5",
+  "elite-annual":      "https://3nexgen.lemonsqueezy.com/checkout/buy/cb786c99-ac37-4ec2-b79a-7e83c494f3a6",
 };
 
 const plans = [
