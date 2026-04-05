@@ -4,14 +4,17 @@ import { Link, useLocation } from "react-router-dom";
 import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
+import { useTranslation } from "react-i18next";
+import { useLocalizedPath } from "@/hooks/useLocalizedPath";
+import LanguageSwitcher from "./LanguageSwitcher";
 import { TELEGRAM_URL } from "@/lib/constants";
 
-const navLinks = [
-  { to: "/", label: "首頁" },
-  { to: "/pricing", label: "收費" },
-  { to: "/technology", label: "技術" },
-  { to: "/faq", label: "常見問題" },
-  { to: "/contact", label: "聯絡我們" },
+const navKeys = [
+  { to: "/", key: "nav.home" },
+  { to: "/pricing", key: "nav.pricing" },
+  { to: "/technology", key: "nav.technology" },
+  { to: "/faq", key: "nav.faq" },
+  { to: "/contact", key: "nav.contact" },
 ];
 
 const TelegramIcon = ({ className = "h-5 w-5" }: { className?: string }) => (
@@ -23,29 +26,32 @@ const TelegramIcon = ({ className = "h-5 w-5" }: { className?: string }) => (
 const Navbar = () => {
   const [open, setOpen] = useState(false);
   const location = useLocation();
+  const { t } = useTranslation("common");
+  const lp = useLocalizedPath();
 
   return (
     <header className="sticky top-0 z-50 w-full bg-gray-950/80 backdrop-blur-md border-b border-white/10 transition-all duration-300">
       <div className="container flex h-16 items-center justify-between">
-        <Link to="/" className="flex items-center gap-2 text-lg font-bold text-white">
+        <Link to={lp("/")} className="flex items-center gap-2 text-lg font-bold text-white">
           <NexGenLogo className="h-7 w-7" />
           <span>NexGen</span>
         </Link>
 
         {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-8">
-          {navLinks.map((link) => {
-            const isActive = location.pathname === link.to;
+          {navKeys.map((link) => {
+            const localizedTo = lp(link.to);
+            const isActive = location.pathname === localizedTo;
             return (
               <Link
                 key={link.to}
-                to={link.to}
+                to={localizedTo}
                 aria-current={isActive ? "page" : undefined}
                 className={`relative text-sm font-semibold transition-colors py-1 ${
                   isActive ? "text-primary" : "text-gray-400 hover:text-white"
                 }`}
               >
-                {link.label}
+                {t(link.key)}
                 {isActive && (
                   <span className="absolute -bottom-0.5 left-0 right-0 h-0.5 rounded-full bg-primary" />
                 )}
@@ -55,13 +61,20 @@ const Navbar = () => {
         </nav>
 
         {/* Desktop CTA — Telegram AI bot link */}
-        <div className="hidden md:flex items-center">
+        <div className="hidden md:flex items-center gap-3">
+          <LanguageSwitcher />
+          <Link
+            to={lp("/pricing")}
+            className="text-sm font-medium bg-primary text-primary-foreground px-4 py-2 rounded-xl hover:bg-primary/90 transition-colors btn-press"
+          >
+            {t("nav.cta")}
+          </Link>
           <a
             href={TELEGRAM_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center rounded-full border border-white/20 bg-white/10 p-2.5 text-gray-400 hover:text-[#26A5E4] transition-colors"
-            aria-label="Telegram AI 機械人"
+            className="flex items-center rounded-full border border-white/20 bg-white/10 p-2.5 text-gray-300 hover:text-[#26A5E4] hover:shadow-[0_0_12px_rgba(38,165,228,0.3)] transition-all"
+            aria-label={t("nav.telegram")}
           >
             <TelegramIcon className="h-5 w-5" />
           </a>
@@ -72,25 +85,26 @@ const Navbar = () => {
           <SheetTrigger asChild className="md:hidden">
             <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
               <Menu className="h-5 w-5" />
-              <span className="sr-only">開啟選單</span>
+              <span className="sr-only">{t("nav.openMenu")}</span>
             </Button>
           </SheetTrigger>
           <SheetContent side="right" className="w-72 bg-gray-950 border-white/10">
-            <SheetTitle className="sr-only">導航選單</SheetTitle>
+            <SheetTitle className="sr-only">{t("nav.menuLabel")}</SheetTitle>
             <nav className="flex flex-col gap-6 mt-8">
-              {navLinks.map((link) => {
-                const isActive = location.pathname === link.to;
+              {navKeys.map((link) => {
+                const localizedTo = lp(link.to);
+                const isActive = location.pathname === localizedTo;
                 return (
                   <Link
                     key={link.to}
-                    to={link.to}
+                    to={localizedTo}
                     onClick={() => setOpen(false)}
                     aria-current={isActive ? "page" : undefined}
                     className={`text-lg font-semibold transition-colors hover:text-primary ${
                       isActive ? "text-primary" : "text-muted-foreground"
                     }`}
                   >
-                    {link.label}
+                    {t(link.key)}
                   </Link>
                 );
               })}
@@ -102,8 +116,11 @@ const Navbar = () => {
                   className="flex items-center gap-2 text-muted-foreground hover:text-[#26A5E4] transition-colors"
                 >
                   <TelegramIcon className="h-6 w-6" />
-                  <span className="text-sm">Telegram AI 機械人</span>
+                  <span className="text-sm">{t("nav.telegram")}</span>
                 </a>
+              </div>
+              <div className="border-t border-white/10 mt-2 pt-2">
+                <LanguageSwitcher variant="inline" onSelect={() => setOpen(false)} />
               </div>
             </nav>
           </SheetContent>

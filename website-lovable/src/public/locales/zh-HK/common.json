@@ -1,3 +1,22 @@
 {
-  "loading": "載入中..."
+  "loading": "載入中...",
+  "nav.home": "首頁",
+  "nav.pricing": "收費",
+  "nav.technology": "技術",
+  "nav.faq": "常見問題",
+  "nav.contact": "聯絡我們",
+  "nav.cta": "查看方案",
+  "nav.telegram": "Telegram AI 機械人",
+  "nav.openMenu": "開啟選單",
+  "nav.menuLabel": "導航選單",
+  "footer.tagline": "AI 智能體安裝服務",
+  "footer.subtitle": "擁有你自己的私人 AI 系統",
+  "footer.slogan": "你的伺服器。你的數據。",
+  "footer.navHeading": "導航",
+  "footer.paymentHeading": "付款方式",
+  "footer.creditCard": "信用卡",
+  "footer.terms": "服務條款",
+  "footer.privacy": "私隱政策",
+  "footer.refund": "退款政策",
+  "footer.copyright": "© 2026 NexGen. All rights reserved."
 }
