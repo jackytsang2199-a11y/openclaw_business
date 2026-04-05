@@ -68,11 +68,26 @@ vite.config.ts            (add OpenCC build plugin)
 
 ---
 
+## CRITICAL: Strings Must Come From Live Code
+
+The zh-HK JSON files in this plan are a **structural template** — they show key naming conventions, namespace organization, and approximate content. **Do NOT blindly copy string values from this plan.** The codebase has been actively edited and the actual strings may differ.
+
+**For every extraction task (Tasks 4-12), you MUST:**
+1. **Read the actual current source file first** (e.g., `src/pages/Pricing.tsx`)
+2. Extract every hardcoded Chinese string from the **live code**, not from this plan
+3. Use this plan's key naming pattern (e.g., `tiers.starter.name`, `faq.basic.0.q`) as a guide for how to structure keys
+4. If a string in the live code differs from what's shown in this plan, **use the live code version**
+5. If the live code has strings not listed in this plan, **add them** with consistent key names
+
+The plan's JSON files are ~90% accurate but the source of truth is always the current codebase.
+
+---
+
 ## Refactoring Pattern (applies to Tasks 4-12)
 
 Every page refactor follows this exact pattern. Read this before starting any extraction task.
 
-**Step A — Create the locale JSON file** in `public/locales/zh-HK/{namespace}.json` with all Chinese strings extracted from the component.
+**Step A — Read the current source file** to identify all hardcoded translatable strings. Then create the locale JSON file in `public/locales/zh-HK/{namespace}.json` with those strings.
 
 **Step B — Refactor the component** by:
 
