@@ -1,0 +1,78 @@
+{
+  "meta.title": "收費方案 | NexGen",
+  "meta.description": "基本版、專業版、旗艦版三種方案，季度計劃每年節省高達 HK$1,200。",
+
+  "header.title": "選擇最適合你的方案",
+  "header.subtitle": "全包月費，沒有隱藏費用，沒有合約。",
+
+  "billing.monthly": "月費 (彈性)",
+  "billing.quarterly": "季度 (推薦)",
+  "billing.annual": "年費 (最優惠)",
+  "billing.bestValue": "最優惠",
+
+  "tiers.starter.name": "基本版",
+  "tiers.starter.concept": "AI 對話工具",
+  "tiers.starter.tagline": "隨時提問，即時回答",
+  "tiers.starter.description": "在 Telegram 上擁有一位隨時待命的 AI 對話助手。基礎配置，即開即用。適合偶爾使用 AI 的用戶。",
+
+  "tiers.pro.name": "專業版",
+  "tiers.pro.concept": "你的專屬 AI 助手",
+  "tiers.pro.tagline": "越用越了解你，幫你搜尋全網",
+  "tiers.pro.description": "記住你說過的每一句話，搜尋全網最新資訊，全天候穩定運行。不只是問答機器，是了解你的專屬助理。",
+
+  "tiers.elite.name": "旗艦版",
+  "tiers.elite.concept": "你的 AI 團隊",
+  "tiers.elite.tagline": "多個 AI 同時工作，替你動手做事",
+  "tiers.elite.description": "多個 AI 智能體同時工作 — 一個幫你搜資料，一個寫報告，一個替你格價搶票。支援瀏覽器自動操作，適合創業者和重度用戶。",
+
+  "tiers.recommended": "推薦",
+  "tiers.perMonth": "/月",
+  "tiers.cycleTotalQuarterly": "季度合計 HK${{total}}",
+  "tiers.cycleTotalAnnual": "年費合計 HK${{total}}",
+  "tiers.savingsAnnual": "比月費每年節省 HK${{savings}}",
+  "tiers.savingsNudge": "選擇季度計劃，每年可節省高達 HK${{savings}}",
+  "tiers.ctaSelect": "選擇{{name}}",
+
+  "tiers.tokens": "每月 {{tokens}} tokens",
+  "tiers.dailyConversations": "（約每日 {{count}} 次對話）",
+
+  "features.memory": "永久記憶",
+  "features.search": "全網搜尋",
+  "features.recovery": "24/7 自動恢復",
+  "features.browser": "瀏覽器操作",
+  "features.multiAgent": "多智能體協作",
+
+  "features.memory.detailPro": "記住所有對話、偏好、習慣",
+  "features.memory.detailElite": "記住所有對話、偏好、習慣",
+  "features.search.detailPro": "包括 Reddit 等封鎖 AI 的網站",
+  "features.search.detailElite": "自訂搜尋配置",
+  "features.recovery.detailPro": "斷線自動修復，全天候穩定",
+  "features.recovery.detailElite": "全套 watchdog 監控",
+  "features.browser.detailElite": "格價、訂位、填表、搶票",
+  "features.multiAgent.detailElite": "多個 AI 分工並行",
+
+  "specs.vps": "VPS",
+  "specs.memory": "記憶",
+  "specs.search": "搜尋",
+
+  "openClaw.heading": "什麼是 OpenClaw？",
+  "openClaw.tagline": "你的專屬 AI，不只聊天，還能動手做事。",
+  "openClaw.body1": "OpenClaw 是一個安裝在你自己伺服器上的 AI 智能體，透過 Telegram 與你對話。它不是雲端共用服務 — 運行在你自己的機器上，資料完全屬於你。",
+  "openClaw.body2": "OpenClaw 不只是聊天。它能搜尋全網資訊、管理檔案、排行程、操作瀏覽器，在你休息時自動完成任務。整個項目開源，社區持續開發新功能。你可以選擇使用 Claude、GPT 或本地模型 — 資料永遠留在你的伺服器上。",
+
+  "openClaw.features.automation.title": "自動化日常",
+  "openClaw.features.automation.desc": "設定提醒、排行程、管理日程，用對話指令完成日常瑣事",
+  "openClaw.features.research.title": "研究與資料",
+  "openClaw.features.research.desc": "搜尋全網、整理資料、生成報告，你專注其他事",
+  "openClaw.features.integration.title": "智能整合",
+  "openClaw.features.integration.desc": "連接多種工具與平台，自動執行工作流程",
+  "openClaw.features.browser.title": "瀏覽器自動化",
+  "openClaw.features.browser.desc": "格價、訂位、填表、搶票，AI 替你操作瀏覽器",
+
+  "payment.methods": "付款方式：信用卡 / PayMe",
+  "payment.postCheckout": "提交表格後，選擇付款方式即可完成訂購。付款確認後，我們會在 30 分鐘內完成安裝。",
+
+  "help.heading": "需要協助選擇？",
+  "help.subtitle": "提交支援工單，我們會為你推薦最適合的方案。",
+  "help.cta": "提交支援工單"
+}
