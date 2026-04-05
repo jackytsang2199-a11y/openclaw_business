@@ -1,0 +1,48 @@
+{
+  "meta.title": "常見問題 | NexGen",
+  "meta.description": "NexGen AI 智能體安裝服務常見問題與解答。",
+
+  "pageTitle": "有問題？",
+  "pageSubtitle": "我們已經準備好答案",
+
+  "categories.basic": "基本問題",
+  "categories.billing": "收費與付款",
+  "categories.features": "功能與技術",
+  "categories.support": "售後支援",
+
+  "basic.0.q": "這跟 ChatGPT 有什麼不同？",
+  "basic.0.a": "ChatGPT 是共用的雲端服務。我們提供的是安裝在你自己設備上的獨立 AI 智能體，擁有永久記憶、全網搜尋、瀏覽器自動化等功能 — 這些都是 ChatGPT 做不到的。",
+  "basic.1.q": "我完全不懂技術，可以用嗎？",
+  "basic.1.a": "完全可以。我們負責所有技術設定，你只需要在 Telegram 跟 AI 對話，就像跟朋友聊天一樣簡單。",
+  "basic.2.q": "安裝需要多久？",
+  "basic.2.a": "最快 30 分鐘。我們為你設定獨立伺服器並完成安裝，你不需要做任何技術操作。",
+  "basic.3.q": "我需要自己準備伺服器嗎？",
+  "basic.3.a": "不需要。月費已包含獨立伺服器，由我們代為設定和管理。",
+
+  "billing.0.q": "有沒有合約？可以隨時取消嗎？",
+  "billing.0.a": "沒有合約。月費、季度和年費三種計劃可選。季度及年費計劃享有折扣，隨時取消，不設退款。服務將於當前計費週期結束後停止。",
+  "billing.1.q": "月費包含什麼？",
+  "billing.1.a": "月費是全包價，包括 VPS 伺服器、AI 運算費用、系統維護和監控。你不需要額外支付任何費用。",
+  "billing.2.q": "接受什麼付款方式？",
+  "billing.2.a": "支援信用卡（Visa / Mastercard）及 PayMe。信用卡付款後自動開始安裝，PayMe 需人工確認。",
+
+  "features.0.q": "永久記憶是什麼意思？",
+  "features.0.a": "基於 Qdrant 向量資料庫 + Mem0 記憶引擎，AI 會記住你說過的每一句話。不像 ChatGPT 只有 100 條記憶上限 — 三個月前提過的偏好，它都記得。",
+  "features.1.q": "全網搜尋跟 ChatGPT 的搜尋有什麼不同？",
+  "features.1.a": "ChatGPT 的搜尋被大量網站封鎖（如 Reddit）。我們用 SearXNG 自架搜尋引擎，可以搜到 ChatGPT 搜不到的內容。",
+  "features.2.q": "瀏覽器自動化可以做什麼？",
+  "features.2.a": "AI 可以直接操作瀏覽器幫你填表、格價、訂位、搶票、查評價。這是旗艦版的專屬功能。",
+  "features.3.q": "我的資料安全嗎？",
+  "features.3.a": "你的所有對話記錄和記憶都儲存在你自己的伺服器上，不會被我們記錄或存儲。AI 模型調用使用加密 API 通道，確保通訊安全。",
+
+  "support.0.q": "如果系統出問題怎麼辦？",
+  "support.0.a": "專業版和旗艦版包含自動恢復功能（Watchdog），系統會 24/7 監控並自動修復。如需人工支援，可透過電郵提交支援工單 (support@3nexgen.com)。",
+  "support.1.q": "可以升級或降級方案嗎？",
+  "support.1.a": "可以。隨時透過電郵提交支援工單，差價按比例計算。",
+  "support.2.q": "如果我想取消服務會怎樣？",
+  "support.2.a": "你可以隨時取消。服務將於當前計費週期結束後停止，伺服器將會回收。不設退款。",
+
+  "cantFind": "找不到答案？",
+  "supportCta": "提交支援工單",
+  "bottomCta.title": "還有其他問題？"
+}

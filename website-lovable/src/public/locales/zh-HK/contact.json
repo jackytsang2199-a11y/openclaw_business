@@ -1,0 +1,28 @@
+{
+  "meta.title": "聯絡我們 | NexGen",
+  "meta.description": "提交支援工單或聯絡 NexGen 團隊。",
+
+  "pageTitle": "提交支援工單",
+  "pageSubtitle": "填寫以下表格，我們會在 24 小時內透過電郵回覆。",
+
+  "form.orderNumber": "訂單號碼",
+  "form.orderNumberOptional": "（選填）",
+  "form.orderNumberPlaceholder": "例如：T1043",
+  "form.email": "電郵地址",
+  "form.emailPlaceholder": "you@example.com",
+  "form.subject": "主題",
+  "form.subjectPlaceholder": "例如：無法連接 AI 助手",
+  "form.description": "問題描述",
+  "form.descriptionPlaceholder": "請詳細描述您遇到的問題...",
+  "form.submit": "提交工單",
+  "form.mailBodyOrder": "訂單號碼：{{order}}",
+  "form.mailBodyEmail": "回覆電郵：{{email}}",
+
+  "success.title": "工單已提交",
+  "success.body": "我們會盡快透過電郵回覆。",
+  "success.another": "提交另一個工單",
+
+  "info.directEmail": "你也可以直接發送電郵至",
+  "info.faqHint": "常見問題可能已有解答",
+  "info.faqLink": "查看 FAQ"
+}
