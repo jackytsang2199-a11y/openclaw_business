@@ -1,0 +1,94 @@
+{
+  "meta": {
+    "title": "Complete Setup | NexGen",
+    "description": "Fill in your details, choose a payment method, and be set up in 30 minutes."
+  },
+  "pageTitle": "Complete Setup",
+  "pageSubtitle": "Fill in the details below and choose a payment method. Installation begins within 30 minutes of payment confirmation.",
+  "form": {
+    "planLabel": "Service Plan *",
+    "planPlaceholder": "Choose your plan",
+    "emailLabel": "Email Address *",
+    "emailPlaceholder": "your@email.com",
+    "emailError": "Please enter a valid email address",
+    "botTokenLabel": "Telegram Bot Token *",
+    "botTokenPlaceholder": "e.g. 123456789:ABCdefGHIjklMNOpqrsTUV",
+    "botTokenError": "Token format should be: numbers:alphanumeric string",
+    "userIdLabel": "Telegram User ID *",
+    "userIdPlaceholder": "e.g. 123456789",
+    "userIdError": "User ID should be at least 5 digits",
+    "botNameLabel": "Bot Display Name",
+    "botNameOptional": "(Optional)",
+    "botNamePlaceholder": "e.g. My AI Assistant",
+    "submitting": "Submitting...",
+    "submit": "Submit & Proceed to Payment",
+    "submitHint": "After submitting, choose a payment method. Credit card payments trigger instant installation."
+  },
+  "plans": {
+    "starter-monthly": "Starter \u2014 Monthly HK$248/mo",
+    "starter-quarterly": "Starter \u2014 Quarterly HK$188/mo (total HK$564)",
+    "starter-annual": "Starter \u2014 Annual HK$158/mo (total HK$1,896)",
+    "pro-monthly": "Pro \u2014 Monthly HK$398/mo",
+    "pro-quarterly": "Pro \u2014 Quarterly HK$298/mo (total HK$894) \u2b50 Recommended",
+    "pro-annual": "Pro \u2014 Annual HK$248/mo (total HK$2,976)",
+    "elite-monthly": "Elite \u2014 Monthly HK$598/mo",
+    "elite-quarterly": "Elite \u2014 Quarterly HK$458/mo (total HK$1,374)",
+    "elite-annual": "Elite \u2014 Annual HK$388/mo (total HK$4,656)"
+  },
+  "optgroup": {
+    "starter": "Starter",
+    "pro": "Pro \u2b50",
+    "elite": "Elite"
+  },
+  "tooltip": {
+    "guide": "Guide",
+    "botToken": {
+      "title": "How to get your Bot Token:",
+      "step1": "Search for <strong>BotFather</strong> on Telegram (look for the blue checkmark \u2713)",
+      "step2": "Send <code>/newbot</code>",
+      "step3": "Set a display name and username for your bot (username must end with bot)",
+      "step4": "BotFather will send you a Token like <code>123456789:ABCdef...</code>",
+      "step5": "Copy the entire Token and paste it here",
+      "fullGuide": "View full step-by-step guide \u2192"
+    },
+    "userId": {
+      "title": "How to get your User ID:",
+      "step1": "Search for <strong>@userinfobot</strong> on Telegram",
+      "step2": "Send it any message",
+      "step3": "It will reply with your User ID (a number)",
+      "step4": "Copy that number and paste it here"
+    }
+  },
+  "payment": {
+    "confirmedTitle": "Details Confirmed",
+    "selectedPlan": "You selected:",
+    "choosePayment": "Choose a payment method to complete your order:",
+    "cardPayment": "Credit Card / Apple Pay",
+    "paymePayment": "PayMe Payment",
+    "paymeInstruction": "Please use the following PayMe link to pay:",
+    "paymeCopyTitle": "Copy Link",
+    "paymeEmailHint": "After payment, please send a confirmation email so we can arrange installation:",
+    "paymeSendEmail": "Send Payment Confirmation Email",
+    "editInfo": "Edit Details",
+    "cardNote": "Installation begins automatically after credit card payment (as fast as 30 min).",
+    "paymeNote": "PayMe payments require manual confirmation; installation may take longer.",
+    "contactSupport": "Questions? Contact "
+  },
+  "email": {
+    "subject": "NexGen PayMe Payment Confirmation \u2014 {{plan}}",
+    "bodyPlan": "Service Plan: {{plan}}",
+    "bodyEmail": "Email: {{email}}",
+    "bodyBotToken": "Bot Token: {{botToken}}",
+    "bodyUserId": "Telegram User ID: {{userId}}",
+    "bodyBotName": "Bot Display Name: {{botName}}",
+    "bodyBotNameEmpty": "(not provided)",
+    "bodyMethod": "Payment Method: PayMe",
+    "bodyConfirm": "Please reply to this email to confirm receipt and arrange installation."
+  },
+  "help": {
+    "botGuideHint": "Need help creating a Telegram Bot? ",
+    "botGuideLink": "View step-by-step guide",
+    "supportHint": "Having trouble? ",
+    "supportLink": "Submit a support ticket"
+  }
+}

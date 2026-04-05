@@ -1,0 +1,46 @@
+{
+  "meta.title": "技術アーキテクチャ | NexGen",
+  "meta.description": "OpenClaw フル装備版の技術エコシステム — Mem0 メモリ、SearXNG 検索、ブラウザ自動化。",
+
+  "pageTitle": "私たちの技術エコシステム",
+  "pageSubtitle": "数ヶ月にわたる研究と深い統合を経て、各コンポーネントは厳格にテストされています。これはオリジナルの OpenClaw ではありません — 完全な AI エコシステムです。",
+
+  "sections.openclaw.name": "OpenClaw",
+  "sections.openclaw.headline": "世界第1位のオープンソース AI エージェントフレームワーク",
+  "sections.openclaw.body": "200,000+ GitHub Stars、世界中で毎週200万人が利用。このプラットフォームをベースに深くカスタマイズし、完全なプラグインエコシステムを追加して、オリジナルをはるかに超える完成されたシステムを構築しました。",
+
+  "sections.mem0.name": "Mem0 + Qdrant",
+  "sections.mem0.headline": "ベクトル級の永続メモリ — AI 最強の頭脳",
+  "sections.mem0.body": "ChatGPT のような100件のメモリ上限ではありません。Qdrant ベクトルデータベース + Mem0 メモリエンジンにより、あなたが話したすべてを永続的に記憶します。3ヶ月前に述べた好みも覚えています。使えば使うほど賢くなり、あなたをより深く理解します。",
+
+  "sections.searxng.name": "SearXNG",
+  "sections.searxng.headline": "AI 検索ブロックを突破 — ウェブ全体検索エンジン",
+  "sections.searxng.body": "ChatGPT の検索は多くのサイトにブロックされています — Reddit、フォーラム、一部のニュースサイトが検索できません。SearXNG はセルフホスト型のメタ検索エンジンで、すべての AI 検索ブロックをバイパスし、ウェブ全体からリアルタイムで情報を検索します。ChatGPT が検索できないものも見つけられます。",
+
+  "sections.chromium.name": "Chromium Headless",
+  "sections.chromium.headline": "AI があなたの代わりにブラウザを操作 — チャットだけでなく、実際に行動する",
+  "sections.chromium.body": "ヘッドレスブラウザ自動化エンジン。AI がブラウザを直接操作して、フォーム入力・価格比較・予約・チケット購入・レビュー確認を行います。質問に答えるだけでなく、実際にタスクを完了します。（エリートプラン限定機能）",
+
+  "sections.docker.name": "Docker",
+  "sections.docker.headline": "コンテナ化によるワンクリックデプロイ — 安定・信頼",
+  "sections.docker.body": "システム全体を Docker コンテナで展開。環境は完全に分離され、安全で安定、ワンクリックで起動。システムは独立して動作し、移行が必要な時もワンクリックでパッケージ化、データは完全に保持されます。",
+
+  "sections.acpx.name": "ACPX",
+  "sections.acpx.headline": "ACP プロトコル実行環境",
+  "sections.acpx.body": "複数の AI が同時に作業する際、互いに通信・調整する必要があります。ACPX によりリアルタイムでタスクを分配し、作業の重複を防ぎます。",
+
+  "sections.clawteam.name": "ClawTeam",
+  "sections.clawteam.headline": "マルチエージェント連携フレームワーク",
+  "sections.clawteam.body": "複数の AI エージェントが独立して稼働し、分担して並行処理、異なるタスクを同時に処理します。1つが調査、1つがレポート作成、互いに干渉しません。",
+
+  "sections.watchdog.name": "Gateway Watchdog",
+  "sections.watchdog.headline": "自動復旧デーモン",
+  "sections.watchdog.body": "24/7 接続監視システム。切断を自動検知して再接続し、マルチノードフェイルオーバーに対応、サービスの中断を防ぎます。",
+
+  "privacy.title": "データプライバシー",
+  "privacy.body": "あなたの対話履歴とメモリはあなた自身のサーバーに保存され、当社が記録・保存することはありません。AI モデルの呼び出しには暗号化された API チャネルを使用し、通信のセキュリティを確保しています。",
+
+  "cta.learnMore": "もっと詳しく知りたいですか？",
+  "cta.viewPricing": "料金プランを見る →",
+  "cta.submitTicket": "サポートチケットを送信"
+}

@@ -1,0 +1,46 @@
+{
+  "meta.title": "Technology | NexGen",
+  "meta.description": "The fully loaded OpenClaw tech ecosystem \u2014 Mem0 memory, SearXNG search, browser automation.",
+
+  "pageTitle": "Our Technology Ecosystem",
+  "pageSubtitle": "Months of research and deep integration, with every component rigorously tested. This isn\u2019t stock OpenClaw \u2014 this is a complete AI ecosystem.",
+
+  "sections.openclaw.name": "OpenClaw",
+  "sections.openclaw.headline": "The world\u2019s #1 open-source AI agent framework",
+  "sections.openclaw.body": "200,000+ GitHub Stars, used by 2 million people weekly worldwide. We\u2019ve deeply customized this platform with a full plugin ecosystem, building a system that goes far beyond the original.",
+
+  "sections.mem0.name": "Mem0 + Qdrant",
+  "sections.mem0.headline": "Vector-powered permanent memory \u2014 the AI\u2019s most powerful brain",
+  "sections.mem0.body": "This isn\u2019t ChatGPT\u2019s 100-memory limit. Built on Qdrant vector database + Mem0 memory engine, it remembers everything you\u2019ve ever said. A preference you mentioned three months ago? It remembers. The more you use it, the smarter it gets.",
+
+  "sections.searxng.name": "SearXNG",
+  "sections.searxng.headline": "Bypass AI search blocks \u2014 a true web search engine",
+  "sections.searxng.body": "ChatGPT\u2019s search is blocked by countless websites \u2014 Reddit, forums, many news sites. SearXNG is a self-hosted meta-search engine that bypasses all AI search restrictions, delivering real-time results from across the web. What ChatGPT can\u2019t find, it can.",
+
+  "sections.chromium.name": "Chromium Headless",
+  "sections.chromium.headline": "AI operates the browser for you \u2014 beyond chat, real action",
+  "sections.chromium.body": "A headless browser automation engine. AI directly controls the browser to fill forms, compare prices, make reservations, grab tickets, and check reviews. It doesn\u2019t just answer questions \u2014 it gets things done. (Elite plan exclusive)",
+
+  "sections.docker.name": "Docker",
+  "sections.docker.headline": "Containerized one-click deployment \u2014 stable and reliable",
+  "sections.docker.body": "The entire system is deployed as Docker containers. Fully isolated environment, secure and stable, launched with a single command. Your system runs independently, and when migration is needed, everything packs up cleanly with all data preserved.",
+
+  "sections.acpx.name": "ACPX",
+  "sections.acpx.headline": "ACP protocol runtime environment",
+  "sections.acpx.body": "When multiple AIs work simultaneously, they need to communicate and coordinate. ACPX enables real-time task distribution so they never duplicate effort.",
+
+  "sections.clawteam.name": "ClawTeam",
+  "sections.clawteam.headline": "Multi-agent collaboration framework",
+  "sections.clawteam.body": "Multiple AI agents running independently and working in parallel, handling different tasks simultaneously. One researches, another writes reports \u2014 without interference.",
+
+  "sections.watchdog.name": "Gateway Watchdog",
+  "sections.watchdog.headline": "Auto-recovery daemon",
+  "sections.watchdog.body": "24/7 connection monitoring system. Automatically detects disconnections and reconnects, with multi-node failover to ensure your service never goes down.",
+
+  "privacy.title": "Data Privacy",
+  "privacy.body": "Your conversation history and memory are stored on your own server \u2014 we never log or store them. AI model calls use an encrypted API channel to ensure secure communication.",
+
+  "cta.learnMore": "Want to learn more?",
+  "cta.viewPricing": "View Pricing \u2192",
+  "cta.submitTicket": "Submit a Support Ticket"
+}

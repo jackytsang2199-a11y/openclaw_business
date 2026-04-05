@@ -1,0 +1,94 @@
+{
+  "meta": {
+    "title": "セットアップ | NexGen",
+    "description": "設定情報を入力し、お支払い方法を選択、30分で設置完了。"
+  },
+  "pageTitle": "セットアップを完了する",
+  "pageSubtitle": "以下の情報を入力し、お支払い方法を選択してください。お支払い確認後、30分以内に設置を完了します。",
+  "form": {
+    "planLabel": "サービスプラン *",
+    "planPlaceholder": "プランを選択してください",
+    "emailLabel": "メールアドレス *",
+    "emailPlaceholder": "your@email.com",
+    "emailError": "有効なメールアドレスを入力してください",
+    "botTokenLabel": "Telegram Bot Token *",
+    "botTokenPlaceholder": "例：123456789:ABCdefGHIjklMNOpqrsTUV",
+    "botTokenError": "Token の形式：数字:英数字の組み合わせ",
+    "userIdLabel": "Telegram User ID *",
+    "userIdPlaceholder": "例：123456789",
+    "userIdError": "User ID は5桁以上の数字です",
+    "botNameLabel": "Bot の表示名",
+    "botNameOptional": "（任意）",
+    "botNamePlaceholder": "例：マイ AI アシスタント",
+    "submitting": "送信中...",
+    "submit": "送信してお支払いへ",
+    "submitHint": "送信後にお支払い方法を選択。クレジットカード決済で即時設置開始"
+  },
+  "plans": {
+    "starter-monthly": "スタータープラン — 月額 HK$248/月",
+    "starter-quarterly": "スタータープラン — 四半期 HK$188/月（合計 HK$564）",
+    "starter-annual": "スタータープラン — 年額 HK$158/月（合計 HK$1,896）",
+    "pro-monthly": "プロプラン — 月額 HK$398/月",
+    "pro-quarterly": "プロプラン — 四半期 HK$298/月（合計 HK$894）⭐ おすすめ",
+    "pro-annual": "プロプラン — 年額 HK$248/月（合計 HK$2,976）",
+    "elite-monthly": "エリートプラン — 月額 HK$598/月",
+    "elite-quarterly": "エリートプラン — 四半期 HK$458/月（合計 HK$1,374）",
+    "elite-annual": "エリートプラン — 年額 HK$388/月（合計 HK$4,656）"
+  },
+  "optgroup": {
+    "starter": "スタータープラン Starter",
+    "pro": "プロプラン Pro ⭐",
+    "elite": "エリートプラン Elite"
+  },
+  "tooltip": {
+    "guide": "ガイド",
+    "botToken": {
+      "title": "Bot Token の取得方法：",
+      "step1": "Telegram で <strong>BotFather</strong> を検索（青いチェックマーク ✓ を確認）",
+      "step2": "<code>/newbot</code> と入力",
+      "step3": "Bot の表示名とユーザー名を設定（末尾は bot にする必要があります）",
+      "step4": "BotFather が Token を送信します。形式：<code>123456789:ABCdef...</code>",
+      "step5": "Token 全体をコピーしてここに貼り付けてください",
+      "fullGuide": "図解ガイドを見る →"
+    },
+    "userId": {
+      "title": "User ID の取得方法：",
+      "step1": "Telegram で <strong>@userinfobot</strong> を検索",
+      "step2": "任意のメッセージを送信",
+      "step3": "あなたの User ID（数字の列）が返信されます",
+      "step4": "この数字をコピーしてここに貼り付けてください"
+    }
+  },
+  "payment": {
+    "confirmedTitle": "情報が確認されました",
+    "selectedPlan": "選択したプラン：",
+    "choosePayment": "お支払い方法を選択して注文を完了：",
+    "cardPayment": "クレジットカード / Apple Pay でお支払い",
+    "paymePayment": "PayMe でお支払い",
+    "paymeInstruction": "以下の PayMe リンクからお支払いください：",
+    "paymeCopyTitle": "リンクをコピー",
+    "paymeEmailHint": "お支払い後、設置手配のため確認メールをお送りください：",
+    "paymeSendEmail": "お支払い確認メールを送信",
+    "editInfo": "情報を修正",
+    "cardNote": "クレジットカード決済後、自動的に設置を開始します（最短30分）。",
+    "paymeNote": "PayMe でのお支払いは手動確認が必要なため、設置までお時間をいただく場合があります。",
+    "contactSupport": "ご不明な点がございましたら、こちらまでお問い合わせください："
+  },
+  "email": {
+    "subject": "NexGen PayMe お支払い確認 — {{plan}}",
+    "bodyPlan": "サービスプラン: {{plan}}",
+    "bodyEmail": "メール: {{email}}",
+    "bodyBotToken": "Bot Token: {{botToken}}",
+    "bodyUserId": "Telegram User ID: {{userId}}",
+    "bodyBotName": "Bot 表示名: {{botName}}",
+    "bodyBotNameEmpty": "（未入力）",
+    "bodyMethod": "お支払い方法: PayMe",
+    "bodyConfirm": "入金確認後、設置手配をお願いします。"
+  },
+  "help": {
+    "botGuideHint": "Telegram Bot の作成にお困りですか？ ",
+    "botGuideLink": "図解ガイドを見る",
+    "supportHint": "問題が発生しましたか？ ",
+    "supportLink": "サポートチケットを送信"
+  }
+}

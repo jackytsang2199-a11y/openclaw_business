@@ -1,0 +1,78 @@
+{
+  "meta.title": "Pricing | NexGen",
+  "meta.description": "Starter, Pro, and Elite plans. Save up to HK$1,200/year with a quarterly plan.",
+
+  "header.title": "Choose the right plan for you",
+  "header.subtitle": "All-inclusive monthly fee. No hidden charges. No contract.",
+
+  "billing.monthly": "Monthly (Flexible)",
+  "billing.quarterly": "Quarterly (Recommended)",
+  "billing.annual": "Annual (Best Value)",
+  "billing.bestValue": "Best Value",
+
+  "tiers.starter.name": "Starter",
+  "tiers.starter.concept": "AI Chat Tool",
+  "tiers.starter.tagline": "Ask anytime, get instant answers",
+  "tiers.starter.description": "An AI chat assistant on Telegram, ready whenever you need it. Basic setup, ready to use. Ideal for occasional AI users.",
+
+  "tiers.pro.name": "Pro",
+  "tiers.pro.concept": "Your Personal AI Assistant",
+  "tiers.pro.tagline": "Learns more about you with every conversation",
+  "tiers.pro.description": "Remembers everything you\u2019ve ever said, searches the web for the latest information, and runs 24/7. Not just a Q&A bot \u2014 a personal assistant that truly knows you.",
+
+  "tiers.elite.name": "Elite",
+  "tiers.elite.concept": "Your AI Team",
+  "tiers.elite.tagline": "Multiple AIs working simultaneously, taking action for you",
+  "tiers.elite.description": "Multiple AI agents working at once \u2014 one researching, one writing reports, one comparing prices and booking tickets. Browser automation included. Built for entrepreneurs and power users.",
+
+  "tiers.recommended": "Recommended",
+  "tiers.perMonth": "/mo",
+  "tiers.cycleTotalQuarterly": "Quarterly total HK${{total}}",
+  "tiers.cycleTotalAnnual": "Annual total HK${{total}}",
+  "tiers.savingsAnnual": "Save HK${{savings}}/year vs. monthly",
+  "tiers.savingsNudge": "Switch to quarterly and save up to HK${{savings}}/year",
+  "tiers.ctaSelect": "Choose {{name}}",
+
+  "tiers.tokens": "{{tokens}} tokens/month",
+  "tiers.dailyConversations": "(approx. {{count}} conversations/day)",
+
+  "features.memory": "Permanent Memory",
+  "features.search": "Web Search",
+  "features.recovery": "24/7 Auto-Recovery",
+  "features.browser": "Browser Automation",
+  "features.multiAgent": "Multi-Agent Collaboration",
+
+  "features.memory.detailPro": "Remembers all conversations, preferences, and habits",
+  "features.memory.detailElite": "Remembers all conversations, preferences, and habits",
+  "features.search.detailPro": "Including sites that block AI, like Reddit",
+  "features.search.detailElite": "Custom search configuration",
+  "features.recovery.detailPro": "Auto-reconnect on disconnect, stable 24/7",
+  "features.recovery.detailElite": "Full watchdog monitoring suite",
+  "features.browser.detailElite": "Price comparison, booking, form filling, ticket grabbing",
+  "features.multiAgent.detailElite": "Multiple AIs working in parallel",
+
+  "specs.vps": "VPS",
+  "specs.memory": "Memory",
+  "specs.search": "Search",
+
+  "openClaw.heading": "What is OpenClaw?",
+  "openClaw.tagline": "Your personal AI \u2014 it doesn\u2019t just chat, it takes action.",
+  "openClaw.body1": "OpenClaw is an AI agent installed on your own server that communicates with you via Telegram. It\u2019s not a shared cloud service \u2014 it runs on your own machine, and your data stays entirely yours.",
+  "openClaw.body2": "OpenClaw goes beyond chat. It can search the web, manage files, schedule tasks, operate a browser, and complete work while you sleep. The project is open-source with an active community building new features. You can choose Claude, GPT, or local models \u2014 your data always stays on your server.",
+
+  "openClaw.features.automation.title": "Daily Automation",
+  "openClaw.features.automation.desc": "Set reminders, schedule tasks, manage your calendar \u2014 handle everyday tasks through conversation",
+  "openClaw.features.research.title": "Research & Data",
+  "openClaw.features.research.desc": "Search the web, organize information, generate reports while you focus on other things",
+  "openClaw.features.integration.title": "Smart Integration",
+  "openClaw.features.integration.desc": "Connect multiple tools and platforms, automate workflows",
+  "openClaw.features.browser.title": "Browser Automation",
+  "openClaw.features.browser.desc": "Price comparison, booking, form filling, ticket grabbing \u2014 AI operates the browser for you",
+
+  "payment.methods": "Payment methods: Credit Card / PayMe",
+  "payment.postCheckout": "After submitting the form, choose a payment method to complete your order. Installation begins within 30 minutes of payment confirmation.",
+
+  "help.heading": "Need help choosing?",
+  "help.subtitle": "Submit a support ticket and we\u2019ll recommend the best plan for you.",
+  "help.cta": "Submit a Support Ticket"
+}

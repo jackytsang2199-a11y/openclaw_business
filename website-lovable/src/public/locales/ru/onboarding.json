@@ -1,0 +1,94 @@
+{
+  "meta": {
+    "title": "Настройка | NexGen",
+    "description": "Заполните данные, выберите способ оплаты — установка за 30 минут."
+  },
+  "pageTitle": "Завершите настройку",
+  "pageSubtitle": "Заполните данные ниже и выберите способ оплаты. После подтверждения оплаты мы завершим установку в течение 30 минут.",
+  "form": {
+    "planLabel": "Тарифный план *",
+    "planPlaceholder": "Выберите тариф",
+    "emailLabel": "Email *",
+    "emailPlaceholder": "your@email.com",
+    "emailError": "Пожалуйста, введите корректный email",
+    "botTokenLabel": "Telegram Bot Token *",
+    "botTokenPlaceholder": "Например: 123456789:ABCdefGHIjklMNOpqrsTUV",
+    "botTokenError": "Формат Token: цифры:буквы",
+    "userIdLabel": "Telegram User ID *",
+    "userIdPlaceholder": "Например: 123456789",
+    "userIdError": "User ID должен содержать не менее 5 цифр",
+    "botNameLabel": "Отображаемое имя бота",
+    "botNameOptional": "(необязательно)",
+    "botNamePlaceholder": "Например: Мой AI-помощник",
+    "submitting": "Отправка...",
+    "submit": "Отправить и перейти к оплате",
+    "submitHint": "После отправки выберите способ оплаты — при оплате картой установка начнётся сразу"
+  },
+  "plans": {
+    "starter-monthly": "Starter — ежемесячно HK$248/мес.",
+    "starter-quarterly": "Starter — квартальный HK$188/мес. (итого HK$564)",
+    "starter-annual": "Starter — годовой HK$158/мес. (итого HK$1,896)",
+    "pro-monthly": "Pro — ежемесячно HK$398/мес.",
+    "pro-quarterly": "Pro — квартальный HK$298/мес. (итого HK$894) ⭐ Рекомендуем",
+    "pro-annual": "Pro — годовой HK$248/мес. (итого HK$2,976)",
+    "elite-monthly": "Elite — ежемесячно HK$598/мес.",
+    "elite-quarterly": "Elite — квартальный HK$458/мес. (итого HK$1,374)",
+    "elite-annual": "Elite — годовой HK$388/мес. (итого HK$4,656)"
+  },
+  "optgroup": {
+    "starter": "Starter",
+    "pro": "Pro ⭐",
+    "elite": "Elite"
+  },
+  "tooltip": {
+    "guide": "Инструкция",
+    "botToken": {
+      "title": "Как получить Bot Token:",
+      "step1": "Найдите в Telegram <strong>BotFather</strong> (с синей галочкой ✓)",
+      "step2": "Отправьте <code>/newbot</code>",
+      "step3": "Задайте отображаемое имя и username бота (должен заканчиваться на bot)",
+      "step4": "BotFather пришлёт Token в формате <code>123456789:ABCdef...</code>",
+      "step5": "Скопируйте весь Token и вставьте сюда",
+      "fullGuide": "Полная инструкция с картинками →"
+    },
+    "userId": {
+      "title": "Как получить User ID:",
+      "step1": "Найдите в Telegram <strong>@userinfobot</strong>",
+      "step2": "Отправьте ему любое сообщение",
+      "step3": "Он ответит вашим User ID (набор цифр)",
+      "step4": "Скопируйте это число и вставьте сюда"
+    }
+  },
+  "payment": {
+    "confirmedTitle": "Данные подтверждены",
+    "selectedPlan": "Вы выбрали:",
+    "choosePayment": "Выберите способ оплаты для завершения заказа:",
+    "cardPayment": "Банковская карта / Apple Pay",
+    "paymePayment": "Оплата через PayMe",
+    "paymeInstruction": "Используйте следующую ссылку PayMe для оплаты:",
+    "paymeCopyTitle": "Скопировать ссылку",
+    "paymeEmailHint": "После оплаты отправьте подтверждение по email для организации установки:",
+    "paymeSendEmail": "Отправить подтверждение оплаты по email",
+    "editInfo": "Изменить данные",
+    "cardNote": "При оплате картой установка начинается автоматически (от 30 минут).",
+    "paymeNote": "Оплата через PayMe требует ручного подтверждения, установка может занять больше времени.",
+    "contactSupport": "При возникновении вопросов обращайтесь: "
+  },
+  "email": {
+    "subject": "NexGen PayMe подтверждение оплаты — {{plan}}",
+    "bodyPlan": "Тарифный план: {{plan}}",
+    "bodyEmail": "Email: {{email}}",
+    "bodyBotToken": "Bot Token: {{botToken}}",
+    "bodyUserId": "Telegram User ID: {{userId}}",
+    "bodyBotName": "Отображаемое имя бота: {{botName}}",
+    "bodyBotNameEmpty": "(не указано)",
+    "bodyMethod": "Способ оплаты: PayMe",
+    "bodyConfirm": "Пожалуйста, подтвердите получение оплаты и организуйте установку."
+  },
+  "help": {
+    "botGuideHint": "Нужна помощь с созданием Telegram Bot? ",
+    "botGuideLink": "Смотреть инструкцию с картинками",
+    "supportHint": "Возникли проблемы? ",
+    "supportLink": "Отправить заявку в поддержку"
+  }
+}

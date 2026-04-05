@@ -1,0 +1,78 @@
+{
+  "meta.title": "料金プラン | NexGen",
+  "meta.description": "スターター、プロ、エリートの3つのプラン。四半期プランで年間最大 HK$1,200 節約。",
+
+  "header.title": "最適なプランを選びましょう",
+  "header.subtitle": "すべて込みの月額料金。隠れた費用なし、契約縛りなし。",
+
+  "billing.monthly": "月額（フレキシブル）",
+  "billing.quarterly": "四半期（おすすめ）",
+  "billing.annual": "年額（最もお得）",
+  "billing.bestValue": "最もお得",
+
+  "tiers.starter.name": "スタータープラン",
+  "tiers.starter.concept": "AI 対話ツール",
+  "tiers.starter.tagline": "いつでも質問、即座に回答",
+  "tiers.starter.description": "Telegram でいつでも待機する AI 対話アシスタント。基本構成ですぐに利用可能。たまに AI を使う方に最適です。",
+
+  "tiers.pro.name": "プロプラン",
+  "tiers.pro.concept": "あなた専属の AI アシスタント",
+  "tiers.pro.tagline": "使うほどあなたを理解し、ウェブ全体を検索",
+  "tiers.pro.description": "あなたが話したすべてを記憶し、ウェブから最新情報を検索し、24時間安定稼働。単なる Q&A ではなく、あなたを理解する専属アシスタントです。",
+
+  "tiers.elite.name": "エリートプラン",
+  "tiers.elite.concept": "あなたの AI チーム",
+  "tiers.elite.tagline": "複数の AI が同時に作業し、あなたの代わりに動く",
+  "tiers.elite.description": "複数の AI エージェントが同時に稼働 — 1つが調査、1つがレポート作成、1つが価格比較やチケット購入を担当。ブラウザ自動操作対応。起業家やヘビーユーザーに最適です。",
+
+  "tiers.recommended": "おすすめ",
+  "tiers.perMonth": "/月",
+  "tiers.cycleTotalQuarterly": "四半期合計 HK${{total}}",
+  "tiers.cycleTotalAnnual": "年間合計 HK${{total}}",
+  "tiers.savingsAnnual": "月額と比べて年間 HK${{savings}} 節約",
+  "tiers.savingsNudge": "四半期プランを選ぶと年間最大 HK${{savings}} 節約",
+  "tiers.ctaSelect": "{{name}}を選択",
+
+  "tiers.tokens": "月間 {{tokens}} tokens",
+  "tiers.dailyConversations": "（約 1日{{count}}回の対話）",
+
+  "features.memory": "永続メモリ",
+  "features.search": "ウェブ全体検索",
+  "features.recovery": "24/7 自動復旧",
+  "features.browser": "ブラウザ操作",
+  "features.multiAgent": "マルチエージェント連携",
+
+  "features.memory.detailPro": "すべての対話・好み・習慣を記憶",
+  "features.memory.detailElite": "すべての対話・好み・習慣を記憶",
+  "features.search.detailPro": "Reddit など AI をブロックするサイトも含む",
+  "features.search.detailElite": "検索設定をカスタマイズ可能",
+  "features.recovery.detailPro": "切断時に自動復旧、24時間安定稼働",
+  "features.recovery.detailElite": "フル Watchdog 監視システム",
+  "features.browser.detailElite": "価格比較・予約・フォーム入力・チケット購入",
+  "features.multiAgent.detailElite": "複数の AI が分担して並行処理",
+
+  "specs.vps": "VPS",
+  "specs.memory": "メモリ",
+  "specs.search": "検索",
+
+  "openClaw.heading": "OpenClaw とは？",
+  "openClaw.tagline": "あなた専用の AI。チャットだけでなく、実際に行動する。",
+  "openClaw.body1": "OpenClaw はあなた自身のサーバーにインストールされる AI エージェントで、Telegram を通じて対話します。クラウドの共有サービスではありません — あなた自身のマシンで動作し、データは完全にあなたのものです。",
+  "openClaw.body2": "OpenClaw はチャットだけではありません。ウェブ全体から情報を検索し、ファイルを管理し、スケジュールを調整し、ブラウザを操作し、あなたが休んでいる間にタスクを自動的に完了します。プロジェクト全体がオープンソースで、コミュニティが継続的に新機能を開発しています。Claude、GPT、またはローカルモデルを選択できます — データは常にあなたのサーバーに残ります。",
+
+  "openClaw.features.automation.title": "日常の自動化",
+  "openClaw.features.automation.desc": "リマインダー設定、スケジュール管理、日程管理を対話コマンドで完了",
+  "openClaw.features.research.title": "リサーチとデータ",
+  "openClaw.features.research.desc": "ウェブ全体を検索、データを整理、レポートを生成 — あなたは他のことに集中",
+  "openClaw.features.integration.title": "スマート統合",
+  "openClaw.features.integration.desc": "複数のツールやプラットフォームを接続し、ワークフローを自動実行",
+  "openClaw.features.browser.title": "ブラウザ自動化",
+  "openClaw.features.browser.desc": "価格比較・予約・フォーム入力・チケット購入 — AI があなたの代わりにブラウザを操作",
+
+  "payment.methods": "お支払い方法：クレジットカード / PayMe",
+  "payment.postCheckout": "フォーム送信後、お支払い方法を選択して注文を完了します。お支払い確認後、30分以内に設置を完了します。",
+
+  "help.heading": "プラン選びでお困りですか？",
+  "help.subtitle": "サポートチケットを送信いただければ、最適なプランをご提案します。",
+  "help.cta": "サポートチケットを送信"
+}

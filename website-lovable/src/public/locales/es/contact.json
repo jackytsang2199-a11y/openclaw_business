@@ -1,0 +1,28 @@
+{
+  "meta.title": "Contacto | NexGen",
+  "meta.description": "Envie un ticket de soporte o contacte al equipo NexGen.",
+
+  "pageTitle": "Enviar ticket de soporte",
+  "pageSubtitle": "Complete el siguiente formulario y le responderemos por correo electronico en 24 horas.",
+
+  "form.orderNumber": "Numero de pedido",
+  "form.orderNumberOptional": "(opcional)",
+  "form.orderNumberPlaceholder": "Ej: T1043",
+  "form.email": "Correo electronico",
+  "form.emailPlaceholder": "you@example.com",
+  "form.subject": "Asunto",
+  "form.subjectPlaceholder": "Ej: No puedo conectar con el asistente AI",
+  "form.description": "Descripcion del problema",
+  "form.descriptionPlaceholder": "Describa detalladamente el problema que encontro...",
+  "form.submit": "Enviar ticket",
+  "form.mailBodyOrder": "Numero de pedido: {{order}}",
+  "form.mailBodyEmail": "Correo de respuesta: {{email}}",
+
+  "success.title": "Ticket enviado",
+  "success.body": "Le responderemos por correo electronico lo antes posible.",
+  "success.another": "Enviar otro ticket",
+
+  "info.directEmail": "Tambien puede enviar un correo electronico directamente a",
+  "info.faqHint": "Las preguntas frecuentes pueden tener la respuesta",
+  "info.faqLink": "Ver FAQ"
+}

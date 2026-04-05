@@ -1,0 +1,115 @@
+{
+  "terms": {
+    "meta": {
+      "title": "Terms of Service | NexGen",
+      "description": "NexGen Terms of Service."
+    },
+    "pageTitle": "Terms of Service",
+    "scope": {
+      "title": "Scope of Service",
+      "body": "NexGen provides remote OpenClaw AI assistant installation and maintenance services. This includes installing and configuring the AI agent system on the customer\u2019s designated VPS server, as well as ongoing technical support and system maintenance."
+    },
+    "payment": {
+      "title": "Payment Terms",
+      "body": "All plans are prepaid, available in monthly, quarterly, and annual billing cycles. Quarterly and annual plans are offered at a discount. All fees are denominated in Hong Kong Dollars (HKD). No refunds are issued after payment."
+    },
+    "sla": {
+      "title": "Service Guarantee",
+      "body": "We commit to 99%+ service uptime. If a service outage caused by us exceeds 24 hours, affected service days will be credited on a pro-rata basis."
+    },
+    "termination": {
+      "title": "Termination",
+      "body": "Customers may contact us to cancel their service at any time. Upon cancellation, the service will remain active until the end of the current billing cycle, after which the server will be reclaimed."
+    },
+    "disclaimer": {
+      "title": "Disclaimer",
+      "body": "AI assistant responses are for reference only and do not constitute professional advice. NexGen bears no responsibility for any loss arising from the use of or reliance on AI responses."
+    },
+    "acceptableUse": {
+      "title": "Acceptable Use",
+      "body": "Customers must not use this service for any unlawful activity, including but not limited to sending spam, distributing malware, or infringing on others\u2019 privacy or intellectual property rights. Violation of this policy will result in immediate service termination with no refund."
+    },
+    "jurisdiction": {
+      "title": "Governing Law",
+      "body": "These terms are governed by the laws of the Hong Kong Special Administrative Region. Both parties agree to submit to the jurisdiction of the courts of Hong Kong for any disputes arising from these terms."
+    },
+    "amendments": {
+      "title": "Amendments",
+      "body": "We reserve the right to amend these terms at any time. Updated terms will be posted on this page with a revised \u201cLast Updated\u201d date. Continued use of the service constitutes acceptance of the amended terms."
+    },
+    "lastUpdated": "Last updated: April 2026"
+  },
+  "privacy": {
+    "meta": {
+      "title": "Privacy Policy | NexGen",
+      "description": "NexGen Privacy Policy."
+    },
+    "pageTitle": "Privacy Policy",
+    "collection": {
+      "title": "Data Collection",
+      "body": "We collect the following personal data: email address, Telegram Bot Token, Telegram User ID, and payment information. This data is collected only when you voluntarily provide it."
+    },
+    "usage": {
+      "title": "Data Usage",
+      "body": "Personal data is used solely to provide and improve our service, including account management, technical support, service notifications, and system maintenance."
+    },
+    "storage": {
+      "title": "Data Storage",
+      "body": "Your conversation data is stored on your dedicated VPS server and is not shared with other customers. We do not access or back up your conversation content."
+    },
+    "sharing": {
+      "title": "Third-Party Sharing",
+      "body": "We do not sell or share your personal data with third parties, except as required by law or with your explicit consent."
+    },
+    "proxy": {
+      "title": "API Proxy",
+      "body": "All API requests are forwarded through an encrypted proxy server. No real API keys are stored on your VPS. The proxy server handles request forwarding only and does not log or store conversation content."
+    },
+    "thirdParty": {
+      "title": "Third-Party Services",
+      "body": "This website uses the following third-party services: Lemon Squeezy (payment processing) and Google Fonts (font delivery). These services may collect your IP address and usage information. Please refer to their respective privacy policies for details."
+    },
+    "rights": {
+      "title": "Your Rights",
+      "body": "You have the right to access, correct, or delete your personal data. To exercise these rights, please contact us using the information below."
+    },
+    "contact": {
+      "title": "Contact",
+      "body": "For privacy-related inquiries, please contact "
+    },
+    "lastUpdated": "Last updated: April 2026"
+  },
+  "refund": {
+    "meta": {
+      "title": "Refund Policy | NexGen",
+      "description": "NexGen Refund Policy."
+    },
+    "pageTitle": "Refund Policy",
+    "prepaid": {
+      "title": "Prepaid Billing",
+      "body": "All plans (monthly, quarterly, annual) are prepaid. Fees are charged at the beginning of each billing cycle."
+    },
+    "noRefund": {
+      "title": "No Refunds",
+      "body": "All fees paid are non-refundable. After cancellation, the service will remain active until the end of the current billing cycle, after which the server will be reclaimed."
+    },
+    "outage": {
+      "title": "Service Outage",
+      "body": "If a service outage caused by us exceeds 24 hours, affected service days will be credited on a pro-rata basis."
+    },
+    "failedInstall": {
+      "title": "Failed Installation",
+      "body": "If installation cannot be completed due to a technical issue on our end, a full refund of fees paid will be issued."
+    },
+    "contact": {
+      "title": "Contact",
+      "body": "For any inquiries, please contact "
+    },
+    "lastUpdated": "Last updated: April 2026"
+  },
+  "notFound": {
+    "title": "404",
+    "message": "Page not found",
+    "homeLink": "Back to Home"
+  }
+}

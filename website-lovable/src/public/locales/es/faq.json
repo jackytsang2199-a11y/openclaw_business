@@ -1,0 +1,48 @@
+{
+  "meta.title": "Preguntas frecuentes | NexGen",
+  "meta.description": "Preguntas frecuentes sobre el servicio de instalacion de agentes AI de NexGen.",
+
+  "pageTitle": "¿Tiene preguntas?",
+  "pageSubtitle": "Ya tenemos las respuestas",
+
+  "categories.basic": "Preguntas basicas",
+  "categories.billing": "Precios y pagos",
+  "categories.features": "Funciones y tecnologia",
+  "categories.support": "Soporte postventa",
+
+  "basic.0.q": "¿En que se diferencia esto de ChatGPT?",
+  "basic.0.a": "ChatGPT es un servicio en la nube compartido. Nosotros proporcionamos un agente AI independiente instalado en su propio equipo, con memoria permanente, busqueda en toda la web, automatizacion del navegador y mas funciones — cosas que ChatGPT no puede hacer.",
+  "basic.1.q": "No tengo conocimientos tecnicos, ¿puedo usarlo?",
+  "basic.1.a": "Por supuesto. Nosotros nos encargamos de toda la configuracion tecnica. Usted solo necesita hablar con el AI en Telegram, tan sencillo como chatear con un amigo.",
+  "basic.2.q": "¿Cuanto tiempo tarda la instalacion?",
+  "basic.2.a": "Tan solo 30 minutos. Configuramos un servidor dedicado para usted y completamos la instalacion sin que tenga que realizar ninguna operacion tecnica.",
+  "basic.3.q": "¿Necesito preparar mi propio servidor?",
+  "basic.3.a": "No. La tarifa mensual ya incluye un servidor dedicado, configurado y gestionado por nosotros.",
+
+  "billing.0.q": "¿Hay contrato? ¿Puedo cancelar en cualquier momento?",
+  "billing.0.a": "No hay contrato. Puede elegir entre planes mensuales, trimestrales y anuales. Los planes trimestrales y anuales tienen descuento. Puede cancelar en cualquier momento, sin reembolso. El servicio continuara hasta el final del periodo de facturacion actual.",
+  "billing.1.q": "¿Que incluye la tarifa mensual?",
+  "billing.1.a": "La tarifa mensual es todo incluido: servidor VPS, costos de computacion AI, mantenimiento y monitoreo del sistema. No necesita pagar nada adicional.",
+  "billing.2.q": "¿Que metodos de pago aceptan?",
+  "billing.2.a": "Aceptamos tarjeta de credito (Visa / Mastercard) y PayMe. El pago con tarjeta de credito inicia la instalacion automaticamente; PayMe requiere confirmacion manual.",
+
+  "features.0.q": "¿Que significa memoria permanente?",
+  "features.0.a": "Basada en la base de datos vectorial Qdrant + el motor de memoria Mem0, el AI recuerda cada palabra que usted ha dicho. A diferencia del limite de 100 memorias de ChatGPT — recuerda preferencias mencionadas hace tres meses.",
+  "features.1.q": "¿En que se diferencia la busqueda en toda la web de la busqueda de ChatGPT?",
+  "features.1.a": "La busqueda de ChatGPT esta bloqueada por numerosos sitios (como Reddit). Nosotros utilizamos SearXNG como motor de busqueda autoalojado, que puede encontrar contenido que ChatGPT no puede.",
+  "features.2.q": "¿Que puede hacer la automatizacion del navegador?",
+  "features.2.a": "El AI puede operar directamente el navegador para llenar formularios, comparar precios, hacer reservas, comprar entradas y verificar resenas. Esta es una funcion exclusiva del plan Elite.",
+  "features.3.q": "¿Estan seguros mis datos?",
+  "features.3.a": "Todos sus registros de conversacion y memorias se almacenan en su propio servidor, no son registrados ni almacenados por nosotros. Las llamadas al modelo AI utilizan un canal API cifrado para garantizar la seguridad de las comunicaciones.",
+
+  "support.0.q": "¿Que pasa si el sistema tiene problemas?",
+  "support.0.a": "Los planes Pro y Elite incluyen funcion de recuperacion automatica (Watchdog), el sistema monitorea y repara automaticamente 24/7. Si necesita soporte humano, puede enviar un ticket de soporte por correo electronico (support@3nexgen.com).",
+  "support.1.q": "¿Puedo cambiar de plan?",
+  "support.1.a": "Si. Envie un ticket de soporte por correo electronico en cualquier momento, la diferencia de precio se calcula proporcionalmente.",
+  "support.2.q": "¿Que pasa si quiero cancelar el servicio?",
+  "support.2.a": "Puede cancelar en cualquier momento. El servicio continuara hasta el final del periodo de facturacion actual y el servidor sera recuperado. Sin reembolso.",
+
+  "cantFind": "¿No encuentra la respuesta?",
+  "supportCta": "Enviar ticket de soporte",
+  "bottomCta.title": "¿Tiene otras preguntas?"
+}

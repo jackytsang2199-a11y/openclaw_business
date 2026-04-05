@@ -1,0 +1,22 @@
+{
+  "loading": "Загрузка...",
+  "nav.home": "Главная",
+  "nav.pricing": "Тарифы",
+  "nav.technology": "Технологии",
+  "nav.faq": "Вопросы",
+  "nav.contact": "Контакты",
+  "nav.cta": "Смотреть тарифы",
+  "nav.telegram": "Telegram AI-бот",
+  "nav.openMenu": "Открыть меню",
+  "nav.menuLabel": "Навигация",
+  "footer.tagline": "Установка AI-агентов",
+  "footer.subtitle": "Ваша персональная AI-система",
+  "footer.slogan": "Ваш сервер. Ваши данные.",
+  "footer.navHeading": "Навигация",
+  "footer.paymentHeading": "Способы оплаты",
+  "footer.creditCard": "Банковская карта",
+  "footer.terms": "Условия использования",
+  "footer.privacy": "Политика конфиденциальности",
+  "footer.refund": "Политика возврата",
+  "footer.copyright": "© 2026 NexGen. All rights reserved."
+}

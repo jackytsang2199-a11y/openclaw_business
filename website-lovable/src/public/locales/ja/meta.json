@@ -1,0 +1,22 @@
+{
+  "home.title": "NexGen — AI エージェント設置サービス",
+  "home.description": "フル装備の OpenClaw AI エージェント設置サービス、HK$188/月から。",
+  "pricing.title": "料金プラン | NexGen",
+  "pricing.description": "スターター、プロ、エリートの3つのプラン。四半期プランで年間最大 HK$1,200 節約。",
+  "technology.title": "技術アーキテクチャ | NexGen",
+  "technology.description": "OpenClaw フル装備版の技術エコシステム — Mem0 メモリ、SearXNG 検索、ブラウザ自動化。",
+  "faq.title": "よくある質問 | NexGen",
+  "faq.description": "NexGen AI エージェント設置サービスのよくある質問と回答。",
+  "contact.title": "お問い合わせ | NexGen",
+  "contact.description": "サポートチケットの送信または NexGen チームへのお問い合わせ。",
+  "onboarding.title": "セットアップ | NexGen",
+  "onboarding.description": "設定情報を入力し、お支払い方法を選択、30分で設置完了。",
+  "botguide.title": "Telegram Bot ガイド | NexGen",
+  "botguide.description": "Telegram Bot の作成方法を図解で説明します。",
+  "terms.title": "利用規約 | NexGen",
+  "terms.description": "NexGen 利用規約。",
+  "privacy.title": "プライバシーポリシー | NexGen",
+  "privacy.description": "NexGen プライバシーポリシー。",
+  "refund.title": "返金ポリシー | NexGen",
+  "refund.description": "NexGen 返金ポリシー。"
+}

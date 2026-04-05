@@ -1,0 +1,48 @@
+{
+  "meta.title": "FAQ | NexGen",
+  "meta.description": "Frequently asked questions about NexGen AI agent installation service.",
+
+  "pageTitle": "Got questions?",
+  "pageSubtitle": "We\u2019ve got answers",
+
+  "categories.basic": "General",
+  "categories.billing": "Billing & Payment",
+  "categories.features": "Features & Technology",
+  "categories.support": "After-Sales Support",
+
+  "basic.0.q": "How is this different from ChatGPT?",
+  "basic.0.a": "ChatGPT is a shared cloud service. We provide an independent AI agent installed on your own machine, with permanent memory, full web search, browser automation, and more \u2014 capabilities that ChatGPT simply doesn\u2019t have.",
+  "basic.1.q": "I have zero technical knowledge. Can I use this?",
+  "basic.1.a": "Absolutely. We handle all the technical setup. You just chat with the AI on Telegram \u2014 as easy as texting a friend.",
+  "basic.2.q": "How long does installation take?",
+  "basic.2.a": "As fast as 30 minutes. We set up a dedicated server and complete the installation for you \u2014 no technical steps on your end.",
+  "basic.3.q": "Do I need to prepare my own server?",
+  "basic.3.a": "No. The monthly fee includes a dedicated server, set up and managed entirely by us.",
+
+  "billing.0.q": "Is there a contract? Can I cancel anytime?",
+  "billing.0.a": "No contract. Choose from monthly, quarterly, or annual plans. Quarterly and annual plans come with discounts. Cancel anytime \u2014 no refunds. Service continues until the end of your current billing cycle.",
+  "billing.1.q": "What does the monthly fee include?",
+  "billing.1.a": "The monthly fee is all-inclusive: VPS server, AI compute costs, system maintenance, and monitoring. You won\u2019t pay a single cent extra.",
+  "billing.2.q": "What payment methods do you accept?",
+  "billing.2.a": "We accept credit cards (Visa / Mastercard) and PayMe. Credit card payments trigger automatic installation; PayMe requires manual confirmation.",
+
+  "features.0.q": "What does \u201cpermanent memory\u201d mean?",
+  "features.0.a": "Built on Qdrant vector database + Mem0 memory engine, the AI remembers everything you\u2019ve ever said. Unlike ChatGPT\u2019s 100-memory limit, it recalls preferences you mentioned three months ago.",
+  "features.1.q": "How is your web search different from ChatGPT\u2019s?",
+  "features.1.a": "ChatGPT\u2019s search is blocked by many websites (like Reddit). We use SearXNG, a self-hosted search engine that can find what ChatGPT cannot.",
+  "features.2.q": "What can browser automation do?",
+  "features.2.a": "The AI can directly operate a browser to fill forms, compare prices, make reservations, grab tickets, and check reviews. This is an Elite plan exclusive feature.",
+  "features.3.q": "Is my data safe?",
+  "features.3.a": "All your conversation history and memory are stored on your own server \u2014 we never log or store them. AI model calls use an encrypted API channel for secure communication.",
+
+  "support.0.q": "What if something goes wrong?",
+  "support.0.a": "Pro and Elite plans include auto-recovery (Watchdog), which monitors and repairs the system 24/7. For human support, submit a ticket via email (support@3nexgen.com).",
+  "support.1.q": "Can I upgrade or downgrade my plan?",
+  "support.1.a": "Yes. Submit a support ticket via email anytime. The price difference is prorated.",
+  "support.2.q": "What happens if I cancel?",
+  "support.2.a": "You can cancel anytime. Service continues until the end of your current billing cycle, after which the server is reclaimed. No refunds.",
+
+  "cantFind": "Can\u2019t find your answer?",
+  "supportCta": "Submit a Support Ticket",
+  "bottomCta.title": "Still have questions?"
+}

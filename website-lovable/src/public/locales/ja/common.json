@@ -1,0 +1,22 @@
+{
+  "loading": "読み込み中...",
+  "nav.home": "ホーム",
+  "nav.pricing": "料金",
+  "nav.technology": "技術",
+  "nav.faq": "よくある質問",
+  "nav.contact": "お問い合わせ",
+  "nav.cta": "プランを見る",
+  "nav.telegram": "Telegram AI ボット",
+  "nav.openMenu": "メニューを開く",
+  "nav.menuLabel": "ナビゲーションメニュー",
+  "footer.tagline": "AI エージェント設置サービス",
+  "footer.subtitle": "あなただけのプライベート AI システム",
+  "footer.slogan": "あなたのサーバー。あなたのデータ。",
+  "footer.navHeading": "ナビゲーション",
+  "footer.paymentHeading": "お支払い方法",
+  "footer.creditCard": "クレジットカード",
+  "footer.terms": "利用規約",
+  "footer.privacy": "プライバシーポリシー",
+  "footer.refund": "返金ポリシー",
+  "footer.copyright": "© 2026 NexGen. All rights reserved."
+}

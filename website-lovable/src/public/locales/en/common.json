@@ -1,0 +1,22 @@
+{
+  "loading": "Loading...",
+  "nav.home": "Home",
+  "nav.pricing": "Pricing",
+  "nav.technology": "Technology",
+  "nav.faq": "FAQ",
+  "nav.contact": "Contact",
+  "nav.cta": "View Plans",
+  "nav.telegram": "Telegram AI Bot",
+  "nav.openMenu": "Open menu",
+  "nav.menuLabel": "Navigation menu",
+  "footer.tagline": "AI Agent Installation Service",
+  "footer.subtitle": "Your own private AI system",
+  "footer.slogan": "Your server. Your data.",
+  "footer.navHeading": "Navigation",
+  "footer.paymentHeading": "Payment Methods",
+  "footer.creditCard": "Credit Card",
+  "footer.terms": "Terms of Service",
+  "footer.privacy": "Privacy Policy",
+  "footer.refund": "Refund Policy",
+  "footer.copyright": "\u00a9 2026 NexGen. All rights reserved."
+}

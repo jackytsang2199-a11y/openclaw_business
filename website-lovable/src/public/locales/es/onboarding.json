@@ -1,0 +1,94 @@
+{
+  "meta": {
+    "title": "Completar configuracion | NexGen",
+    "description": "Complete sus datos, elija un metodo de pago, instalacion en 30 minutos."
+  },
+  "pageTitle": "Completar configuracion",
+  "pageSubtitle": "Complete los siguientes datos y elija un metodo de pago. Una vez confirmado el pago, completaremos la instalacion en 30 minutos.",
+  "form": {
+    "planLabel": "Plan de servicio *",
+    "planPlaceholder": "Seleccione su plan",
+    "emailLabel": "Correo electronico *",
+    "emailPlaceholder": "your@email.com",
+    "emailError": "Ingrese un correo electronico valido",
+    "botTokenLabel": "Telegram Bot Token *",
+    "botTokenPlaceholder": "Ej: 123456789:ABCdefGHIjklMNOpqrsTUV",
+    "botTokenError": "El formato del Token debe ser: numeros:combinacion de letras",
+    "userIdLabel": "Telegram User ID *",
+    "userIdPlaceholder": "Ej: 123456789",
+    "userIdError": "El User ID debe tener al menos 5 digitos",
+    "botNameLabel": "Nombre visible del Bot",
+    "botNameOptional": "(opcional)",
+    "botNamePlaceholder": "Ej: Mi asistente AI",
+    "submitting": "Enviando...",
+    "submit": "Enviar y proceder al pago",
+    "submitHint": "Despues de enviar, seleccione un metodo de pago. El pago con tarjeta de credito inicia la instalacion inmediatamente"
+  },
+  "plans": {
+    "starter-monthly": "Starter — Mensual HK$248/mes",
+    "starter-quarterly": "Starter — Trimestral HK$188/mes (total HK$564)",
+    "starter-annual": "Starter — Anual HK$158/mes (total HK$1,896)",
+    "pro-monthly": "Pro — Mensual HK$398/mes",
+    "pro-quarterly": "Pro — Trimestral HK$298/mes (total HK$894) ⭐ Recomendado",
+    "pro-annual": "Pro — Anual HK$248/mes (total HK$2,976)",
+    "elite-monthly": "Elite — Mensual HK$598/mes",
+    "elite-quarterly": "Elite — Trimestral HK$458/mes (total HK$1,374)",
+    "elite-annual": "Elite — Anual HK$388/mes (total HK$4,656)"
+  },
+  "optgroup": {
+    "starter": "Starter",
+    "pro": "Pro ⭐",
+    "elite": "Elite"
+  },
+  "tooltip": {
+    "guide": "Tutorial",
+    "botToken": {
+      "title": "Como obtener el Bot Token:",
+      "step1": "Busque <strong>BotFather</strong> en Telegram (identificado con la marca azul ✓)",
+      "step2": "Escriba <code>/newbot</code>",
+      "step3": "Configure el nombre visible del Bot y el username (debe terminar en bot)",
+      "step4": "BotFather enviara un Token con formato <code>123456789:ABCdef...</code>",
+      "step5": "Copie el Token completo y peguelo aqui",
+      "fullGuide": "Ver tutorial completo con imagenes →"
+    },
+    "userId": {
+      "title": "Como obtener el User ID:",
+      "step1": "Busque <strong>@userinfobot</strong> en Telegram",
+      "step2": "Enviele cualquier mensaje",
+      "step3": "Le respondera con su User ID (una serie de numeros)",
+      "step4": "Copie ese numero y peguelo aqui"
+    }
+  },
+  "payment": {
+    "confirmedTitle": "Datos confirmados",
+    "selectedPlan": "Usted selecciono:",
+    "choosePayment": "Elija un metodo de pago para completar su pedido:",
+    "cardPayment": "Tarjeta de credito / Apple Pay",
+    "paymePayment": "Pago con PayMe",
+    "paymeInstruction": "Use el siguiente enlace de PayMe para pagar:",
+    "paymeCopyTitle": "Copiar enlace",
+    "paymeEmailHint": "Despues de pagar, envie un correo de confirmacion para que podamos organizar la instalacion:",
+    "paymeSendEmail": "Enviar correo de confirmacion de pago",
+    "editInfo": "Modificar datos",
+    "cardNote": "Instalacion automatica tras el pago con tarjeta de credito (en tan solo 30 minutos).",
+    "paymeNote": "El pago con PayMe requiere confirmacion manual, el tiempo de instalacion puede ser mayor.",
+    "contactSupport": "Si tiene alguna consulta, contacte a "
+  },
+  "email": {
+    "subject": "NexGen confirmacion de pago PayMe — {{plan}}",
+    "bodyPlan": "Plan de servicio: {{plan}}",
+    "bodyEmail": "Correo: {{email}}",
+    "bodyBotToken": "Bot Token: {{botToken}}",
+    "bodyUserId": "Telegram User ID: {{userId}}",
+    "bodyBotName": "Nombre visible del Bot: {{botName}}",
+    "bodyBotNameEmpty": "(no completado)",
+    "bodyMethod": "Metodo de pago: PayMe",
+    "bodyConfirm": "Por favor responda a este correo para confirmar la recepcion del pago y organizar la instalacion."
+  },
+  "help": {
+    "botGuideHint": "¿Necesita ayuda para crear un Telegram Bot? ",
+    "botGuideLink": "Ver tutorial con imagenes",
+    "supportHint": "¿Tiene problemas? ",
+    "supportLink": "Enviar ticket de soporte"
+  }
+}

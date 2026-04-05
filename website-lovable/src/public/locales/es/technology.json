@@ -1,0 +1,46 @@
+{
+  "meta.title": "Arquitectura tecnica | NexGen",
+  "meta.description": "Ecosistema tecnologico completo de OpenClaw — memoria Mem0, busqueda SearXNG, automatizacion del navegador.",
+
+  "pageTitle": "Nuestro ecosistema tecnologico",
+  "pageSubtitle": "Meses de investigacion e integracion profunda, cada componente rigurosamente probado. Esto no es el OpenClaw original — es un ecosistema AI completo.",
+
+  "sections.openclaw.name": "OpenClaw",
+  "sections.openclaw.headline": "El framework de agentes AI de codigo abierto #1 del mundo",
+  "sections.openclaw.body": "200,000+ estrellas en GitHub, 2 millones de usuarios activos semanales en todo el mundo. Hemos personalizado profundamente esta plataforma, anadiendo un ecosistema completo de complementos para crear un sistema muy superior al original.",
+
+  "sections.mem0.name": "Mem0 + Qdrant",
+  "sections.mem0.headline": "Memoria permanente vectorial — el cerebro mas poderoso del AI",
+  "sections.mem0.body": "No es como el limite de 100 memorias de ChatGPT. Basado en la base de datos vectorial Qdrant + el motor de memoria Mem0, recuerda cada palabra que usted ha dicho. ¿Una preferencia mencionada hace tres meses? La recuerda. Cuanto mas lo usa, mas inteligente se vuelve y mejor lo conoce.",
+
+  "sections.searxng.name": "SearXNG",
+  "sections.searxng.headline": "Supere los bloqueos de busqueda AI — motor de busqueda en toda la web",
+  "sections.searxng.body": "La busqueda de ChatGPT esta bloqueada por numerosos sitios — Reddit, foros y algunos sitios de noticias no aparecen. SearXNG es un metamotor de busqueda autoalojado que evita todos los bloqueos de busqueda AI, buscando informacion en toda la web en tiempo real. Lo que ChatGPT no puede encontrar, este lo encuentra.",
+
+  "sections.chromium.name": "Chromium Headless",
+  "sections.chromium.headline": "AI opera el navegador por usted — no solo conversa, realmente actua",
+  "sections.chromium.body": "Motor de automatizacion de navegador headless. AI opera directamente el navegador para llenar formularios, comparar precios, hacer reservas, comprar entradas y verificar resenas. No solo responde preguntas — realmente ejecuta tareas por usted. (Funcion exclusiva del plan Elite)",
+
+  "sections.docker.name": "Docker",
+  "sections.docker.headline": "Despliegue en contenedores con un solo paso — estable y confiable",
+  "sections.docker.body": "Todo el sistema se despliega en contenedores Docker. Entorno completamente aislado, seguro y estable, inicio con un solo paso. Su sistema funciona de forma independiente y puede empaquetarse para migracion, preservando todos los datos.",
+
+  "sections.acpx.name": "ACPX",
+  "sections.acpx.headline": "Entorno de ejecucion del protocolo ACP",
+  "sections.acpx.body": "Cuando multiples AI trabajan simultaneamente, necesitan comunicarse y coordinarse. ACPX les permite asignar tareas en tiempo real sin duplicar trabajo.",
+
+  "sections.clawteam.name": "ClawTeam",
+  "sections.clawteam.headline": "Framework de colaboracion multiagente",
+  "sections.clawteam.body": "Multiples agentes AI funcionando de forma independiente, trabajando en paralelo y procesando diferentes tareas simultaneamente. Uno busca informacion, otro redacta informes, sin interferencias.",
+
+  "sections.watchdog.name": "Gateway Watchdog",
+  "sections.watchdog.headline": "Proceso de recuperacion automatica",
+  "sections.watchdog.body": "Sistema de monitoreo de conexion 24/7, detecta automaticamente desconexiones y reconecta, soporta conmutacion por error multinodo, garantizando que el servicio nunca se interrumpa.",
+
+  "privacy.title": "Privacidad de datos",
+  "privacy.body": "Sus registros de conversacion y memorias se almacenan en su propio servidor, no son registrados ni almacenados por nosotros. Las llamadas al modelo AI utilizan un canal API cifrado para garantizar la seguridad de las comunicaciones.",
+
+  "cta.learnMore": "¿Desea saber mas?",
+  "cta.viewPricing": "Ver planes de precios →",
+  "cta.submitTicket": "Enviar ticket de soporte"
+}

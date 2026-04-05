@@ -1,0 +1,35 @@
+{
+  "meta": {
+    "title": "Telegram Bot ガイド | NexGen",
+    "description": "Telegram Bot の作成方法を図解で説明します。"
+  },
+  "pageTitle": "Telegram Bot の作成方法",
+  "pageSubtitle": "わずか2分、以下の手順に従うだけで完了します。",
+  "backLink": "← 設定フォームに戻る",
+  "steps": {
+    "1": {
+      "title": "BotFather を開く",
+      "line1": "Telegram で <code>@BotFather</code> を検索して会話を開始します。",
+      "line2": "または直接こちらをクリック：",
+      "linkText": "t.me/BotFather"
+    },
+    "2": {
+      "title": "新しい Bot を作成",
+      "line1": "<code>/newbot</code> コマンドを送信します。",
+      "line2": "Bot の表示名を入力します（例：「マイ AI アシスタント」）。",
+      "line3": "Bot のユーザー名を入力します（末尾は <code>bot</code> にする必要があります。例：<code>my_ai_assistant_bot</code>）。"
+    },
+    "3": {
+      "title": "Bot Token をコピー",
+      "line1": "BotFather が Token を返信します（形式：<code>123456789:ABCdefGHIjklMNOpqrsTUVwxyz</code>）。",
+      "line2": "この Token を当社の設定フォームに貼り付けてください。"
+    },
+    "4": {
+      "title": "Telegram User ID を確認",
+      "line1": "Telegram で <code>@userinfobot</code> を検索して会話を開始します。",
+      "line2": "任意のメッセージを送信すると、Bot があなたの User ID（数字の列）を返信します。",
+      "line3": "この ID を設定フォームに貼り付けてください。"
+    }
+  },
+  "doneCta": "完了しましたか？設定フォームに戻って入力する"
+}

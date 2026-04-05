@@ -1,0 +1,35 @@
+{
+  "meta": {
+    "title": "Telegram Bot Guide | NexGen",
+    "description": "Step-by-step guide to creating a Telegram Bot."
+  },
+  "pageTitle": "How to Create a Telegram Bot",
+  "pageSubtitle": "Takes just 2 minutes. Follow the steps below.",
+  "backLink": "\u2190 Back to setup form",
+  "steps": {
+    "1": {
+      "title": "Open BotFather",
+      "line1": "Search for <code>@BotFather</code> on Telegram and start a conversation.",
+      "line2": "Or tap this link directly:",
+      "linkText": "t.me/BotFather"
+    },
+    "2": {
+      "title": "Create a New Bot",
+      "line1": "Send the <code>/newbot</code> command.",
+      "line2": "Enter a display name for your bot (e.g. \u201cMy AI Assistant\u201d).",
+      "line3": "Enter a username for your bot (must end with <code>bot</code>, e.g. <code>my_ai_assistant_bot</code>)."
+    },
+    "3": {
+      "title": "Copy the Bot Token",
+      "line1": "BotFather will reply with a Token (format: <code>123456789:ABCdefGHIjklMNOpqrsTUVwxyz</code>).",
+      "line2": "Paste this Token into our setup form."
+    },
+    "4": {
+      "title": "Find Your Telegram User ID",
+      "line1": "Search for <code>@userinfobot</code> on Telegram and start a conversation.",
+      "line2": "Send any message, and the bot will reply with your User ID (a number).",
+      "line3": "Paste this ID into the setup form."
+    }
+  },
+  "doneCta": "All done? Go back to the setup form"
+}

@@ -1,0 +1,35 @@
+{
+  "meta": {
+    "title": "Инструкция по Telegram Bot | NexGen",
+    "description": "Пошаговая инструкция по созданию Telegram Bot."
+  },
+  "pageTitle": "Как создать Telegram Bot",
+  "pageSubtitle": "Всего 2 минуты — следуйте инструкции ниже.",
+  "backLink": "← Вернуться к форме настройки",
+  "steps": {
+    "1": {
+      "title": "Откройте BotFather",
+      "line1": "Найдите в Telegram <code>@BotFather</code> и начните диалог.",
+      "line2": "Или перейдите по ссылке:",
+      "linkText": "t.me/BotFather"
+    },
+    "2": {
+      "title": "Создайте нового бота",
+      "line1": "Отправьте команду <code>/newbot</code>.",
+      "line2": "Введите отображаемое имя бота (например: «Мой AI-помощник»).",
+      "line3": "Введите имя пользователя бота (должно заканчиваться на <code>bot</code>, например: <code>my_ai_assistant_bot</code>)."
+    },
+    "3": {
+      "title": "Скопируйте Bot Token",
+      "line1": "BotFather пришлёт Token (в формате: <code>123456789:ABCdefGHIjklMNOpqrsTUVwxyz</code>).",
+      "line2": "Вставьте этот Token в нашу форму настройки."
+    },
+    "4": {
+      "title": "Узнайте ваш Telegram User ID",
+      "line1": "Найдите в Telegram <code>@userinfobot</code> и начните диалог.",
+      "line2": "Отправьте любое сообщение — бот ответит вашим User ID (набор цифр).",
+      "line3": "Вставьте этот ID в форму настройки."
+    }
+  },
+  "doneCta": "Готово? Вернуться к форме настройки"
+}

@@ -1,0 +1,28 @@
+{
+  "meta.title": "Контакты | NexGen",
+  "meta.description": "Отправьте заявку в поддержку или свяжитесь с командой NexGen.",
+
+  "pageTitle": "Отправить заявку в поддержку",
+  "pageSubtitle": "Заполните форму ниже — мы ответим по email в течение 24 часов.",
+
+  "form.orderNumber": "Номер заказа",
+  "form.orderNumberOptional": "(необязательно)",
+  "form.orderNumberPlaceholder": "Например: T1043",
+  "form.email": "Email",
+  "form.emailPlaceholder": "you@example.com",
+  "form.subject": "Тема",
+  "form.subjectPlaceholder": "Например: Не удаётся подключиться к AI-помощнику",
+  "form.description": "Описание проблемы",
+  "form.descriptionPlaceholder": "Пожалуйста, подробно опишите вашу проблему...",
+  "form.submit": "Отправить заявку",
+  "form.mailBodyOrder": "Номер заказа: {{order}}",
+  "form.mailBodyEmail": "Email для ответа: {{email}}",
+
+  "success.title": "Заявка отправлена",
+  "success.body": "Мы ответим вам по email в ближайшее время.",
+  "success.another": "Отправить ещё одну заявку",
+
+  "info.directEmail": "Вы также можете написать напрямую на",
+  "info.faqHint": "Возможно, ответ уже есть в разделе частых вопросов",
+  "info.faqLink": "Смотреть FAQ"
+}

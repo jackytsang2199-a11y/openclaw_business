@@ -1,0 +1,28 @@
+{
+  "meta.title": "Contact Us | NexGen",
+  "meta.description": "Submit a support ticket or contact the NexGen team.",
+
+  "pageTitle": "Submit a Support Ticket",
+  "pageSubtitle": "Fill out the form below and we\u2019ll respond via email within 24 hours.",
+
+  "form.orderNumber": "Order Number",
+  "form.orderNumberOptional": "(Optional)",
+  "form.orderNumberPlaceholder": "e.g. T1043",
+  "form.email": "Email Address",
+  "form.emailPlaceholder": "you@example.com",
+  "form.subject": "Subject",
+  "form.subjectPlaceholder": "e.g. Unable to connect to AI assistant",
+  "form.description": "Description",
+  "form.descriptionPlaceholder": "Please describe the issue in detail...",
+  "form.submit": "Submit Ticket",
+  "form.mailBodyOrder": "Order Number: {{order}}",
+  "form.mailBodyEmail": "Reply Email: {{email}}",
+
+  "success.title": "Ticket Submitted",
+  "success.body": "We\u2019ll respond via email as soon as possible.",
+  "success.another": "Submit another ticket",
+
+  "info.directEmail": "You can also email us directly at",
+  "info.faqHint": "Your question may already be answered in our FAQ",
+  "info.faqLink": "View FAQ"
+}

@@ -1,0 +1,115 @@
+{
+  "terms": {
+    "meta": {
+      "title": "Terminos de servicio | NexGen",
+      "description": "Terminos de servicio de NexGen."
+    },
+    "pageTitle": "Terminos de servicio",
+    "scope": {
+      "title": "Alcance del servicio",
+      "body": "NexGen proporciona servicios de instalacion y mantenimiento remoto de asistentes AI OpenClaw. El servicio incluye la instalacion y configuracion de sistemas de agentes AI en el servidor VPS designado por el cliente, asi como soporte tecnico continuo y mantenimiento del sistema."
+    },
+    "payment": {
+      "title": "Terminos de pago",
+      "body": "Todos los planes son de prepago, con tres opciones disponibles: mensual, trimestral y anual. Los planes trimestrales y anuales cuentan con descuento. Todos los cargos se calculan en dolares de Hong Kong (HKD). No se realizan reembolsos una vez efectuado el pago."
+    },
+    "sla": {
+      "title": "Garantia de servicio",
+      "body": "Nos comprometemos a una disponibilidad del servicio superior al 99%. Si por causas atribuibles a nosotros el servicio se interrumpe por mas de 24 horas, compensaremos proporcionalmente los dias de servicio afectados."
+    },
+    "termination": {
+      "title": "Terminacion del servicio",
+      "body": "El cliente puede contactarnos en cualquier momento para cancelar el servicio. Tras la cancelacion, el servicio continuara hasta el final del periodo de facturacion actual y el servidor sera recuperado."
+    },
+    "disclaimer": {
+      "title": "Exencion de responsabilidad",
+      "body": "Las respuestas del asistente AI son solo de referencia y no constituyen asesoramiento profesional. NexGen no asume responsabilidad por cualquier perdida derivada del uso o la dependencia de las respuestas del AI."
+    },
+    "acceptableUse": {
+      "title": "Uso aceptable",
+      "body": "El cliente no podra utilizar este servicio para ninguna actividad ilegal, incluyendo pero no limitandose al envio de spam, distribucion de software malicioso, violacion de la privacidad o propiedad intelectual de terceros. La violacion de estos terminos resultara en la terminacion inmediata del servicio, sin reembolso."
+    },
+    "jurisdiction": {
+      "title": "Legislacion aplicable",
+      "body": "Estos terminos se rigen por las leyes de la Region Administrativa Especial de Hong Kong. Cualquier disputa derivada de estos terminos sera sometida a la jurisdiccion de los tribunales de Hong Kong."
+    },
+    "amendments": {
+      "title": "Modificacion de terminos",
+      "body": "Nos reservamos el derecho de modificar estos terminos en cualquier momento. Los terminos modificados se publicaran en esta pagina con la fecha de \"ultima actualizacion\" correspondiente. El uso continuado del servicio implica la aceptacion de los terminos modificados."
+    },
+    "lastUpdated": "Ultima actualizacion: abril de 2026"
+  },
+  "privacy": {
+    "meta": {
+      "title": "Politica de privacidad | NexGen",
+      "description": "Politica de privacidad de NexGen."
+    },
+    "pageTitle": "Politica de privacidad",
+    "collection": {
+      "title": "Recopilacion de datos",
+      "body": "Los datos personales que recopilamos incluyen: direccion de correo electronico, Telegram Bot Token, Telegram User ID e informacion de pago. Estos datos solo se recopilan cuando usted los proporciona voluntariamente."
+    },
+    "usage": {
+      "title": "Uso de datos",
+      "body": "Los datos personales se utilizan unicamente para proporcionar y mejorar el servicio, incluyendo gestion de cuentas, soporte tecnico, notificaciones de servicio y mantenimiento del sistema."
+    },
+    "storage": {
+      "title": "Almacenamiento de datos",
+      "body": "Sus datos de conversacion se almacenan en su servidor VPS dedicado y no se comparten con otros clientes. No accedemos ni realizamos copias de seguridad de su contenido de conversacion."
+    },
+    "sharing": {
+      "title": "Compartir con terceros",
+      "body": "No vendemos ni compartimos sus datos personales con terceros, excepto cuando la ley lo requiera o con su consentimiento explicito."
+    },
+    "proxy": {
+      "title": "Proxy API",
+      "body": "Todas las solicitudes API se transmiten a traves de un servidor proxy cifrado. No se almacenan claves API reales en su VPS. El servidor proxy solo procesa el reenvio de solicitudes, no registra ni almacena contenido de conversacion."
+    },
+    "thirdParty": {
+      "title": "Servicios de terceros",
+      "body": "Este sitio web utiliza los siguientes servicios de terceros: Lemon Squeezy (procesamiento de pagos) y Google Fonts (carga de fuentes). Estos servicios pueden recopilar su direccion IP e informacion de uso. Consulte las politicas de privacidad de cada servicio para mas detalles."
+    },
+    "rights": {
+      "title": "Sus derechos",
+      "body": "Usted tiene derecho a consultar, corregir o eliminar sus datos personales. Para ejercer estos derechos, contactenos a traves de los siguientes medios."
+    },
+    "contact": {
+      "title": "Contacto",
+      "body": "Para consultas relacionadas con la privacidad, contacte a "
+    },
+    "lastUpdated": "Ultima actualizacion: abril de 2026"
+  },
+  "refund": {
+    "meta": {
+      "title": "Politica de reembolso | NexGen",
+      "description": "Politica de reembolso de NexGen."
+    },
+    "pageTitle": "Politica de reembolso",
+    "prepaid": {
+      "title": "Sistema de prepago",
+      "body": "Todos los planes (mensual, trimestral, anual) son de prepago. Los cargos se cobran al inicio de cada periodo de facturacion."
+    },
+    "noRefund": {
+      "title": "Sin reembolsos",
+      "body": "No se realizan reembolsos por los cargos ya cobrados. Tras la cancelacion del servicio, este continuara hasta el final del periodo de facturacion actual y el servidor sera recuperado."
+    },
+    "outage": {
+      "title": "Interrupciones del servicio",
+      "body": "Si por causas atribuibles a nosotros el servicio se interrumpe por mas de 24 horas, compensaremos proporcionalmente los dias de servicio afectados."
+    },
+    "failedInstall": {
+      "title": "Instalacion fallida",
+      "body": "Si por razones tecnicas atribuibles a nosotros la instalacion no puede completarse, se reembolsara el monto total cobrado."
+    },
+    "contact": {
+      "title": "Contacto",
+      "body": "Para cualquier consulta, contacte a "
+    },
+    "lastUpdated": "Ultima actualizacion: abril de 2026"
+  },
+  "notFound": {
+    "title": "404",
+    "message": "Pagina no encontrada",
+    "homeLink": "Volver al inicio"
+  }
+}

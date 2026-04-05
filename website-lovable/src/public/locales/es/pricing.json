@@ -1,0 +1,78 @@
+{
+  "meta.title": "Planes de precios | NexGen",
+  "meta.description": "Tres planes: Starter, Pro y Elite. Ahorre hasta HK$1,200 al ano con el plan trimestral.",
+
+  "header.title": "Elija el plan ideal para usted",
+  "header.subtitle": "Tarifa mensual todo incluido, sin cargos ocultos, sin contrato.",
+
+  "billing.monthly": "Mensual (flexible)",
+  "billing.quarterly": "Trimestral (recomendado)",
+  "billing.annual": "Anual (mejor precio)",
+  "billing.bestValue": "Mejor precio",
+
+  "tiers.starter.name": "Starter",
+  "tiers.starter.concept": "Herramienta de conversacion AI",
+  "tiers.starter.tagline": "Pregunte en cualquier momento, respuestas instantaneas",
+  "tiers.starter.description": "Un asistente de conversacion AI siempre disponible en Telegram. Configuracion basica, listo para usar. Ideal para usuarios ocasionales de AI.",
+
+  "tiers.pro.name": "Pro",
+  "tiers.pro.concept": "Su asistente AI personal",
+  "tiers.pro.tagline": "Cuanto mas lo use, mejor lo conoce. Busca en toda la web por usted",
+  "tiers.pro.description": "Recuerda cada palabra que usted ha dicho, busca la informacion mas reciente en toda la web, funciona de manera estable las 24 horas. No es solo un bot de preguntas y respuestas, es un asistente personal que lo conoce.",
+
+  "tiers.elite.name": "Elite",
+  "tiers.elite.concept": "Su equipo AI",
+  "tiers.elite.tagline": "Multiples AI trabajando simultaneamente, ejecutando tareas por usted",
+  "tiers.elite.description": "Multiples agentes AI trabajando simultaneamente — uno busca informacion, otro redacta informes, otro compara precios y compra entradas. Compatible con automatizacion del navegador, ideal para emprendedores y usuarios intensivos.",
+
+  "tiers.recommended": "Recomendado",
+  "tiers.perMonth": "/mes",
+  "tiers.cycleTotalQuarterly": "Total trimestral HK${{total}}",
+  "tiers.cycleTotalAnnual": "Total anual HK${{total}}",
+  "tiers.savingsAnnual": "Ahorre HK${{savings}} al ano vs. tarifa mensual",
+  "tiers.savingsNudge": "Elija el plan trimestral y ahorre hasta HK${{savings}} al ano",
+  "tiers.ctaSelect": "Elegir {{name}}",
+
+  "tiers.tokens": "{{tokens}} tokens por mes",
+  "tiers.dailyConversations": "(aprox. {{count}} conversaciones diarias)",
+
+  "features.memory": "Memoria permanente",
+  "features.search": "Busqueda en toda la web",
+  "features.recovery": "Recuperacion automatica 24/7",
+  "features.browser": "Automatizacion del navegador",
+  "features.multiAgent": "Colaboracion multiagente",
+
+  "features.memory.detailPro": "Recuerda todas las conversaciones, preferencias y habitos",
+  "features.memory.detailElite": "Recuerda todas las conversaciones, preferencias y habitos",
+  "features.search.detailPro": "Incluye sitios que bloquean AI como Reddit",
+  "features.search.detailElite": "Configuracion de busqueda personalizada",
+  "features.recovery.detailPro": "Recuperacion automatica ante desconexiones, estable las 24 horas",
+  "features.recovery.detailElite": "Suite completa de monitoreo watchdog",
+  "features.browser.detailElite": "Comparacion de precios, reservas, formularios, compra de entradas",
+  "features.multiAgent.detailElite": "Multiples AI trabajando en paralelo",
+
+  "specs.vps": "VPS",
+  "specs.memory": "Memoria",
+  "specs.search": "Busqueda",
+
+  "openClaw.heading": "¿Que es OpenClaw?",
+  "openClaw.tagline": "Su AI personal que no solo conversa, sino que tambien actua.",
+  "openClaw.body1": "OpenClaw es un agente AI instalado en su propio servidor que se comunica con usted a traves de Telegram. No es un servicio en la nube compartido — se ejecuta en su propia maquina y los datos le pertenecen completamente.",
+  "openClaw.body2": "OpenClaw no solo conversa. Puede buscar informacion en toda la web, gestionar archivos, programar horarios, operar el navegador y completar tareas automaticamente mientras usted descansa. El proyecto es de codigo abierto y la comunidad desarrolla nuevas funciones constantemente. Puede elegir usar Claude, GPT o modelos locales — los datos siempre permanecen en su servidor.",
+
+  "openClaw.features.automation.title": "Automatizacion diaria",
+  "openClaw.features.automation.desc": "Configure recordatorios, programe horarios, gestione agenda, complete tareas cotidianas con comandos de conversacion",
+  "openClaw.features.research.title": "Investigacion y datos",
+  "openClaw.features.research.desc": "Busque en toda la web, organice datos, genere informes, mientras usted se enfoca en otras cosas",
+  "openClaw.features.integration.title": "Integracion inteligente",
+  "openClaw.features.integration.desc": "Conecte multiples herramientas y plataformas, ejecute flujos de trabajo automaticamente",
+  "openClaw.features.browser.title": "Automatizacion del navegador",
+  "openClaw.features.browser.desc": "Comparacion de precios, reservas, formularios, compra de entradas — AI opera el navegador por usted",
+
+  "payment.methods": "Metodos de pago: Tarjeta de credito / PayMe",
+  "payment.postCheckout": "Despues de enviar el formulario, seleccione un metodo de pago para completar su pedido. Una vez confirmado el pago, completaremos la instalacion en 30 minutos.",
+
+  "help.heading": "¿Necesita ayuda para elegir?",
+  "help.subtitle": "Envie un ticket de soporte y le recomendaremos el plan mas adecuado.",
+  "help.cta": "Enviar ticket de soporte"
+}

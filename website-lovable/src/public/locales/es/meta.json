@@ -1,0 +1,22 @@
+{
+  "home.title": "NexGen — Servicio de instalacion de agentes AI",
+  "home.description": "Servicio de instalacion de agentes AI OpenClaw con configuracion completa, desde HK$188/mes.",
+  "pricing.title": "Planes de precios | NexGen",
+  "pricing.description": "Tres planes: Starter, Pro y Elite. Ahorre hasta HK$1,200 al ano con el plan trimestral.",
+  "technology.title": "Arquitectura tecnica | NexGen",
+  "technology.description": "Ecosistema tecnologico completo de OpenClaw — memoria Mem0, busqueda SearXNG, automatizacion del navegador.",
+  "faq.title": "Preguntas frecuentes | NexGen",
+  "faq.description": "Preguntas frecuentes sobre el servicio de instalacion de agentes AI de NexGen.",
+  "contact.title": "Contacto | NexGen",
+  "contact.description": "Envie un ticket de soporte o contacte al equipo NexGen.",
+  "onboarding.title": "Completar configuracion | NexGen",
+  "onboarding.description": "Complete sus datos, elija un metodo de pago, instalacion en 30 minutos.",
+  "botguide.title": "Tutorial de Telegram Bot | NexGen",
+  "botguide.description": "Tutorial con imagenes sobre como crear un Telegram Bot.",
+  "terms.title": "Terminos de servicio | NexGen",
+  "terms.description": "Terminos de servicio de NexGen.",
+  "privacy.title": "Politica de privacidad | NexGen",
+  "privacy.description": "Politica de privacidad de NexGen.",
+  "refund.title": "Politica de reembolso | NexGen",
+  "refund.description": "Politica de reembolso de NexGen."
+}

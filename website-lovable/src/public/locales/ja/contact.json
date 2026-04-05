@@ -1,0 +1,28 @@
+{
+  "meta.title": "お問い合わせ | NexGen",
+  "meta.description": "サポートチケットの送信または NexGen チームへのお問い合わせ。",
+
+  "pageTitle": "サポートチケットを送信",
+  "pageSubtitle": "以下のフォームにご記入ください。24時間以内にメールで返信いたします。",
+
+  "form.orderNumber": "注文番号",
+  "form.orderNumberOptional": "（任意）",
+  "form.orderNumberPlaceholder": "例：T1043",
+  "form.email": "メールアドレス",
+  "form.emailPlaceholder": "you@example.com",
+  "form.subject": "件名",
+  "form.subjectPlaceholder": "例：AI アシスタントに接続できない",
+  "form.description": "問題の説明",
+  "form.descriptionPlaceholder": "発生した問題を詳しくお書きください...",
+  "form.submit": "チケットを送信",
+  "form.mailBodyOrder": "注文番号：{{order}}",
+  "form.mailBodyEmail": "返信先メール：{{email}}",
+
+  "success.title": "チケットが送信されました",
+  "success.body": "できるだけ早くメールで返信いたします。",
+  "success.another": "別のチケットを送信",
+
+  "info.directEmail": "直接メールを送ることもできます：",
+  "info.faqHint": "よくある質問で解決できるかもしれません",
+  "info.faqLink": "FAQ を見る"
+}
