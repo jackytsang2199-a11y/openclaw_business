@@ -1,7 +1,7 @@
 import { Helmet } from "react-helmet-async";
 import { useState, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { Info, HelpCircle, Send, CheckCircle2, Loader2, CreditCard, Smartphone } from "lucide-react";
+import { Info, HelpCircle, Send, CheckCircle2, Loader2, CreditCard, Smartphone, ExternalLink, Copy, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,6 +12,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { SUPPORT_EMAIL } from "@/lib/constants";
+import { useTranslation } from 'react-i18next';
+import { useLocalizedPath } from '@/hooks/useLocalizedPath';
 
 // Lemon Squeezy checkout URLs — all 9 products (3 tiers × 3 billing cycles)
 const checkoutUrls: Record<string, string> = {
@@ -26,30 +28,25 @@ const checkoutUrls: Record<string, string> = {
   "elite-annual":      "https://3nexgen.lemonsqueezy.com/checkout/buy/cb786c99-ac37-4ec2-b79a-7e83c494f3a6",
 };
 
-const plans = [
-  { id: "starter-monthly", label: "基本版 — 月費 HK$248/月" },
-  { id: "starter-quarterly", label: "基本版 — 季度 HK$188/月（合計 HK$564）" },
-  { id: "starter-annual", label: "基本版 — 年費 HK$158/月（合計 HK$1,896）" },
-  { id: "pro-monthly", label: "專業版 — 月費 HK$398/月" },
-  { id: "pro-quarterly", label: "專業版 — 季度 HK$298/月（合計 HK$894）⭐ 推薦" },
-  { id: "pro-annual", label: "專業版 — 年費 HK$248/月（合計 HK$2,976）" },
-  { id: "elite-monthly", label: "旗艦版 — 月費 HK$598/月" },
-  { id: "elite-quarterly", label: "旗艦版 — 季度 HK$458/月（合計 HK$1,374）" },
-  { id: "elite-annual", label: "旗艦版 — 年費 HK$388/月（合計 HK$4,656）" },
-];
+const PLAN_IDS = [
+  "starter-monthly", "starter-quarterly", "starter-annual",
+  "pro-monthly", "pro-quarterly", "pro-annual",
+  "elite-monthly", "elite-quarterly", "elite-annual",
+] as const;
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const botTokenRegex = /^\d+:[A-Za-z0-9_-]+$/;
 const userIdRegex = /^\d{5,}$/;
 
 function GuideTooltip({ children }: { children: React.ReactNode }) {
+  const { t } = useTranslation('onboarding');
   return (
     <TooltipProvider delayDuration={200}>
       <Tooltip>
         <TooltipTrigger asChild>
           <button type="button" className="inline-flex items-center gap-1 rounded-full border border-primary/20 bg-primary/5 px-2.5 py-1 text-primary hover:bg-primary/10 hover:text-primary/80 transition-all duration-200">
             <HelpCircle className="h-3.5 w-3.5" />
-            <span className="text-xs font-medium">教學</span>
+            <span className="text-xs font-medium">{t('tooltip.guide')}</span>
           </button>
         </TooltipTrigger>
         <TooltipContent side="right" className="max-w-xs text-sm leading-relaxed p-4" sideOffset={8}>
@@ -67,6 +64,8 @@ function getFieldState(value: string, pattern?: RegExp, touched?: boolean): stri
 }
 
 const Onboarding = () => {
+  const { t } = useTranslation('onboarding');
+  const lp = useLocalizedPath();
   const [searchParams] = useSearchParams();
   const tierParam = searchParams.get("tier") || "";
   const planParam = searchParams.get("plan") || "quarterly";
@@ -120,40 +119,54 @@ const Onboarding = () => {
     }
   };
 
-  const handleFpsPayment = () => {
-    // Send form data via email for manual processing
-    const subject = encodeURIComponent(`NexGen PayMe/FPS 付款 — ${form.plan}`);
+  const [showPayme, setShowPayme] = useState(false);
+  const [copiedPayme, setCopiedPayme] = useState(false);
+
+  const PAYME_URL = "https://payme.hsbc/nexgen";
+
+  const handlePaymePayment = () => {
+    setShowPayme(true);
+  };
+
+  const handleCopyPaymeLink = () => {
+    navigator.clipboard.writeText(PAYME_URL);
+    setCopiedPayme(true);
+    setTimeout(() => setCopiedPayme(false), 2000);
+  };
+
+  const selectedPlanLabel = t(`plans.${form.plan}`, { defaultValue: form.plan });
+
+  const handlePaymeEmailConfirm = () => {
+    const subject = encodeURIComponent(t('email.subject', { plan: form.plan }));
     const body = encodeURIComponent(
-      `服務計劃: ${plans.find((p) => p.id === form.plan)?.label || form.plan}\n` +
-      `電郵: ${form.email}\n` +
-      `Bot Token: ${form.botToken}\n` +
-      `Telegram User ID: ${form.userId}\n` +
-      `Bot 顯示名稱: ${form.botName || "(未填寫)"}\n\n` +
-      `付款方式: PayMe / FPS\n` +
-      `請回覆此電郵確認收款後安排安裝。`
+      `${t('email.bodyPlan', { plan: selectedPlanLabel })}\n` +
+      `${t('email.bodyEmail', { email: form.email })}\n` +
+      `${t('email.bodyBotToken', { botToken: form.botToken })}\n` +
+      `${t('email.bodyUserId', { userId: form.userId })}\n` +
+      `${t('email.bodyBotName', { botName: form.botName || t('email.bodyBotNameEmpty') })}\n\n` +
+      `${t('email.bodyMethod')}\n` +
+      t('email.bodyConfirm')
     );
-    sessionStorage.removeItem("nexgen_onboarding");
-    window.location.href = `mailto:${SUPPORT_EMAIL}?subject=${subject}&body=${body}`;
+    window.open(`mailto:${SUPPORT_EMAIL}?subject=${subject}&body=${body}`, "_blank");
   };
 
   // Payment choice screen after form submission
   if (submitted) {
-    const selectedPlan = plans.find((p) => p.id === form.plan);
     return (
       <>
       <Helmet>
-        <title>完成設定 | NexGen</title>
-        <meta name="description" content="填寫設定資料，選擇付款方式，30 分鐘完成安裝。" />
+        <title>{t('meta.title')}</title>
+        <meta name="description" content={t('meta.description')} />
       </Helmet>
       <section className="container py-20 max-w-lg mx-auto text-center space-y-8">
         <div className="h-16 w-16 rounded-full bg-emerald-100 dark:bg-emerald-950 flex items-center justify-center mx-auto">
           <CheckCircle2 className="h-8 w-8 text-emerald-600" />
         </div>
-        <h1 className="text-3xl md:text-4xl">資料已確認</h1>
+        <h1 className="text-3xl md:text-4xl">{t('payment.confirmedTitle')}</h1>
         <p className="text-muted-foreground">
-          你選擇了：<span className="text-foreground font-medium">{selectedPlan?.label}</span>
+          {t('payment.selectedPlan')}<span className="text-foreground font-medium">{selectedPlanLabel}</span>
         </p>
-        <p className="text-muted-foreground">選擇付款方式完成訂購：</p>
+        <p className="text-muted-foreground">{t('payment.choosePayment')}</p>
 
         <div className="space-y-4 max-w-sm mx-auto">
           {/* Primary: Card payment via Lemon Squeezy */}
@@ -163,32 +176,68 @@ const Onboarding = () => {
             className="w-full rounded-2xl text-base py-6 bg-primary text-primary-foreground hover:bg-primary/90 shadow-xl shadow-primary/20 btn-press"
           >
             <CreditCard className="h-5 w-5 mr-2" />
-            信用卡 / Apple Pay 付款
+            {t('payment.cardPayment')}
           </Button>
 
-          {/* Secondary: PayMe / FPS */}
+          {/* Secondary: PayMe */}
           <Button
-            onClick={handleFpsPayment}
+            onClick={handlePaymePayment}
             variant="outline"
             size="lg"
             className="w-full rounded-2xl text-base py-6 border-border hover:bg-accent btn-press"
           >
             <Smartphone className="h-5 w-5 mr-2" />
-            PayMe / FPS 付款
+            {t('payment.paymePayment')}
           </Button>
 
+          {showPayme && (
+            <div className="rounded-xl border border-primary/20 bg-primary/5 p-5 space-y-4 text-left">
+              <p className="text-sm font-medium">{t('payment.paymeInstruction')}</p>
+              <div className="flex items-center gap-2">
+                <a
+                  href={PAYME_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 text-sm font-mono text-primary hover:underline break-all"
+                >
+                  {PAYME_URL}
+                  <ExternalLink className="inline h-3.5 w-3.5 ml-1 -mt-0.5" />
+                </a>
+                <button
+                  onClick={handleCopyPaymeLink}
+                  className="shrink-0 p-2 rounded-lg hover:bg-accent transition-colors"
+                  title={t('payment.paymeCopyTitle')}
+                >
+                  {copiedPayme ? <Check className="h-4 w-4 text-emerald-500" /> : <Copy className="h-4 w-4 text-muted-foreground" />}
+                </button>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {t('payment.paymeEmailHint')}
+              </p>
+              <Button
+                onClick={handlePaymeEmailConfirm}
+                variant="outline"
+                size="sm"
+                className="w-full rounded-xl text-sm"
+              >
+                <Send className="h-4 w-4 mr-2" />
+                {t('payment.paymeSendEmail')}
+              </Button>
+            </div>
+          )}
+
           <button onClick={() => setSubmitted(false)} className="text-sm text-primary hover:underline mt-2">
-            修改資料
+            {t('payment.editInfo')}
           </button>
 
           <p className="text-xs text-muted-foreground">
-            信用卡付款後自動開始安裝（最快 30 分鐘）。<br />
-            PayMe/FPS 付款需人工確認，安裝時間可能較長。
+            {t('payment.cardNote')}<br />
+            {t('payment.paymeNote')}
           </p>
         </div>
 
         <p className="text-sm text-muted-foreground pt-4">
-          如有問題，請聯絡{" "}
+          {t('payment.contactSupport')}
           <a href={`mailto:${SUPPORT_EMAIL}`} className="text-primary hover:underline">{SUPPORT_EMAIL}</a>
         </p>
       </section>
@@ -199,15 +248,15 @@ const Onboarding = () => {
   return (
     <>
     <Helmet>
-      <title>完成設定 | NexGen</title>
-      <meta name="description" content="填寫設定資料，選擇付款方式，30 分鐘完成安裝。" />
+      <title>{t('meta.title')}</title>
+      <meta name="description" content={t('meta.description')} />
     </Helmet>
     <section className="container py-16 max-w-xl mx-auto">
       {/* Header */}
       <div className="text-center space-y-3 mb-10">
-        <h1 className="text-3xl md:text-5xl">完成設定</h1>
+        <h1 className="text-3xl md:text-5xl">{t('pageTitle')}</h1>
         <p className="text-muted-foreground prose-zh">
-          填寫以下資料並選擇付款方式。付款確認後，我們會在 30 分鐘內完成安裝。
+          {t('pageSubtitle')}
         </p>
       </div>
 
@@ -216,7 +265,7 @@ const Onboarding = () => {
         {/* Plan selection */}
         <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <Label htmlFor="plan" className="text-base font-medium">服務計劃 *</Label>
+            <Label htmlFor="plan" className="text-base font-medium">{t('form.planLabel')}</Label>
           </div>
           <select
             id="plan"
@@ -227,20 +276,20 @@ const Onboarding = () => {
             }`}
             required
           >
-            <option value="" disabled>選擇你的方案</option>
-            <optgroup label="基本版 Starter">
-              {plans.filter((p) => p.id.startsWith("starter")).map((p) => (
-                <option key={p.id} value={p.id}>{p.label}</option>
+            <option value="" disabled>{t('form.planPlaceholder')}</option>
+            <optgroup label={t('optgroup.starter')}>
+              {PLAN_IDS.filter((p) => p.startsWith("starter")).map((p) => (
+                <option key={p} value={p}>{t(`plans.${p}`)}</option>
               ))}
             </optgroup>
-            <optgroup label="專業版 Pro ⭐">
-              {plans.filter((p) => p.id.startsWith("pro")).map((p) => (
-                <option key={p.id} value={p.id}>{p.label}</option>
+            <optgroup label={t('optgroup.pro')}>
+              {PLAN_IDS.filter((p) => p.startsWith("pro")).map((p) => (
+                <option key={p} value={p}>{t(`plans.${p}`)}</option>
               ))}
             </optgroup>
-            <optgroup label="旗艦版 Elite">
-              {plans.filter((p) => p.id.startsWith("elite")).map((p) => (
-                <option key={p.id} value={p.id}>{p.label}</option>
+            <optgroup label={t('optgroup.elite')}>
+              {PLAN_IDS.filter((p) => p.startsWith("elite")).map((p) => (
+                <option key={p} value={p}>{t(`plans.${p}`)}</option>
               ))}
             </optgroup>
           </select>
@@ -248,11 +297,11 @@ const Onboarding = () => {
 
         {/* Email */}
         <div className="space-y-2">
-          <Label htmlFor="email" className="text-base font-medium">電郵地址 *</Label>
+          <Label htmlFor="email" className="text-base font-medium">{t('form.emailLabel')}</Label>
           <Input
             id="email"
             type="email"
-            placeholder="your@email.com"
+            placeholder={t('form.emailPlaceholder')}
             value={form.email}
             onChange={(e) => setForm({ ...form, email: e.target.value })}
             onBlur={() => markTouched("email")}
@@ -260,32 +309,32 @@ const Onboarding = () => {
             required
           />
           {touched.email && form.email && !emailRegex.test(form.email) && (
-            <p className="text-xs text-destructive">請輸入有效的電郵地址</p>
+            <p className="text-xs text-destructive">{t('form.emailError')}</p>
           )}
         </div>
 
         {/* Bot Token */}
         <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <Label htmlFor="botToken" className="text-base font-medium">Telegram Bot Token *</Label>
+            <Label htmlFor="botToken" className="text-base font-medium">{t('form.botTokenLabel')}</Label>
             <GuideTooltip>
-              <p className="font-medium mb-2">如何取得 Bot Token：</p>
+              <p className="font-medium mb-2">{t('tooltip.botToken.title')}</p>
               <ol className="list-decimal list-inside space-y-1.5">
-                <li>在 Telegram 搜尋 <strong>BotFather</strong>（認住藍色剔號 ✓）</li>
-                <li>輸入 <code className="bg-muted px-1 rounded">/newbot</code></li>
-                <li>設定 Bot 顯示名稱和 username（必須以 bot 結尾）</li>
-                <li>BotFather 會發送一串 Token，格式如 <code className="bg-muted px-1 rounded text-xs">123456789:ABCdef...</code></li>
-                <li>複製整串 Token 貼到這裏</li>
+                <li dangerouslySetInnerHTML={{ __html: t('tooltip.botToken.step1') }} />
+                <li dangerouslySetInnerHTML={{ __html: t('tooltip.botToken.step2') }} />
+                <li>{t('tooltip.botToken.step3')}</li>
+                <li dangerouslySetInnerHTML={{ __html: t('tooltip.botToken.step4') }} />
+                <li>{t('tooltip.botToken.step5')}</li>
               </ol>
-              <Link to="/bot-guide" className="text-primary text-xs mt-2 block hover:underline">
-                查看完整圖文教學 →
+              <Link to={lp("/bot-guide")} className="text-primary text-xs mt-2 block hover:underline">
+                {t('tooltip.botToken.fullGuide')}
               </Link>
             </GuideTooltip>
           </div>
           <Input
             id="botToken"
             type="text"
-            placeholder="例如：123456789:ABCdefGHIjklMNOpqrsTUV"
+            placeholder={t('form.botTokenPlaceholder')}
             value={form.botToken}
             onChange={(e) => setForm({ ...form, botToken: e.target.value })}
             onBlur={() => markTouched("botToken")}
@@ -293,28 +342,28 @@ const Onboarding = () => {
             required
           />
           {touched.botToken && form.botToken && !botTokenRegex.test(form.botToken) && (
-            <p className="text-xs text-destructive">Token 格式應為：數字:英文字母組合</p>
+            <p className="text-xs text-destructive">{t('form.botTokenError')}</p>
           )}
         </div>
 
         {/* User ID */}
         <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <Label htmlFor="userId" className="text-base font-medium">Telegram User ID *</Label>
+            <Label htmlFor="userId" className="text-base font-medium">{t('form.userIdLabel')}</Label>
             <GuideTooltip>
-              <p className="font-medium mb-2">如何取得 User ID：</p>
+              <p className="font-medium mb-2">{t('tooltip.userId.title')}</p>
               <ol className="list-decimal list-inside space-y-1.5">
-                <li>在 Telegram 搜尋 <strong>@userinfobot</strong></li>
-                <li>向它發送任何訊息</li>
-                <li>它會回覆你的 User ID（一串數字）</li>
-                <li>複製這個數字貼到這裏</li>
+                <li dangerouslySetInnerHTML={{ __html: t('tooltip.userId.step1') }} />
+                <li>{t('tooltip.userId.step2')}</li>
+                <li>{t('tooltip.userId.step3')}</li>
+                <li>{t('tooltip.userId.step4')}</li>
               </ol>
             </GuideTooltip>
           </div>
           <Input
             id="userId"
             type="text"
-            placeholder="例如：123456789"
+            placeholder={t('form.userIdPlaceholder')}
             value={form.userId}
             onChange={(e) => setForm({ ...form, userId: e.target.value })}
             onBlur={() => markTouched("userId")}
@@ -322,20 +371,20 @@ const Onboarding = () => {
             required
           />
           {touched.userId && form.userId && !userIdRegex.test(form.userId) && (
-            <p className="text-xs text-destructive">User ID 應為至少 5 位數字</p>
+            <p className="text-xs text-destructive">{t('form.userIdError')}</p>
           )}
         </div>
 
         {/* Bot display name (optional) */}
         <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <Label htmlFor="botName" className="text-base font-medium">Bot 顯示名稱</Label>
-            <span className="text-xs text-muted-foreground">（選填）</span>
+            <Label htmlFor="botName" className="text-base font-medium">{t('form.botNameLabel')}</Label>
+            <span className="text-xs text-muted-foreground">{t('form.botNameOptional')}</span>
           </div>
           <Input
             id="botName"
             type="text"
-            placeholder="例如：我的 AI 助手"
+            placeholder={t('form.botNamePlaceholder')}
             value={form.botName}
             onChange={(e) => setForm({ ...form, botName: e.target.value })}
             className="rounded-xl py-3 transition-all duration-200"
@@ -355,10 +404,10 @@ const Onboarding = () => {
             ) : (
               <Send className="h-5 w-5 mr-2" />
             )}
-            {isSubmitting ? "提交中…" : "提交並前往付款"}
+            {isSubmitting ? t('form.submitting') : t('form.submit')}
           </Button>
           <p className="text-center text-xs text-muted-foreground mt-3">
-            提交後選擇付款方式，信用卡付款即時開始安裝
+            {t('form.submitHint')}
           </p>
         </div>
       </form>
@@ -368,18 +417,18 @@ const Onboarding = () => {
         <div className="flex items-start gap-3">
           <Info className="h-5 w-5 text-muted-foreground shrink-0 mt-0.5" />
           <p className="text-sm text-muted-foreground">
-            需要幫助建立 Telegram Bot？{" "}
-            <Link to="/bot-guide" className="text-primary font-medium hover:underline">
-              查看圖文教學
+            {t('help.botGuideHint')}
+            <Link to={lp("/bot-guide")} className="text-primary font-medium hover:underline">
+              {t('help.botGuideLink')}
             </Link>
           </p>
         </div>
         <div className="flex items-start gap-3">
           <HelpCircle className="h-5 w-5 text-muted-foreground shrink-0 mt-0.5" />
           <p className="text-sm text-muted-foreground">
-            遇到問題？{" "}
-            <Link to="/contact" className="text-primary font-medium hover:underline">
-              提交支援工單
+            {t('help.supportHint')}
+            <Link to={lp("/contact")} className="text-primary font-medium hover:underline">
+              {t('help.supportLink')}
             </Link>
           </p>
         </div>

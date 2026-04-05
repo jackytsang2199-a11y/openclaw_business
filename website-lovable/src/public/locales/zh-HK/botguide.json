@@ -1,0 +1,35 @@
+{
+  "meta": {
+    "title": "Telegram Bot 教學 | NexGen",
+    "description": "如何建立 Telegram Bot 的圖文教學。"
+  },
+  "pageTitle": "如何建立 Telegram Bot",
+  "pageSubtitle": "只需 2 分鐘，跟著以下步驟即可完成。",
+  "backLink": "← 返回設定表格",
+  "steps": {
+    "1": {
+      "title": "開啟 BotFather",
+      "line1": "在 Telegram 搜尋 <code>@BotFather</code> 並開始對話。",
+      "line2": "或直接點擊：",
+      "linkText": "t.me/BotFather"
+    },
+    "2": {
+      "title": "建立新 Bot",
+      "line1": "發送 <code>/newbot</code> 指令。",
+      "line2": "輸入 Bot 的顯示名稱（例如：「我的 AI 助手」）。",
+      "line3": "輸入 Bot 的用戶名（必須以 <code>bot</code> 結尾，例如：<code>my_ai_assistant_bot</code>）。"
+    },
+    "3": {
+      "title": "複製 Bot Token",
+      "line1": "BotFather 會回覆一串 Token（格式如：<code>123456789:ABCdefGHIjklMNOpqrsTUVwxyz</code>）。",
+      "line2": "將此 Token 貼到我們的設定表格中。"
+    },
+    "4": {
+      "title": "查詢您的 Telegram User ID",
+      "line1": "在 Telegram 搜尋 <code>@userinfobot</code> 並開始對話。",
+      "line2": "發送任何訊息，Bot 會回覆你的 User ID（一串數字）。",
+      "line3": "將此 ID 貼到設定表格中。"
+    }
+  },
+  "doneCta": "已完成？返回填寫設定表格"
+}

@@ -1,0 +1,94 @@
+{
+  "meta": {
+    "title": "完成設定 | NexGen",
+    "description": "填寫設定資料，選擇付款方式，30 分鐘完成安裝。"
+  },
+  "pageTitle": "完成設定",
+  "pageSubtitle": "填寫以下資料並選擇付款方式。付款確認後，我們會在 30 分鐘內完成安裝。",
+  "form": {
+    "planLabel": "服務計劃 *",
+    "planPlaceholder": "選擇你的方案",
+    "emailLabel": "電郵地址 *",
+    "emailPlaceholder": "your@email.com",
+    "emailError": "請輸入有效的電郵地址",
+    "botTokenLabel": "Telegram Bot Token *",
+    "botTokenPlaceholder": "例如：123456789:ABCdefGHIjklMNOpqrsTUV",
+    "botTokenError": "Token 格式應為：數字:英文字母組合",
+    "userIdLabel": "Telegram User ID *",
+    "userIdPlaceholder": "例如：123456789",
+    "userIdError": "User ID 應為至少 5 位數字",
+    "botNameLabel": "Bot 顯示名稱",
+    "botNameOptional": "（選填）",
+    "botNamePlaceholder": "例如：我的 AI 助手",
+    "submitting": "提交中…",
+    "submit": "提交並前往付款",
+    "submitHint": "提交後選擇付款方式，信用卡付款即時開始安裝"
+  },
+  "plans": {
+    "starter-monthly": "基本版 — 月費 HK$248/月",
+    "starter-quarterly": "基本版 — 季度 HK$188/月（合計 HK$564）",
+    "starter-annual": "基本版 — 年費 HK$158/月（合計 HK$1,896）",
+    "pro-monthly": "專業版 — 月費 HK$398/月",
+    "pro-quarterly": "專業版 — 季度 HK$298/月（合計 HK$894）⭐ 推薦",
+    "pro-annual": "專業版 — 年費 HK$248/月（合計 HK$2,976）",
+    "elite-monthly": "旗艦版 — 月費 HK$598/月",
+    "elite-quarterly": "旗艦版 — 季度 HK$458/月（合計 HK$1,374）",
+    "elite-annual": "旗艦版 — 年費 HK$388/月（合計 HK$4,656）"
+  },
+  "optgroup": {
+    "starter": "基本版 Starter",
+    "pro": "專業版 Pro ⭐",
+    "elite": "旗艦版 Elite"
+  },
+  "tooltip": {
+    "guide": "教學",
+    "botToken": {
+      "title": "如何取得 Bot Token：",
+      "step1": "在 Telegram 搜尋 <strong>BotFather</strong>（認住藍色剔號 ✓）",
+      "step2": "輸入 <code>/newbot</code>",
+      "step3": "設定 Bot 顯示名稱和 username（必須以 bot 結尾）",
+      "step4": "BotFather 會發送一串 Token，格式如 <code>123456789:ABCdef...</code>",
+      "step5": "複製整串 Token 貼到這裏",
+      "fullGuide": "查看完整圖文教學 →"
+    },
+    "userId": {
+      "title": "如何取得 User ID：",
+      "step1": "在 Telegram 搜尋 <strong>@userinfobot</strong>",
+      "step2": "向它發送任何訊息",
+      "step3": "它會回覆你的 User ID（一串數字）",
+      "step4": "複製這個數字貼到這裏"
+    }
+  },
+  "payment": {
+    "confirmedTitle": "資料已確認",
+    "selectedPlan": "你選擇了：",
+    "choosePayment": "選擇付款方式完成訂購：",
+    "cardPayment": "信用卡 / Apple Pay 付款",
+    "paymePayment": "PayMe 付款",
+    "paymeInstruction": "請使用以下 PayMe 連結付款：",
+    "paymeCopyTitle": "複製連結",
+    "paymeEmailHint": "付款後，請發送電郵確認以便我們安排安裝：",
+    "paymeSendEmail": "發送付款確認電郵",
+    "editInfo": "修改資料",
+    "cardNote": "信用卡付款後自動開始安裝（最快 30 分鐘）。",
+    "paymeNote": "PayMe 付款需人工確認，安裝時間可能較長。",
+    "contactSupport": "如有問題，請聯絡 "
+  },
+  "email": {
+    "subject": "NexGen PayMe 付款確認 — {{plan}}",
+    "bodyPlan": "服務計劃: {{plan}}",
+    "bodyEmail": "電郵: {{email}}",
+    "bodyBotToken": "Bot Token: {{botToken}}",
+    "bodyUserId": "Telegram User ID: {{userId}}",
+    "bodyBotName": "Bot 顯示名稱: {{botName}}",
+    "bodyBotNameEmpty": "(未填寫)",
+    "bodyMethod": "付款方式: PayMe",
+    "bodyConfirm": "請回覆此電郵確認收款後安排安裝。"
+  },
+  "help": {
+    "botGuideHint": "需要幫助建立 Telegram Bot？ ",
+    "botGuideLink": "查看圖文教學",
+    "supportHint": "遇到問題？ ",
+    "supportLink": "提交支援工單"
+  }
+}
