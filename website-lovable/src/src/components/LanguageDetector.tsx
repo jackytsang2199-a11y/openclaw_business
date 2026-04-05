@@ -24,17 +24,26 @@ export default function LanguageDetector() {
       }
     } else {
       const stored = localStorage.getItem('nexgen-lang');
-      const detected = i18n.language;
 
-      if (!stored && detected !== DEFAULT_LANGUAGE) {
+      // Returning user with stored preference that isn't the default
+      if (stored && PREFIXED_LANGUAGES.includes(stored as any)) {
+        navigate(`/${stored}${location.pathname}${location.search}`, { replace: true });
+        return;
+      }
+
+      // First visit — detect from browser
+      if (!stored) {
+        const detected = i18n.language;
         if (SUPPORTED_LANGUAGES.includes(detected as any) && detected !== DEFAULT_LANGUAGE) {
           navigate(`/${detected}${location.pathname}${location.search}`, { replace: true });
           return;
         }
+        // Browser language not supported → fallback to English
         navigate(`/${FALLBACK_LANGUAGE}${location.pathname}${location.search}`, { replace: true });
         return;
       }
 
+      // stored === DEFAULT_LANGUAGE — stay on unprefixed route
       if (i18n.language !== DEFAULT_LANGUAGE) {
         i18n.changeLanguage(DEFAULT_LANGUAGE);
       }
