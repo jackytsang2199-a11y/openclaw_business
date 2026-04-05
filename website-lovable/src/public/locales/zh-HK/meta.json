@@ -1,0 +1,22 @@
+{
+  "home.title": "NexGen — AI 智能體安裝服務",
+  "home.description": "全配版 OpenClaw AI 智能體安裝服務，由 HK$188/月起。",
+  "pricing.title": "收費方案 | NexGen",
+  "pricing.description": "基本版、專業版、旗艦版三種方案，季度計劃每年節省高達 HK$1,200。",
+  "technology.title": "技術架構 | NexGen",
+  "technology.description": "OpenClaw 全配版技術生態系統 — Mem0 記憶、SearXNG 搜尋、瀏覽器自動化。",
+  "faq.title": "常見問題 | NexGen",
+  "faq.description": "NexGen AI 智能體安裝服務常見問題與解答。",
+  "contact.title": "聯絡我們 | NexGen",
+  "contact.description": "提交支援工單或聯絡 NexGen 團隊。",
+  "onboarding.title": "完成設定 | NexGen",
+  "onboarding.description": "填寫設定資料，選擇付款方式，30 分鐘完成安裝。",
+  "botguide.title": "Telegram Bot 教學 | NexGen",
+  "botguide.description": "如何建立 Telegram Bot 的圖文教學。",
+  "terms.title": "服務條款 | NexGen",
+  "terms.description": "NexGen 服務條款。",
+  "privacy.title": "私隱政策 | NexGen",
+  "privacy.description": "NexGen 私隱政策。",
+  "refund.title": "退款政策 | NexGen",
+  "refund.description": "NexGen 退款政策。"
+}

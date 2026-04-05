@@ -1,4 +1,4 @@
-import { Helmet } from "react-helmet-async";
+import SEOHead from "@/components/SEOHead";
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useInView } from "framer-motion";
 import { Link } from "react-router-dom";
@@ -286,10 +286,7 @@ const Index = () => {
 
   return (
     <>
-      <Helmet>
-        <title>{t('meta.title')}</title>
-        <meta name="description" content={t('meta.description')} />
-      </Helmet>
+      <SEOHead page="home" />
       {/* ── 1. Hero ── */}
       <section className="relative overflow-hidden" style={{ background: "linear-gradient(135deg, #1E293B 0%, #0F172A 50%, #020617 100%)" }}>
         <div className="absolute inset-0 hero-pattern" />

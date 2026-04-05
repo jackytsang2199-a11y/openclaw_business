@@ -1,4 +1,4 @@
-import { Helmet } from "react-helmet-async";
+import SEOHead from "@/components/SEOHead";
 import { useState, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { Info, HelpCircle, Send, CheckCircle2, Loader2, CreditCard, Smartphone, ExternalLink, Copy, Check } from "lucide-react";
@@ -154,10 +154,7 @@ const Onboarding = () => {
   if (submitted) {
     return (
       <>
-      <Helmet>
-        <title>{t('meta.title')}</title>
-        <meta name="description" content={t('meta.description')} />
-      </Helmet>
+      <SEOHead page="onboarding" />
       <section className="container py-20 max-w-lg mx-auto text-center space-y-8">
         <div className="h-16 w-16 rounded-full bg-emerald-100 dark:bg-emerald-950 flex items-center justify-center mx-auto">
           <CheckCircle2 className="h-8 w-8 text-emerald-600" />
@@ -247,10 +244,7 @@ const Onboarding = () => {
 
   return (
     <>
-    <Helmet>
-      <title>{t('meta.title')}</title>
-      <meta name="description" content={t('meta.description')} />
-    </Helmet>
+    <SEOHead page="onboarding" />
     <section className="container py-16 max-w-xl mx-auto">
       {/* Header */}
       <div className="text-center space-y-3 mb-10">

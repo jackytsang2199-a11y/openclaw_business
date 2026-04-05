@@ -1,4 +1,4 @@
-import { Helmet } from "react-helmet-async";
+import SEOHead from "@/components/SEOHead";
 import { useTranslation } from 'react-i18next';
 
 const SECTIONS = ['collection', 'usage', 'storage', 'sharing', 'proxy', 'thirdParty', 'rights'] as const;
@@ -8,10 +8,7 @@ const Privacy = () => {
 
   return (
     <>
-      <Helmet>
-        <title>{t('privacy.meta.title')}</title>
-        <meta name="description" content={t('privacy.meta.description')} />
-      </Helmet>
+      <SEOHead page="privacy" />
       <section className="container py-20 max-w-3xl mx-auto">
       <div className="text-center space-y-4 mb-12">
         <h1 className="text-3xl md:text-5xl">{t('privacy.pageTitle')}</h1>

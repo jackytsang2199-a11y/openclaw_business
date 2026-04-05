@@ -1,4 +1,4 @@
-import { Helmet } from "react-helmet-async";
+import SEOHead from "@/components/SEOHead";
 import { useTranslation } from 'react-i18next';
 
 const SECTIONS = ['prepaid', 'noRefund', 'outage', 'failedInstall'] as const;
@@ -8,10 +8,7 @@ const Refund = () => {
 
   return (
     <>
-      <Helmet>
-        <title>{t('refund.meta.title')}</title>
-        <meta name="description" content={t('refund.meta.description')} />
-      </Helmet>
+      <SEOHead page="refund" />
       <section className="container py-20 max-w-3xl mx-auto">
       <div className="text-center space-y-4 mb-12">
         <h1 className="text-3xl md:text-5xl">{t('refund.pageTitle')}</h1>

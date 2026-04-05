@@ -1,4 +1,4 @@
-import { Helmet } from "react-helmet-async";
+import SEOHead from "@/components/SEOHead";
 import { Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -13,10 +13,7 @@ const BotGuide = () => {
 
   return (
     <>
-      <Helmet>
-        <title>{t('meta.title')}</title>
-        <meta name="description" content={t('meta.description')} />
-      </Helmet>
+      <SEOHead page="botguide" />
       <section className="container py-20">
       {/* Hero */}
       <div className="max-w-3xl mx-auto text-center space-y-4 mb-12">

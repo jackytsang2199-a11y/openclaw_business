@@ -1,4 +1,4 @@
-import { Helmet } from "react-helmet-async";
+import SEOHead from "@/components/SEOHead";
 import { useState, FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { Mail, Send, CheckCircle, Info } from "lucide-react";
@@ -37,10 +37,7 @@ const Contact = () => {
 
   return (
     <>
-      <Helmet>
-        <title>{t('meta.title')}</title>
-        <meta name="description" content={t('meta.description')} />
-      </Helmet>
+      <SEOHead page="contact" />
       <section className="container py-20 bg-section-alt min-h-[80vh]">
       {/* Hero */}
       <div className="max-w-3xl mx-auto text-center space-y-4 mb-12">

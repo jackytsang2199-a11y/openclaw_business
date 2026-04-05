@@ -1,4 +1,4 @@
-import { Helmet } from "react-helmet-async";
+import SEOHead from "@/components/SEOHead";
 import { Link } from "react-router-dom";
 import { Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -37,10 +37,7 @@ const Technology = () => {
 
   return (
     <>
-      <Helmet>
-        <title>{t('meta.title')}</title>
-        <meta name="description" content={t('meta.description')} />
-      </Helmet>
+      <SEOHead page="technology" />
       <section className="container py-20">
         <div className="text-center space-y-4 mb-16">
           <h1 className="text-3xl md:text-5xl">{t('pageTitle')}</h1>
