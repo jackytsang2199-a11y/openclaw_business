@@ -96,7 +96,7 @@ journalctl --user -u nexgen-worker.service -f
 journalctl --user -u nexgen-worker.service --no-pager -n 50
 ```
 
-**Note:** The service is currently **loaded but not enabled** — it won't auto-start on reboot until you run `systemctl --user enable`.
+**Note:** The service is **enabled and running** (since 2026-03-28). Linger is enabled for boot persistence.
 
 ---
 
@@ -296,9 +296,9 @@ Shows 7 sections (wrangler) or 4 sections (API):
 
 | Tier | Name | Monthly Fee | API Budget | Features |
 |------|------|-------------|-----------|----------|
-| T1 | 新手上路 | HK$148 | HK$40 | VPS + DeepSeek chat only |
-| T2 | 智能管家 | HK$248 | HK$70 | + Mem0 memory + SearXNG search + watchdogs |
-| T3 | 全能大師 | HK$388 | HK$100 | + Chromium browser + custom personality |
+| T1 | 基本版 Starter | HK$248 | HK$40 | VPS + DeepSeek chat only |
+| T2 | 專業版 Pro | HK$398 | HK$70 | + Mem0 memory + SearXNG search + watchdogs |
+| T3 | 旗艦版 Elite | HK$598 | HK$100 | + Chromium browser + multi-agent + custom personality |
 
 **Budget enforcement:** 90% → warn header | 100% → 429 block | 1st of month → auto-reset
 
