@@ -89,11 +89,11 @@ Python, runs on Raspberry Pi 5 (home LAN, no public IP). Systemd user service.
 
 ## Service Tiers
 
-| Tier | Name | Monthly | Scripts | Key Features |
-|------|------|---------|---------|--------------|
-| 1 | 新手上路 | HK$148 | 00-04, 08-10 | OpenClaw + Telegram only |
-| 2 | 智能管家 | HK$248 | 00-10 | + Mem0/Qdrant memory + SearXNG search + watchdog |
-| 3 | 全能大師 | HK$388 | 00-13 | + Chrome headless + Claude Code CLI + ClawTeam |
+| Tier | Name | Monthly | Quarterly | Annual | Key Features |
+|------|------|---------|-----------|--------|--------------|
+| 1 | 基本版 Starter | HK$248 | HK$188 | HK$158 | AI chat on Telegram only |
+| 2 | 專業版 Pro | HK$398 | HK$298 | HK$248 | + Mem0 memory + SearXNG search + watchdog |
+| 3 | 旗艦版 Elite | HK$598 | HK$458 | HK$388 | + Chrome headless + multi-agent + custom personality |
 
 ## API Providers
 

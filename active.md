@@ -9,7 +9,7 @@
 
 ### 業務規劃 ✅ 100%
 - [x] 14-section 商業計劃 v1 完成（所有 section confirmed）
-- [x] 三層 Decoy Effect 定價（新手上路 $148/月 → 智能管家 $248/月 → 全能大師 $388/月）
+- [x] 三層定價（基本版 $248/月 → 專業版 $398/月 → 旗艦版 $598/月）
 - [x] API 定價研究（7 個 provider，HK 可用性分析）
 - [x] 法律分析完成（HK 限制地區 — DeepSeek 直接可用，Azure OpenAI 為合規 GPT 通道）
 - [x] 安裝自動化策略決定（Option C: Hybrid — 80% bash + 20% Claude Agent SDK）

@@ -28,17 +28,17 @@
 - **All customer-facing copy:** 香港書面語 (HK formal written Chinese)
 - **NEVER use:** Cantonese slang (嘅、咩、唔、佢、嗰、咁、啲)
 - **English for:** tech terms (OpenClaw, AI, API, Telegram, VPS, Docker)
-- **Emoji ONLY for:** tier names (🌱 新手上路, ⭐ 智能管家, 🚀 全能大師)
+- **No emoji in tier names:** 基本版 Starter, 專業版 Pro, 旗艦版 Elite
 
-## Service Tiers (Decoy Effect Pricing)
+## Service Tiers (3-Tier Pricing)
 
-All-inclusive monthly pricing (VPS + API compute + maintenance):
+All-inclusive subscription (VPS + API compute + maintenance). No install fees.
 
-| Tier | Name | Install (half-price) | Monthly | Target |
-|------|------|---------------------|---------|--------|
-| 🌱 | 新手上路 | HK$200 | HK$148/mo | Decoy — basic VPS only |
-| ⭐ | 智能管家 | HK$400 | HK$248/mo | **Main revenue driver** — memory + search + watchdog |
-| 🚀 | 全能大師 | HK$900 | HK$388/mo | Premium — everything + browser + custom personality |
+| Tier | Name | Monthly (彈性) | Quarterly (推薦) | Annual (最優惠) | Target |
+|------|------|---------------|-----------------|----------------|--------|
+| 1 | 基本版 Starter | HK$248/mo | HK$188/mo | HK$158/mo | Entry — AI chat on Telegram only |
+| 2 | 專業版 Pro | HK$398/mo | HK$298/mo | HK$248/mo | **Main revenue driver** — memory + search + watchdog |
+| 3 | 旗艦版 Elite | HK$598/mo | HK$458/mo | HK$388/mo | Premium — everything + browser + custom personality |
 
 ## Brand Identity
 

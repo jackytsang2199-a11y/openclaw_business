@@ -93,12 +93,15 @@ openclaw_setup_business/
 - **Internal business docs:** May contain 廣東話 — this is fine for internal use.
 - **Design directives / AI instructions / Code:** English.
 
-### Service Tiers (Decoy Effect Pricing) — All-Inclusive Monthly
-- **🌱 新手上路** (Install HK$400→200 half-price, HK$148/mo) — Intentional decoy. VPS only, no memory/search.
-- **⭐ 智能管家** (Install HK$800→400 half-price, HK$248/mo) — Main revenue driver. Memory + search + watchdogs.
-- **🚀 全能大師** (Install HK$1,800→900 half-price, HK$388/mo) — Everything + browser + custom personality.
+### Service Tiers (3-Tier Pricing) — All-Inclusive Subscription
 
-Monthly fee is all-inclusive: VPS + API compute + maintenance. No separate API packages.
+| Tier | Name | Monthly (彈性) | Quarterly (推薦) | Annual (最優惠) | Token Allocation | Key Features |
+|------|------|---------------|-----------------|----------------|-----------------|--------------|
+| 1 | 基本版 Starter | HK$248/mo | HK$188/mo | HK$158/mo | 5M tokens/mo | AI chat on Telegram only |
+| 2 | 專業版 Pro | HK$398/mo | HK$298/mo | HK$248/mo | 10M tokens/mo | + Mem0 memory + SearXNG search + watchdog |
+| 3 | 旗艦版 Elite | HK$598/mo | HK$458/mo | HK$388/mo | 20M tokens/mo | + Chrome headless + multi-agent + custom personality |
+
+No install fees — subscription only. Monthly fee is all-inclusive: VPS + API compute + maintenance.
 
 ### Architecture: Proxy-Only (Zero Keys on VPS)
 
@@ -141,7 +144,7 @@ What we install beyond vanilla OpenClaw:
 - We use DeepSeek for chat + LLM extraction, OpenAI only for embeddings (via proxy)
 
 ### Revenue Model
-Dual stream: one-time installation fees (HK$200-900 half-price period) + all-inclusive monthly fees (HK$148-388/mo). API costs absorbed into monthly fee.
+Subscription only: all-inclusive monthly fees (HK$158-598/mo depending on tier and billing cycle). No one-time install fees. API costs absorbed into the subscription.
 
 ## Working With This Repo
 

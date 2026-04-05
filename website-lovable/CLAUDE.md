@@ -34,7 +34,7 @@ ClawHK / 3NexGen website built with Lovable (React + Vite + Tailwind CSS + shadc
 - All customer-facing copy: 香港書面語 (formal written Chinese)
 - No Cantonese slang (嘅、咩、唔、佢)
 - English for tech terms (OpenClaw, AI, API, Telegram)
-- Emoji only for tier names (🌱 新手上路, ⭐ 智能管家, 🚀 全能大師)
+- No emoji for tier names — use: 基本版 Starter, 專業版 Pro, 旗艦版 Elite
 
 ## Design System
 - Dark mode base with crab-orange accent
