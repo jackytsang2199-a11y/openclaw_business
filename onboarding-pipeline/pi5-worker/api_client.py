@@ -107,3 +107,91 @@ class ApiClient:
         )
         resp.raise_for_status()
         return resp.json()["usage"]
+
+    # --- Admin methods (for CLI / semi-auto operations) ---
+
+    def get_job(self, job_id: str) -> Optional[dict]:
+        """Get a specific job by ID."""
+        resp = requests.get(
+            f"{self.base_url}/api/jobs/{job_id}",
+            headers=self.headers,
+            timeout=10,
+        )
+        if resp.status_code == 404:
+            return None
+        resp.raise_for_status()
+        return resp.json().get("job")
+
+    def get_pending_jobs(self) -> list:
+        """Get all jobs with status 'ready'. Uses polling endpoint."""
+        job = self.get_next_job()
+        return [job] if job else []
+
+    def get_vps_by_status(self, status: str) -> list:
+        """Get VPS instances filtered by status."""
+        resp = requests.get(
+            f"{self.base_url}/api/vps?status={status}",
+            headers=self.headers,
+            timeout=10,
+        )
+        resp.raise_for_status()
+        data = resp.json()
+        if isinstance(data, list):
+            return data
+        return data.get("vps_list") or data.get("instances") or []
+
+    def get_usage_admin(self, confirm_api_key: str) -> list:
+        """List all usage records (admin). Requires CONFIRM_API_KEY."""
+        resp = requests.get(
+            f"{self.base_url}/api/usage",
+            headers={"X-API-Key": confirm_api_key},
+            timeout=10,
+        )
+        resp.raise_for_status()
+        data = resp.json()
+        if isinstance(data, list):
+            return data
+        return data.get("usage") or data.get("records") or []
+
+    def get_usage_single(self, customer_id: str, confirm_api_key: str) -> Optional[dict]:
+        """Get single customer usage (admin)."""
+        resp = requests.get(
+            f"{self.base_url}/api/usage/{customer_id}",
+            headers={"X-API-Key": confirm_api_key},
+            timeout=10,
+        )
+        if resp.status_code == 404:
+            return None
+        resp.raise_for_status()
+        return resp.json().get("usage")
+
+    def update_usage(self, customer_id: str, confirm_api_key: str, **fields) -> dict:
+        """Update customer usage record (admin). Fields: monthly_budget_hkd, tier, etc."""
+        resp = requests.patch(
+            f"{self.base_url}/api/usage/{customer_id}",
+            headers={"X-API-Key": confirm_api_key, "Content-Type": "application/json"},
+            json=fields,
+            timeout=10,
+        )
+        resp.raise_for_status()
+        return resp.json().get("usage", {})
+
+    def revoke_usage(self, customer_id: str, confirm_api_key: str) -> dict:
+        """Revoke customer gateway token (admin)."""
+        resp = requests.post(
+            f"{self.base_url}/api/usage/{customer_id}/revoke",
+            headers={"X-API-Key": confirm_api_key},
+            timeout=10,
+        )
+        resp.raise_for_status()
+        return resp.json()
+
+    def reset_usage(self, customer_id: str, confirm_api_key: str) -> dict:
+        """Reset customer monthly spend to 0 (admin)."""
+        resp = requests.post(
+            f"{self.base_url}/api/usage/{customer_id}/reset",
+            headers={"X-API-Key": confirm_api_key},
+            timeout=10,
+        )
+        resp.raise_for_status()
+        return resp.json()
