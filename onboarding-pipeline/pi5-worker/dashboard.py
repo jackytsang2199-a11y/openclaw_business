@@ -275,6 +275,33 @@ def warnings_section():
                 except Exception:
                     pass
 
+    # Check VPS cancel deadlines approaching
+    cancel_data = _api("/api/vps?status=cancelling")
+    cancel_instances = []
+    if isinstance(cancel_data, list):
+        cancel_instances = cancel_data
+    elif isinstance(cancel_data, dict):
+        cancel_instances = cancel_data.get("vps_list") or cancel_data.get("instances") or []
+
+    for v in cancel_instances:
+        deadline = v.get("cancel_deadline", "")
+        if deadline:
+            try:
+                dl = datetime.fromisoformat(deadline.replace("Z", "+00:00"))
+                days_left = (dl - datetime.now(timezone.utc)).days
+                vid = v.get("vps_id", "?")
+                ip = v.get("contabo_ip", "?")
+                if days_left <= 7:
+                    warnings.append(
+                        f"VPS {vid} ({ip}) deadline in **{days_left} days** — recycle or let expire"
+                    )
+                elif days_left <= 14:
+                    warnings.append(
+                        f"VPS {vid} ({ip}) deadline in {days_left} days — consider recycling"
+                    )
+            except (ValueError, TypeError):
+                pass
+
     if not warnings:
         return "## Status: All OK\n\nNo warnings.\n"
 

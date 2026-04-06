@@ -20,6 +20,7 @@ from pathlib import Path
 import config
 from api_client import ApiClient
 from notifier import Notifier
+from vps_lifecycle import VpsLifecycle
 from formatters import format_job, format_vps_list, format_usage, format_tier_name, TIER_BUDGETS
 
 
@@ -150,6 +151,47 @@ def handle_reset_budget(api: ApiClient, customer_id: str) -> str:
     return f"Reset spend for {customer_id} to HK$0"
 
 
+def handle_cancel(api: ApiClient, notifier: Notifier, customer_id: str) -> str:
+    """Cancel a customer: find their VPS, wipe data, cancel at Contabo, revoke token."""
+    # Find customer's active VPS
+    active_vps = api.get_vps_by_status("active")
+    customer_vps = [v for v in active_vps if v.get("customer_id") == customer_id]
+    if not customer_vps:
+        return f"No active VPS found for customer {customer_id}."
+
+    vps = customer_vps[0]
+    vps_id = vps["vps_id"]
+    ip = vps.get("contabo_ip", "unknown")
+
+    # Build a cancel job dict for vps_lifecycle.handle_cancel()
+    cancel_job = {
+        "id": f"cancel_{customer_id}",
+        "vps_id": vps_id,
+        "contabo_contract_id": vps.get("contabo_contract_id", vps_id),
+    }
+
+    # Execute cancellation via lifecycle
+    lifecycle = VpsLifecycle(api, notifier)
+    lifecycle.handle_cancel(cancel_job)
+
+    # Revoke gateway token (block API access immediately)
+    confirm_key = getattr(config, "CONFIRM_API_KEY", "")
+    try:
+        api.revoke_usage(customer_id, confirm_key)
+    except Exception as e:
+        return (
+            f"Customer {customer_id} VPS {vps_id} ({ip}) cancelled at Contabo, "
+            f"but token revoke failed: {e}. Revoke manually."
+        )
+
+    return (
+        f"Customer {customer_id} cancelled:\n"
+        f"  VPS {vps_id} ({ip}) — data wiped, Contabo cancel submitted\n"
+        f"  Gateway token revoked (API access blocked)\n"
+        f"  VPS enters recyclable pool until Contabo deadline"
+    )
+
+
 def main():
     if len(sys.argv) < 2:
         print("Usage: nexgen_cli.py <command> [args]")
@@ -176,6 +218,8 @@ def main():
             idx = sys.argv.index("--vps")
             vps_id = sys.argv[idx + 1] if idx + 1 < len(sys.argv) else ""
         print(handle_deploy(api, notifier, job_id, vps_id))
+    elif cmd == "cancel" and len(sys.argv) >= 3:
+        print(handle_cancel(api, notifier, sys.argv[2]))
     elif cmd == "upgrade" and len(sys.argv) >= 4:
         print(handle_upgrade(api, sys.argv[2], int(sys.argv[3])))
     elif cmd == "downgrade" and len(sys.argv) >= 4:

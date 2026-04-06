@@ -81,5 +81,72 @@ class TestUpgradeDowngrade(unittest.TestCase):
         self.assertFalse(ok)
 
 
+class TestCancelCommand(unittest.TestCase):
+    """Test cancel CLI command — finds VPS, calls lifecycle, revokes token."""
+
+    def setUp(self):
+        self.api = MagicMock()
+        self.notifier = MagicMock()
+
+    def test_cancel_finds_vps_and_calls_lifecycle(self):
+        from nexgen_cli import handle_cancel
+        # Customer has an active VPS
+        self.api.get_vps_by_status.return_value = [
+            {"vps_id": "203187256", "contabo_ip": "161.97.88.8",
+             "customer_id": "1001", "status": "active",
+             "contabo_contract_id": "contract_123"},
+        ]
+        self.api.revoke_usage.return_value = {}
+        # Mock the lifecycle so it doesn't actually call Contabo
+        with patch("nexgen_cli.VpsLifecycle") as mock_lifecycle_cls:
+            mock_lifecycle = MagicMock()
+            mock_lifecycle_cls.return_value = mock_lifecycle
+            result = handle_cancel(self.api, self.notifier, "1001")
+        self.assertIn("1001", result)
+        self.assertIn("cancelled", result.lower())
+        mock_lifecycle.handle_cancel.assert_called_once()
+        # Verify gateway token was revoked
+        self.api.revoke_usage.assert_called_once()
+
+    def test_cancel_customer_no_vps(self):
+        from nexgen_cli import handle_cancel
+        self.api.get_vps_by_status.return_value = []
+        result = handle_cancel(self.api, self.notifier, "9999")
+        self.assertIn("No active VPS", result)
+
+    def test_cancel_revokes_gateway_token(self):
+        from nexgen_cli import handle_cancel
+        self.api.get_vps_by_status.return_value = [
+            {"vps_id": "203187256", "contabo_ip": "161.97.88.8",
+             "customer_id": "1001", "status": "active",
+             "contabo_contract_id": "contract_123"},
+        ]
+        self.api.revoke_usage.return_value = {}
+        with patch("nexgen_cli.VpsLifecycle") as mock_lifecycle_cls:
+            mock_lifecycle = MagicMock()
+            mock_lifecycle_cls.return_value = mock_lifecycle
+            handle_cancel(self.api, self.notifier, "1001")
+        self.api.revoke_usage.assert_called_once_with("1001", unittest.mock.ANY)
+
+    def test_cancel_multiple_vps_uses_first_active(self):
+        from nexgen_cli import handle_cancel
+        self.api.get_vps_by_status.return_value = [
+            {"vps_id": "VPS_A", "contabo_ip": "1.1.1.1",
+             "customer_id": "1001", "status": "active",
+             "contabo_contract_id": "contract_A"},
+            {"vps_id": "VPS_B", "contabo_ip": "2.2.2.2",
+             "customer_id": "1001", "status": "active",
+             "contabo_contract_id": "contract_B"},
+        ]
+        self.api.revoke_usage.return_value = {}
+        with patch("nexgen_cli.VpsLifecycle") as mock_lifecycle_cls:
+            mock_lifecycle = MagicMock()
+            mock_lifecycle_cls.return_value = mock_lifecycle
+            handle_cancel(self.api, self.notifier, "1001")
+        # Should use first match
+        call_args = mock_lifecycle.handle_cancel.call_args[0][0]
+        self.assertEqual(call_args["vps_id"], "VPS_A")
+
+
 if __name__ == "__main__":
     unittest.main()
