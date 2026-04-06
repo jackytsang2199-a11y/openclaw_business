@@ -205,13 +205,18 @@ curl -s -X POST \
 
 ### 4.6 Revoke Cancellation (For Recycling)
 
-> **WARNING: This endpoint is unverified.** The exact API method for revoking a cancellation has not been confirmed through testing. Contabo support has confirmed revocation is possible via the control panel. The API endpoint may be one of:
+> **VERIFIED 2026-04-06: Contabo API does NOT support revoking cancellations.**
 >
-> - `PATCH /compute/instances/{instanceId}/cancel` with `{"cancel": false}`
-> - `DELETE /compute/instances/{instanceId}/cancel`
-> - May not exist in API — manual panel revocation required as fallback
+> Tested all plausible endpoints:
+> - `PATCH /compute/instances/{id}/cancel` with `{"cancel": false}` → 404
+> - `DELETE /compute/instances/{id}/cancel` → 404
+> - `PATCH /compute/instances/{id}` with `{"cancelDate": null}` → 200 but field unchanged (read-only)
+> - `PATCH /compute/instances/{id}` with `{"cancelDate": ""}` → 200 but field unchanged (read-only)
+>
+> **Revocation is ONLY possible via the Contabo control panel (manual).**
+> Panel URL: https://my.contabo.com/compute → instance → "Undo cancellation"
 
-**Fallback plan:** If API revocation doesn't work, send Telegram alert to owner with panel link for manual revocation. This is acceptable for early-stage operations (<50 customers).
+**Required workflow:** When recycling a VPS, the operator must manually revoke in the Contabo panel before the CLI can proceed with OS reinstall and deployment. The CLI will prompt and wait.
 
 **Use case:** When a new customer arrives and a cancelling VPS is available in the recycling pool, revoke its cancellation before reinstalling and redeploying.
 

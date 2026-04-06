@@ -35,17 +35,18 @@ class VpsLifecycle:
 
         print(f"[recycle] {job_id}: Found recyclable VPS {vps_id} ({ip})")
 
-        # Step 1: Revoke cancellation (Contabo API first)
+        # Step 1: Verify cancellation is revoked (must be done manually in Contabo panel)
         result = subprocess.run(
             ["bash", str(self.provision_dir / "contabo-revoke.sh"), vps_id],
             capture_output=True, text=True, timeout=60,
             cwd=str(config.OPENCLAW_INSTALL_DIR),
         )
         if result.returncode != 0:
-            print(f"[recycle] {job_id}: Revoke failed: {result.stderr}")
+            print(f"[recycle] {job_id}: Revoke check failed: {result.stderr}")
             self.notifier.send(
-                f"{job_id}: VPS {vps_id} revoke failed — "
-                f"manual panel revoke needed, or provision fresh"
+                f"{job_id}: VPS {vps_id} still has pending cancellation.\n"
+                f"Revoke manually: https://my.contabo.com/compute\n"
+                f"Then re-run deploy."
             )
             return None
 
