@@ -1,221 +1,166 @@
-# NexGen — 項目狀態
+# NexGen — Project Status
 
-> **最後更新：** 2026-03-30
-> **階段：** Phase 0 → Phase 1 過渡中（技術基建已驗證，準備 soft launch）
-
----
-
-## 已完成項目
-
-### 業務規劃 ✅ 100%
-- [x] 14-section 商業計劃 v1 完成（所有 section confirmed）
-- [x] 三層定價（基本版 $248/月 → 專業版 $398/月 → 旗艦版 $598/月）
-- [x] API 定價研究（7 個 provider，HK 可用性分析）
-- [x] 法律分析完成（HK 限制地區 — DeepSeek 直接可用，Azure OpenAI 為合規 GPT 通道）
-- [x] 安裝自動化策略決定（Option C: Hybrid — 80% bash + 20% Claude Agent SDK）
-
-### 客戶 Onboarding Pipeline ✅ 95%
-- [x] CF Worker API gateway 部署到 `api.3nexgen.com`（19 個 endpoints）
-- [x] Per-client gateway tokens（64-char hex，D1 `api_usage` table 追蹤）
-- [x] Proxy-only 架構 — **零真實 API key 在客戶 VPS 上**
-- [x] AI cost tracking per-client（HKD，monthly budget enforcement：90% warn，100% block）
-- [x] 3 個 API streams 全部經 proxy：DeepSeek chat + OpenAI embeddings + Mem0 LLM extraction
-- [x] Pi5 worker Python modules（deployer, api_client, notifier, playbook, worker, vps_lifecycle, backup, restore）
-- [x] 35 tests 全部通過（Windows + Pi5 ARM64）
-- [x] Claude Agent SDK 驗證（CLI v2.1.85，OAuth token via Max plan）
-- [x] E2E pipeline test（Job T1043，Tier 2，Hetzner VPS — 到 Phase 3 timeout 前核心 stack 已運行）
-- [x] Contabo provisioning scripts（create, cancel, revoke, reinstall, destroy）
-- [x] 8 admin usage endpoints（list, get, update, bulk budgets, reset, revoke, rotate, create）
-- [x] Gateway token generation in deployer（_generate_gateway_token, _register_gateway_token）
-- [x] Bot management 改為 customer-provided（客戶自己建 Telegram bot，簡化流程）
-- [x] 11 個 E2E bugs 修復（SDK package name, rate_limit_event patch, systemd config, SSH path 等）
-- [x] proxy.ts bug fix — OpenAI `/v1` path missing（Mem0 "404 no body" root cause）
-- [x] 10-configure-env.sh — vectorStore `dimension` key fix（was `embeddingModelDims`）
-
-### VPS 安裝系統 ✅ 100%
-- [x] 14 個 modular install scripts（00-swap 到 13-clawteam）
-- [x] 5-layer QA suite（health, ports, API, Telegram, full integration — 28 checks）
-- [x] Discovery run 完成（1 小時，12 issues found + fixed）
-- [x] CLAUDE.md installer playbook（完整部署指南 + troubleshooting table）
-- [x] T001 + T002 test deployments on Hetzner
-
-### 基礎設施 ✅
-- [x] Domain `3nexgen.com` 買咗（Cloudflare）
-- [x] CF Worker 部署 + D1 database
-- [x] Pi5 as deployment orchestrator（systemd enabled, active since 2026-03-28, PID 2986975）
-- [x] PC-side backup script（rsync→scp rewrite for Windows Git Bash compat）
-
-### 客戶 Onboarding 內容 ✅
-- [x] 客人交付 Telegram message template（香港書面語，onboarding-pipeline/templates/delivery-message.md）
-- [x] Telegram FAQ Knowledge Base（21 Q&A，marketing/telegram-faq.md）
-- [x] Website missing checklist 更新（actionable steps + execution order）
-- [x] Agent briefing docs（docs/agent-briefs/ — 3 files for AI agent onboarding）
-- [x] E2E test script: VPS recycling（tests/test_e2e_vps_lifecycle.py）
-- [x] E2E test script: Backup/restore（tests/test_e2e_backup_restore.py）
-- [x] Pi5 monitoring dashboard script（dashboard.sh + cron setup guide）
-- [x] OG image SVG（website-lovable/public/og-image.svg）
-- [x] Privacy diagram SVG（website-lovable/public/privacy-diagram.svg）
-
-### 網站 🔄 70%
-- [x] Lovable website 初版建好（React + Vite + Tailwind + shadcn/ui）
-- [x] 14 次設計 iteration（01-13 series + E/F variants）
-- [x] 設計方向確定（Contabo-inspired dark mode, crab theme）
-- [x] Copy voice 確定（13-prompt-F2-copy-rewrite.md）
-- [ ] Final Lovable build with latest copy
-- [ ] Deploy to Cloudflare Pages
+> **Last updated:** 2026-04-06
+> **Phase:** Pre-launch (Semi-auto operations ready, website deployed, payment integrated)
+> **Mode:** SEMI-AUTO — worker notifies, operator deploys via CLI/Marigold
 
 ---
 
-## 剩餘工作（Remaining Tasks）
+## What's Done
+
+### Business Planning ✅
+- [x] 14-section business plan v1
+- [x] 3-tier pricing (Starter $248 / Pro $398 / Elite $598)
+- [x] API pricing research (7 providers, HK availability)
+- [x] Legal analysis (HK restricted region — DeepSeek direct, Azure OpenAI compliant)
+- [x] Installation automation strategy (Option C: Hybrid — 80% bash + 20% Agent SDK)
+
+### Onboarding Pipeline ✅
+- [x] CF Worker API gateway at `api.3nexgen.com` (19 endpoints)
+- [x] Proxy-only architecture — zero real API keys on customer VPS
+- [x] Per-client gateway tokens (64-char hex, D1 tracking, HKD cost)
+- [x] Budget enforcement: 90% warn header, 100% block (429)
+- [x] 3 API streams via proxy: DeepSeek chat + OpenAI embeddings + Mem0 extraction
+- [x] Pi5 worker: deployer, api_client, notifier, playbook, vps_lifecycle, backup, restore
+- [x] Webhook handler: order_created, subscription_cancelled, subscription_expired, payment_failed
+- [x] 66 tests passing (0 failures)
+- [x] Claude Agent SDK verified (CLI v2.1.85, OAuth via Max plan)
+- [x] Contabo provisioning scripts (create, cancel, revoke-verify, reinstall)
+- [x] 8 admin usage endpoints (list, get, update, bulk budgets, reset, revoke, rotate, create)
+- [x] Bot management: customer-provided (customer creates own Telegram bot)
+
+### Semi-Auto Operations ✅ (NEW — 2026-04-06)
+- [x] worker.py switched to notify-only mode (detects jobs, sends Telegram alert, does NOT deploy)
+- [x] Notification dedup: first alert → suppress → 2h reminder → stop
+- [x] nexgen_cli.py: 12 subcommands (status, jobs, pool, customer, deploy, cancel, upgrade, downgrade, block, unblock, reset_budget, backup_now)
+- [x] formatters.py: human-readable output for jobs, VPS, usage data
+- [x] dashboard.py enhanced: pending orders + recyclable pool sections + deadline warnings
+- [x] Cancel CLI: finds customer VPS, wipes data, cancels at Contabo, revokes gateway token
+- [x] Upgrade/downgrade: changes API budget in D1, reminds to adjust Lemon Squeezy manually
+- [x] Block/unblock: emergency budget-to-zero + restore
+- [x] ApiClient: 8 new admin methods for CLI operations
+- [x] Contabo revoke API verified: DOES NOT WORK — manual panel revoke required
+- [x] contabo-revoke.sh updated to verify (not attempt) revocation
+- [x] Marigold briefing v2.1 written (comprehensive semi-auto operations guide)
+
+### VPS Installation System ✅
+- [x] 14 modular install scripts (00-swap to 13-clawteam)
+- [x] 5-layer QA suite (28 checks)
+- [x] Discovery run (1 hour, 12 issues found + fixed)
+- [x] CLAUDE.md installer playbook
+- [x] T001 + T002 test deployments
+
+### Website ✅ (deployed 2026-04-06)
+- [x] React + Vite + Tailwind + shadcn/ui
+- [x] Deployed to Cloudflare Pages at 3nexgen.com
+- [x] 6-language i18n (zh-HK, zh-CN, en, es, ja, ru)
+- [x] Lemon Squeezy payment integration (9 checkout links: 3 tiers x 3 billing cycles)
+- [x] Telegram contact links removed (email + ticket only)
+- [x] Setup time updated: "24 hours" (was "30 minutes")
+- [x] BotFather tutorial with images
+- [x] OG image, sitemap, robots.txt, SEO meta tags
+- [x] Privacy policy, refund policy, terms of service
+
+### Infrastructure ✅
+- [x] Domain `3nexgen.com` (Cloudflare)
+- [x] CF Worker deployed at `api.3nexgen.com`
+- [x] D1 database (jobs, vps_instances, api_usage, usage_history, audit_log, health)
+- [x] Pi5 deployment orchestrator (systemd enabled, active since 2026-03-28)
+- [x] Dashboard cron (every 15 min)
+- [x] Backup cron (daily 4am)
+- [x] SSH keys for VPS access
+
+### Documentation ✅
+- [x] Semi-auto operations design spec
+- [x] Semi-auto operations implementation plan (10 tasks, all completed)
+- [x] Pre-launch E2E test plan (8 phases + 7 additional phases)
+- [x] Marigold briefing v2.1 (semi-auto operations guide)
+- [x] Contabo API guide (section 4.6 updated with revoke verification)
+- [x] Pi5 remote management guide
+- [x] Customer delivery message template (email only, no TG support bot)
+
+### Contabo VPS Status (Live — verified 2026-04-06)
+```
+203187256 | 161.97.88.8   | running | cancel=2026-04-27 (21 days left)
+203187278 | 161.97.82.155 | running | cancel=2026-04-27 (21 days left)
+```
+Both VPS are running but scheduled for cancellation. To use for first customer: manually revoke in Contabo panel, then deploy via CLI.
+
+---
+
+## Remaining Tasks
 
 ### 🔴 Critical — Before First Customer
 
-| # | Task | Category | Status | Notes |
-|---|------|----------|--------|-------|
-| 1 | ~~Contabo 首單手動下單~~ | VPS | ✅ | 已買，161.97.82.155 (deploy test VPS) + 另一台 |
-| 2 | ~~Contabo API credentials 更新到 Pi5 `.env`~~ | VPS | ✅ | 已設定，API auth 已驗證（JWT token OK） |
-| 3 | VPS E2E Mem0 capture 測試 | Pipeline | Ready | 161.97.82.155 available for testing |
-| 4 | ~~Update deployer.py — remove real key injection~~ | Code | ✅ | gateway_token only, no os.environ real keys |
-| 5 | Website deploy to Cloudflare Pages | Website | 未開始 | `npm run build` → CF Pages |
-| 6 | ~~Payment integration（Lemon Squeezy）~~ | Payment | ✅ | 9 products (3 tiers × 3 billing cycles), checkout URLs in code |
+| # | Task | Status | Notes |
+|---|------|--------|-------|
+| 1 | SCP new code to Pi5 | Not done | worker.py, nexgen_cli.py, formatters.py, dashboard.py, api_client.py, vps_lifecycle.py, contabo-revoke.sh |
+| 2 | Restart nexgen-worker on Pi5 | Not done | After SCP, restart systemd service to activate semi-auto mode |
+| 3 | Copy Marigold briefing v2.1 to Pi5 | Not done | Paste `docs/pi5-assistant-briefing-v2.md` to Marigold conversation |
+| 4 | Test semi-auto flow on Pi5 | Not done | Ask Marigold: "status", "jobs", "pool" — verify CLI works |
+| 5 | Lemon Squeezy webhook secret | Not done | Set `LEMONSQUEEZY_WEBHOOK_SECRET` in CF Worker via `wrangler secret put` |
+| 6 | Test Lemon Squeezy webhook | Not done | Make test purchase, verify webhook fires, job appears in D1 |
+| 7 | Revoke Contabo cancellation on 1 VPS | Not done | Manual: Contabo panel → VPS → "Undo cancellation" (for first customer) |
+| 8 | Verify support email works | Not done | Send test to support@3nexgen.com, confirm it arrives |
 
 ### 🟡 Important — Before Soft Launch
 
-| # | Task | Category | Status | Notes |
-|---|------|----------|--------|-------|
-| 7 | ~~VPS recycling pool E2E test~~ | Pipeline | ✅ | test_e2e_vps_lifecycle.py ready to run on Pi5 |
-| 8 | ~~Backup/restore E2E test~~ | Pipeline | ✅ | test_e2e_backup_restore.py ready to run on Pi5 |
-| 9 | ~~Pin Qdrant Docker image to v1.14.0~~ | Scripts | ✅ | qdrant/qdrant:v1.14.0 in 05-setup-qdrant.sh |
-| 10 | ~~Telegram 客服 bot + Knowledge Base~~ | Customer | ✅ | marketing/telegram-faq.md (21 Q&A pairs) |
-| 11 | 商業登記 | Legal | 未開始 | HK business registration |
-| 12 | ~~客人交付 message template~~ | Onboarding | ✅ | onboarding-pipeline/templates/delivery-message.md |
-| 13 | ~~Monitoring dashboard（Pi5）~~ | Ops | ✅ | dashboard.sh + dashboard-cron-setup.md |
+| # | Task | Status | Notes |
+|---|------|--------|-------|
+| 9 | Run E2E test plan on Pi5 | Not done | `docs/pre-launch-e2e-test-plan.md` — 8 core + 7 additional phases |
+| 10 | Pentest (Shannon/Strix) | Not done | After systems are live — CF Worker auth, proxy, webhook HMAC |
+| 11 | First beta customer (friend/family) | Not done | Test full journey: website → pay → deploy → use |
+| 12 | Business registration (HK) | Not done | Legal requirement |
 
-### 🟢 Phase 1 — Growth
+### 🟢 Phase 1 — Growth (After First Customers)
 
-| # | Task | Category | Status | Notes |
-|---|------|----------|--------|-------|
-| 14 | IG business account + Threads | Marketing | 未開始 | |
-| 15 | 10 個 Reels 內容 | Marketing | 未開始 | |
-| 16 | Telegram Group "OpenClaw HK" | Marketing | 未開始 | |
-| 17 | LIHKG 推廣帖 | Marketing | 未開始 | |
-| 18 | WhatsApp Business 接入研究 | Customer | 未開始 | |
-| 19 | SDK patch review（claude-code-sdk updates past v0.0.25）| Maintenance | 待觀察 | rate_limit_event patch 可能不再需要 |
-| 20 | Clean up D1 test data（T_E2E_PROXY test spend） | Cleanup | 低優先 | |
+| # | Task | Status | Notes |
+|---|------|--------|-------|
+| 13 | LIHKG soft launch post | Not done | Priority marketing channel |
+| 14 | IG business account + Reels | Not done | |
+| 15 | Telegram announcement channel | Not done | |
+| 16 | OpenClaw skill for Marigold | Not done | Formal nexgen_admin skill (currently using CLI directly) |
+| 17 | Confirmation gate (Telegram reply) | Not done | Code-level confirmation for destructive CLI actions |
+| 18 | Graduate to full-auto mode | Not done | After 5 successful deploys + 2 weeks stability |
 
 ---
 
-## 技術架構摘要（Current State）
+## Architecture (Current State)
 
-### Proxy-Only Architecture（已驗證 ✅）
+### Semi-Auto Deployment Flow
 ```
-Customer VPS (零 real API keys)
+Customer pays (Lemon Squeezy)
+    → Webhook → CF Worker creates job (status: ready)
+    → Pi5 worker detects → Telegram notification to owner
+    → Owner chats with Marigold → decides action
+    → nexgen_cli.py deploy <job> --vps <id>
+    → Agent SDK deploys (14 scripts, 3 phases, QA gates)
+    → Customer notified: "Your AI is ready!"
+```
+
+### Proxy-Only Architecture
+```
+Customer VPS (zero real API keys)
     ↓ Bearer gateway_token
 CF Worker @ api.3nexgen.com
     ├── Auth: D1 token lookup → customer_id
     ├── Cost: Calculate HKD, update D1
-    ├── Budget: 90% warn header, 100% block
+    ├── Budget: 90% warn, 100% block (429)
     └── Forward with real API key (Worker secrets)
-         ├── /api/ai/deepseek/* → api.deepseek.com/v1/*
-         └── /api/ai/openai/*   → api.openai.com/v1/*
+         ├── /api/ai/deepseek/* → DeepSeek (chat + LLM extract)
+         └── /api/ai/openai/*   → OpenAI (embeddings only)
 ```
 
-### 3 API Streams（全部經 proxy）
-| Stream | Provider | Purpose | VPS Sends |
-|--------|----------|---------|-----------|
-| Chat | DeepSeek | OpenClaw 對話 | gateway_token as DEEPSEEK_API_KEY |
-| Embeddings | OpenAI | Mem0 vector memory | gateway_token as apiKey |
-| LLM Extract | DeepSeek (via OpenAI client) | Mem0 fact extraction | gateway_token as apiKey |
+### Key Numbers
 
-### Deployment Pipeline
-```
-Lemon Squeezy webhook → CF Worker /api/confirm → D1 job queue
-    ↓ (Pi5 polls every 30s)
-Pi5 Worker → Contabo API provision → Agent SDK deploy → QA gates → deliver
-```
-
----
-
-## 項目文件索引（Updated）
-
-```
-openclaw_setup_business/
-├── active.md                           ← 你而家睇緊嘅嘢
-├── CLAUDE.md                           ← Master AI guidance
-│
-├── business/                           ← 商業策略
-│   ├── openclaw-setup-business-plan-v1.md  ← 主 plan（14 sections）
-│   ├── installation-automation-strategy.md ← 安裝自動化策略（Option C: Hybrid）
-│   ├── api-pricing-research-2026-03.md     ← API 定價研究（7 providers）
-│   ├── pricing-analysis.md                 ← 成本分析 + tier margins
-│   ├── todo-master.md                      ← 原始 48 tasks（部分已完成）
-│   └── archive/                            ← 已過時文件
-│
-├── docs/superpowers/
-│   ├── plans/                              ← Implementation plans
-│   │   ├── 2026-03-26-plan-b-pi5-worker.md     ← Plan B MAIN（已實現）
-│   │   ├── 2026-03-27-plan-pipeline-v2.md       ← Pipeline v2 refinements
-│   │   ├── 2026-03-28-plan-per-client-api-gateway.md ← API gateway（已實現）
-│   │   └── archive/                              ← Plan A（已過時）
-│   └── specs/                              ← Design specs
-│       ├── 2026-03-26-customer-onboarding-pipeline-design.md
-│       ├── 2026-03-27-contabo-vps-billing-strategy-design.md
-│       ├── 2026-03-27-customer-backup-strategy-design.md
-│       ├── 2026-03-27-pipeline-v2-bot-and-recycling-design.md
-│       ├── 2026-03-28-per-client-api-gateway-design.md
-│       └── archive/
-│
-├── legal/
-│   └── legal-analysis-hk-ai-reseller.md    ← CRITICAL: HK 限制 + 合規通道
-│
-├── onboarding-pipeline/                    ← Customer onboarding automation
-│   ├── cf-worker/                          ← CF Worker（TypeScript，已部署）
-│   ├── pi5-worker/                         ← Pi5 Python worker（已部署，未 enable）
-│   ├── plan-b-implementation-report.md     ← Implementation status
-│   ├── contabo-api-guide.md                ← Contabo API reference
-│   └── telegram-bot-creation/              ← Bot setup guide
-│
-├── openclaw_install/                       ← VPS installation system
-│   ├── scripts/                            ← 14 install scripts (00-13)
-│   ├── qa/                                 ← 5-layer QA suite (28 checks)
-│   ├── provision/                          ← Contabo provisioning scripts
-│   ├── discovery/                          ← E2E run documentation (12 issues)
-│   └── clients/T001, T002/                 ← Test deployment records
-│
-├── Pi5/
-│   └── Pi5_remote_management.md            ← Pi5 SSH + ops guide
-│
-├── technical/
-│   ├── guides/openclaw-stack-reference.md  ← Full stack technical reference
-│   └── inventory/pi5-setup-inventory.md    ← Hardware + software BOM
-│
-├── website-lovable/                        ← Website（React + Vite + Tailwind）
-│   ├── 00-knowledge-file.md                ← Lovable knowledge base
-│   ├── 05-build-strategy.md                ← Lovable workflow guide
-│   ├── 08-13-prompt-*.md                   ← Current design iterations
-│   ├── src/                                ← Website source code
-│   └── archive/                            ← Outdated v1 prompts
-│
-├── scripts/
-│   └── nexgen-backup-pull.sh               ← PC → Pi5 backup sync
-│
-└── marketing/templates/                    ← 待建
-```
-
----
-
-## 關鍵數字
-
-| 指標 | 數值 |
-|------|------|
-| Plan sections | 14（全部 confirmed） |
-| Pipeline tests | 35（全部 passing） |
-| Install scripts | 14（00-13） |
-| QA checks | 28（5 layers） |
-| E2E bugs fixed | 11（pipeline）+ 12（installer） |
+| Metric | Value |
+|--------|-------|
+| Pipeline tests | 66 (all passing) |
+| Install scripts | 14 (00-13) |
+| QA checks | 28 (5 layers) |
 | CF Worker endpoints | 19 |
-| Admin usage endpoints | 8 |
-| Website design iterations | 14 |
-| Critical remaining tasks | 3（Contabo creds, website deploy, payment setup） |
+| CLI subcommands | 12 |
+| Website languages | 6 |
+| Lemon Squeezy products | 9 (3 tiers x 3 cycles) |
+| Contabo VPS available | 2 (both cancel=Apr 27, need manual revoke) |
 | Startup cost | ~HK$300-400 |
-| 目標：第一個客 | Phase 1（pending website + payment） |
