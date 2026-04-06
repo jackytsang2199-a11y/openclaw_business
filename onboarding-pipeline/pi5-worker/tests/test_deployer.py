@@ -152,6 +152,7 @@ class TestGatewayTokenIntegration(unittest.TestCase):
             customer_id="1001",
             gateway_token=token,
             tier=2,
+            monthly_budget_hkd=70.0,
         )
 
 
