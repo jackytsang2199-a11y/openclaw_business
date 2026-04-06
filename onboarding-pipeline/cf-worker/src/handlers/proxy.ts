@@ -84,7 +84,7 @@ export async function handleAiProxy(
   // 4. Check budget
   if (usage.monthly_budget_hkd !== null) {
     if (usage.current_spend_hkd >= usage.monthly_budget_hkd) {
-      return tooManyRequests("API 每月用量已達上限。如需升級服務，請瀏覽我們的網站 3nexgen.com 或聯絡 @NexGenAI_Support_bot 查詢。用量將於下月 1 號自動重置。");
+      return tooManyRequests("API 每月用量已達上限。如需升級服務，請瀏覽我們的網站 3nexgen.com 或發電郵至 support@3nexgen.com 查詢。用量將於下月 1 號自動重置。");
     }
   }
 

@@ -30,7 +30,6 @@ Telegram: @{BOT_USERNAME}
 - 助手全天候 24 小時運作，隨時可用
 
 **需要協助？**
-Telegram: @NexGenAI_Support_bot
 電郵: support@3nexgen.com
 
 感謝您選擇 3NexGen，祝您使用愉快！

@@ -63,7 +63,7 @@ class Deployer:
                 bot["token"],
                 telegram_user_id,
                 "Setting up your AI assistant, please wait approximately 15 minutes... "
-                "If you have any questions, contact @NexGenAI_Support_bot or support@3nexgen.com"
+                "If you have any questions, contact support@3nexgen.com"
             )
 
             # Step 2: Provision VPS (sync — deterministic API call)
@@ -326,7 +326,7 @@ class Deployer:
                 telegram_user_id,
                 "We encountered an issue setting up your AI assistant. "
                 "Our team has been notified and will resolve this shortly. "
-                "Contact @NexGenAI_Support_bot for updates."
+                "Contact support@3nexgen.com for updates."
             )
         except Exception:
             pass
