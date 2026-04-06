@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NexGen Hero Demo Mockups</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #0d1117;
+    color: #e6edf3;
+    padding: 40px 20px;
+  }
+
+  .controls {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  .controls button {
+    background: #8b5cf6;
+    color: #fff;
+    border: none;
+    padding: 12px 28px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .controls button:hover {
+    background: #7c3aed;
+  }
+
+  .demos-row {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+
+  /* Phone frame */
+  .phone-frame {
+    width: 400px;
+    border-radius: 32px;
+    border: 3px solid #3a3f4b;
+    background: #1a2234;
+    overflow: hidden;
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,0.05),
+      0 20px 60px rgba(0,0,0,0.5),
+      inset 0 1px 0 rgba(255,255,255,0.05);
+    position: relative;
+  }
+
+  /* Notch */
+  .phone-frame::before {
+    content: '';
+    display: block;
+    width: 120px;
+    height: 28px;
+    background: #0d1117;
+    border-radius: 0 0 16px 16px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 10;
+  }
+
+  /* Chat header */
+  .chat-header {
+    background: #1e293b;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    margin-top: -4px;
+  }
+
+  .chat-header .back-arrow {
+    color: #8b5cf6;
+    font-size: 20px;
+    font-weight: 300;
+  }
+
+  .chat-header .avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+  }
+
+  .chat-header .header-info {
+    flex: 1;
+  }
+
+  .chat-header .header-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: #f1f5f9;
+  }
+
+  .chat-header .header-status {
+    font-size: 12px;
+    color: #64748b;
+  }
+
+  .chat-header .header-actions {
+    display: flex;
+    gap: 16px;
+    color: #8b5cf6;
+    font-size: 18px;
+  }
+
+  /* Chat body */
+  .chat-body {
+    padding: 12px 10px 20px;
+    min-height: 420px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  /* Date separator */
+  .date-sep {
+    text-align: center;
+    margin: 8px 0 12px;
+  }
+
+  .date-sep span {
+    background: rgba(255,255,255,0.08);
+    color: #94a3b8;
+    font-size: 12px;
+    padding: 4px 12px;
+    border-radius: 10px;
+  }
+
+  /* Message bubbles */
+  .msg {
+    display: flex;
+    flex-direction: column;
+    max-width: 82%;
+    margin-bottom: 4px;
+  }
+
+  .msg.received {
+    align-self: flex-start;
+  }
+
+  .msg.sent {
+    align-self: flex-end;
+  }
+
+  .bubble {
+    padding: 8px 12px;
+    border-radius: 14px;
+    font-size: 14px;
+    line-height: 1.5;
+    position: relative;
+    word-break: break-word;
+  }
+
+  .msg.received .bubble {
+    background: #2a3444;
+    color: #e2e8f0;
+    border-top-left-radius: 4px;
+  }
+
+  .msg.sent .bubble {
+    background: #8b5cf6;
+    color: #fff;
+    border-top-right-radius: 4px;
+  }
+
+  .msg-meta {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 4px;
+    margin-top: 2px;
+    padding: 0 4px;
+  }
+
+  .msg-time {
+    font-size: 11px;
+    color: rgba(255,255,255,0.4);
+  }
+
+  .msg.sent .msg-time {
+    color: rgba(255,255,255,0.6);
+  }
+
+  /* Double check marks */
+  .read-checks {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 2px;
+  }
+
+  .read-checks svg {
+    width: 16px;
+    height: 12px;
+  }
+
+  /* Info / Rich cards */
+  .rich-card {
+    background: #1e293b;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin: 6px 10px;
+    max-width: 340px;
+  }
+
+  .rich-card .card-icon {
+    font-size: 20px;
+    margin-bottom: 6px;
+  }
+
+  .rich-card .card-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #f1f5f9;
+    margin-bottom: 8px;
+  }
+
+  .rich-card .card-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    padding: 3px 0;
+    color: #cbd5e1;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+
+  .rich-card .card-row:last-child {
+    border-bottom: none;
+  }
+
+  .rich-card .card-row .label {
+    color: #94a3b8;
+  }
+
+  .rich-card .card-row .value {
+    font-weight: 500;
+    color: #e2e8f0;
+  }
+
+  /* Ticket success card — the KEY visual */
+  .ticket-card {
+    background: linear-gradient(135deg, #1a2e1a 0%, #1e293b 50%);
+    border: 1px solid #22c55e40;
+    border-radius: 14px;
+    padding: 18px 18px 14px;
+    margin: 8px 10px;
+    max-width: 350px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ticket-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #22c55e, #4ade80, #22c55e);
+  }
+
+  .ticket-success-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #22c55e20;
+    border: 1px solid #22c55e50;
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #4ade80;
+    margin-bottom: 12px;
+  }
+
+  .ticket-success-badge .check-circle {
+    width: 18px;
+    height: 18px;
+    background: #22c55e;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .ticket-card .ticket-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #f1f5f9;
+    margin-bottom: 4px;
+  }
+
+  .ticket-card .ticket-subtitle {
+    font-size: 13px;
+    color: #94a3b8;
+    margin-bottom: 14px;
+  }
+
+  .ticket-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 16px;
+    margin-bottom: 14px;
+  }
+
+  .ticket-detail-item .td-label {
+    font-size: 11px;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 2px;
+  }
+
+  .ticket-detail-item .td-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: #e2e8f0;
+  }
+
+  .ticket-divider {
+    border: none;
+    border-top: 1px dashed rgba(255,255,255,0.1);
+    margin: 10px 0;
+  }
+
+  .ticket-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .ticket-total .total-label {
+    font-size: 13px;
+    color: #94a3b8;
+  }
+
+  .ticket-total .total-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: #4ade80;
+  }
+
+  /* Ski info card */
+  .ski-card {
+    background: linear-gradient(135deg, #1a2234 0%, #1e3a5f 100%);
+    border: 1px solid rgba(56, 189, 248, 0.2);
+    border-radius: 14px;
+    padding: 16px 18px;
+    margin: 8px 10px;
+    max-width: 350px;
+  }
+
+  .ski-card .ski-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .ski-card .ski-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #f1f5f9;
+  }
+
+  .ski-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .ski-stat {
+    background: rgba(255,255,255,0.05);
+    border-radius: 8px;
+    padding: 8px 10px;
+  }
+
+  .ski-stat .ss-label {
+    font-size: 11px;
+    color: #64748b;
+    margin-bottom: 2px;
+  }
+
+  .ski-stat .ss-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: #e2e8f0;
+  }
+
+  .ski-recommend {
+    background: rgba(56, 189, 248, 0.1);
+    border: 1px solid rgba(56, 189, 248, 0.15);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 13px;
+    color: #7dd3fc;
+  }
+
+  .ski-recommend strong {
+    color: #38bdf8;
+  }
+
+  /* Report card */
+  .report-card {
+    background: #1e293b;
+    border: 1px solid rgba(251, 191, 36, 0.2);
+    border-radius: 14px;
+    padding: 16px 18px;
+    margin: 8px 10px;
+    max-width: 350px;
+  }
+
+  .report-card .report-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .report-card .report-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #f1f5f9;
+  }
+
+  .report-metrics {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .report-metric {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+
+  .report-metric:last-child {
+    border-bottom: none;
+  }
+
+  .report-metric .rm-label {
+    font-size: 13px;
+    color: #94a3b8;
+  }
+
+  .report-metric .rm-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: #e2e8f0;
+  }
+
+  .report-metric .rm-change {
+    font-size: 12px;
+    font-weight: 500;
+    margin-left: 6px;
+  }
+
+  .rm-change.up { color: #4ade80; }
+  .rm-change.down { color: #f87171; }
+
+  /* Input bar */
+  .input-bar {
+    background: #1e293b;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .input-bar .attach-btn {
+    color: #64748b;
+    font-size: 20px;
+    cursor: pointer;
+  }
+
+  .input-bar .text-input {
+    flex: 1;
+    background: #2a3444;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 16px;
+    font-size: 14px;
+    color: #94a3b8;
+    outline: none;
+  }
+
+  .input-bar .mic-btn {
+    color: #64748b;
+    font-size: 20px;
+    cursor: pointer;
+  }
+
+  /* Print mode */
+  body.print-mode .controls { display: none !important; }
+  body.print-mode { background: transparent; padding: 20px; }
+  body.print-mode .phone-frame {
+    box-shadow: none;
+  }
+
+  /* Label above each phone */
+  .demo-label {
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: #8b5cf6;
+    margin-bottom: 12px;
+    letter-spacing: 0.5px;
+  }
+
+  .demo-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* Responsive */
+  @media (max-width: 1300px) {
+    .demos-row { flex-direction: column; align-items: center; }
+  }
+</style>
+</head>
+<body>
+
+<div class="controls">
+  <button onclick="togglePrintMode()">Print / Screenshot Mode</button>
+</div>
+
+<div class="demos-row">
+
+  <!-- DEMO 1: Concert Ticket -->
+  <div class="demo-wrapper">
+    <div class="demo-label">DEMO 1 -- Concert Tickets</div>
+    <div class="phone-frame">
+      <div class="chat-header">
+        <span class="back-arrow">&#8249;</span>
+        <div class="avatar">N</div>
+        <div class="header-info">
+          <div class="header-name">NexGen AI</div>
+          <div class="header-status">online</div>
+        </div>
+        <div class="header-actions">
+          <span>&#8942;</span>
+        </div>
+      </div>
+      <div class="chat-body">
+        <div class="date-sep"><span>Today</span></div>
+
+        <div class="msg received">
+          <div class="bubble">你之前提過想看陳奕迅演唱會 &mdash; 明天早上 10 點開賣。需要我自動排隊搶票嗎？$680 山頂位，跟你上次說的預算一樣。</div>
+          <div class="msg-meta"><span class="msg-time">09:55</span></div>
+        </div>
+
+        <div class="msg sent">
+          <div class="bubble">好，幫我搶兩張</div>
+          <div class="msg-meta">
+            <span class="msg-time">09:56</span>
+            <span class="read-checks"><svg viewBox="0 0 16 11"><path d="M11.071.653a.457.457 0 0 0-.304-.102.493.493 0 0 0-.381.178l-6.19 7.636-2.011-2.175a.463.463 0 0 0-.659-.04.462.462 0 0 0-.04.635l2.38 2.58a.47.47 0 0 0 .347.158.467.467 0 0 0 .338-.152l6.558-8.085a.477.477 0 0 0-.038-.633z" fill="#34d399"/><path d="M15.071.653a.457.457 0 0 0-.304-.102.493.493 0 0 0-.381.178l-6.19 7.636-1.2-1.298" fill="none" stroke="#34d399" stroke-width="1.1"/></svg></span>
+          </div>
+        </div>
+
+        <div class="msg received">
+          <div class="bubble">收到。明天 9:55 自動進入排隊系統，搶到後即時通知你。</div>
+          <div class="msg-meta"><span class="msg-time">09:56</span></div>
+        </div>
+
+        <div class="date-sep"><span>Tomorrow</span></div>
+
+        <!-- Ticket success card -->
+        <div class="ticket-card">
+          <div class="ticket-success-badge">
+            <span class="check-circle">&#10003;</span>
+            搶票成功
+          </div>
+          <div class="ticket-title">陳奕迅演唱會 2026</div>
+          <div class="ticket-subtitle">Fear and Dreams World Tour &mdash; Hong Kong</div>
+          <div class="ticket-details">
+            <div class="ticket-detail-item">
+              <div class="td-label">日期</div>
+              <div class="td-value">2026/05/15</div>
+            </div>
+            <div class="ticket-detail-item">
+              <div class="td-label">時間</div>
+              <div class="td-value">20:00</div>
+            </div>
+            <div class="ticket-detail-item">
+              <div class="td-label">區域</div>
+              <div class="td-value">山頂位 A 區</div>
+            </div>
+            <div class="ticket-detail-item">
+              <div class="td-label">座位</div>
+              <div class="td-value">第 3 排 12-13</div>
+            </div>
+          </div>
+          <hr class="ticket-divider">
+          <div class="ticket-total">
+            <span class="total-label">2 張門票 &times; $680</span>
+            <span class="total-value">$1,360</span>
+          </div>
+        </div>
+
+        <div class="msg received">
+          <div class="bubble">已成功搶到兩張！詳情如上，電子票已發送到你的郵箱。</div>
+          <div class="msg-meta"><span class="msg-time">10:01</span></div>
+        </div>
+      </div>
+      <div class="input-bar">
+        <span class="attach-btn">&#128206;</span>
+        <div class="text-input">Message</div>
+        <span class="mic-btn">&#127908;</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- DEMO 2: Ski Trip -->
+  <div class="demo-wrapper">
+    <div class="demo-label">DEMO 2 -- Travel Intel</div>
+    <div class="phone-frame">
+      <div class="chat-header">
+        <span class="back-arrow">&#8249;</span>
+        <div class="avatar">N</div>
+        <div class="header-info">
+          <div class="header-name">NexGen AI</div>
+          <div class="header-status">online</div>
+        </div>
+        <div class="header-actions">
+          <span>&#8942;</span>
+        </div>
+      </div>
+      <div class="chat-body">
+        <div class="date-sep"><span>Today</span></div>
+
+        <div class="msg received">
+          <div class="bubble">你下個月的神樂滑雪場行程 &mdash; 今天有 3 成地區未開放。我已整理了最新雪道地圖給你參考。</div>
+          <div class="msg-meta"><span class="msg-time">14:30</span></div>
+        </div>
+
+        <!-- Ski info card -->
+        <div class="ski-card">
+          <div class="ski-header">
+            <span style="font-size:22px">&#9968;&#65039;</span>
+            <div class="ski-title">神樂滑雪場 &mdash; 即時狀況</div>
+          </div>
+          <div class="ski-stats">
+            <div class="ski-stat">
+              <div class="ss-label">中級雪道</div>
+              <div class="ss-value">5 條開放</div>
+            </div>
+            <div class="ski-stat">
+              <div class="ss-label">上級雪道</div>
+              <div class="ss-value">2 條開放</div>
+            </div>
+            <div class="ski-stat">
+              <div class="ss-label">積雪深度</div>
+              <div class="ss-value">180 cm</div>
+            </div>
+            <div class="ski-stat">
+              <div class="ss-label">天氣</div>
+              <div class="ss-value">-5&#176;C 晴</div>
+            </div>
+          </div>
+          <div class="ski-recommend"><strong>推薦雪道：</strong>大會場、Sunshine Course</div>
+        </div>
+
+        <div class="msg received">
+          <div class="bubble">目前開放的中級雪道有 5 條，推薦大會場和 Sunshine Course。需要我幫你查最新積雪狀況嗎？</div>
+          <div class="msg-meta"><span class="msg-time">14:31</span></div>
+        </div>
+
+        <div class="msg sent">
+          <div class="bubble">太好了，幫我查埋酒店附近交通</div>
+          <div class="msg-meta">
+            <span class="msg-time">14:32</span>
+            <span class="read-checks"><svg viewBox="0 0 16 11"><path d="M11.071.653a.457.457 0 0 0-.304-.102.493.493 0 0 0-.381.178l-6.19 7.636-2.011-2.175a.463.463 0 0 0-.659-.04.462.462 0 0 0-.04.635l2.38 2.58a.47.47 0 0 0 .347.158.467.467 0 0 0 .338-.152l6.558-8.085a.477.477 0 0 0-.038-.633z" fill="#34d399"/><path d="M15.071.653a.457.457 0 0 0-.304-.102.493.493 0 0 0-.381.178l-6.19 7.636-1.2-1.298" fill="none" stroke="#34d399" stroke-width="1.1"/></svg></span>
+          </div>
+        </div>
+
+        <div class="msg received">
+          <div class="bubble">好的，正在查詢越後湯澤站到神樂的接駁巴士時刻表。大概需要 30 秒。</div>
+          <div class="msg-meta"><span class="msg-time">14:32</span></div>
+        </div>
+      </div>
+      <div class="input-bar">
+        <span class="attach-btn">&#128206;</span>
+        <div class="text-input">Message</div>
+        <span class="mic-btn">&#127908;</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- DEMO 3: Competitor Tracking -->
+  <div class="demo-wrapper">
+    <div class="demo-label">DEMO 3 -- Business Intel</div>
+    <div class="phone-frame">
+      <div class="chat-header">
+        <span class="back-arrow">&#8249;</span>
+        <div class="avatar">N</div>
+        <div class="header-info">
+          <div class="header-name">NexGen AI</div>
+          <div class="header-status">online</div>
+        </div>
+        <div class="header-actions">
+          <span>&#8942;</span>
+        </div>
+      </div>
+      <div class="chat-body">
+        <div class="date-sep"><span>Today</span></div>
+
+        <div class="msg received">
+          <div class="bubble">你追蹤的 3 間競爭對手中，A 公司剛發佈了 Q4 財報。我已用你慣用的「摘要 &rarr; 數據 &rarr; 分析」格式整理好，要看嗎？</div>
+          <div class="msg-meta"><span class="msg-time">16:45</span></div>
+        </div>
+
+        <div class="msg sent">
+          <div class="bubble">好，傳過來</div>
+          <div class="msg-meta">
+            <span class="msg-time">16:46</span>
+            <span class="read-checks"><svg viewBox="0 0 16 11"><path d="M11.071.653a.457.457 0 0 0-.304-.102.493.493 0 0 0-.381.178l-6.19 7.636-2.011-2.175a.463.463 0 0 0-.659-.04.462.462 0 0 0-.04.635l2.38 2.58a.47.47 0 0 0 .347.158.467.467 0 0 0 .338-.152l6.558-8.085a.477.477 0 0 0-.038-.633z" fill="#34d399"/><path d="M15.071.653a.457.457 0 0 0-.304-.102.493.493 0 0 0-.381.178l-6.19 7.636-1.2-1.298" fill="none" stroke="#34d399" stroke-width="1.1"/></svg></span>
+          </div>
+        </div>
+
+        <div class="msg received">
+          <div class="bubble">已整理完成。重點：營收按年增長 12%，但毛利率下跌 3%。完整報告如下：</div>
+          <div class="msg-meta"><span class="msg-time">16:46</span></div>
+        </div>
+
+        <!-- Report card -->
+        <div class="report-card">
+          <div class="report-header">
+            <span style="font-size:20px">&#128202;</span>
+            <div class="report-title">A 公司 Q4 財報摘要</div>
+          </div>
+          <div class="report-metrics">
+            <div class="report-metric">
+              <span class="rm-label">營收</span>
+              <span>
+                <span class="rm-value">$2.8B</span>
+                <span class="rm-change up">+12% YoY</span>
+              </span>
+            </div>
+            <div class="report-metric">
+              <span class="rm-label">毛利率</span>
+              <span>
+                <span class="rm-value">42%</span>
+                <span class="rm-change down">-3%</span>
+              </span>
+            </div>
+            <div class="report-metric">
+              <span class="rm-label">淨利</span>
+              <span>
+                <span class="rm-value">$380M</span>
+                <span class="rm-change up">+5% YoY</span>
+              </span>
+            </div>
+            <div class="report-metric">
+              <span class="rm-label">研發支出</span>
+              <span>
+                <span class="rm-value">$420M</span>
+                <span class="rm-change up">+18% YoY</span>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="msg received">
+          <div class="bubble">值得留意：研發支出大幅增加 18%，可能正在準備新產品線。要我持續追蹤嗎？</div>
+          <div class="msg-meta"><span class="msg-time">16:47</span></div>
+        </div>
+      </div>
+      <div class="input-bar">
+        <span class="attach-btn">&#128206;</span>
+        <div class="text-input">Message</div>
+        <span class="mic-btn">&#127908;</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function togglePrintMode() {
+    document.body.classList.toggle('print-mode');
+    const btn = document.querySelector('.controls button');
+    if (document.body.classList.contains('print-mode')) {
+      btn.textContent = 'Exit Print Mode';
+    } else {
+      btn.textContent = 'Print / Screenshot Mode';
+    }
+  }
+</script>
+
+</body>
+</html>

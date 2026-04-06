@@ -30,6 +30,7 @@ export default function LanguageSwitcher({ variant = 'dropdown', onSelect }: Lan
   function switchLanguage(lang: SupportedLanguage) {
     const basePath = stripLangPrefix(location.pathname);
     const newPath = getLocalizedPath(basePath, lang);
+    localStorage.setItem('nexgen-lang', lang);
     i18n.changeLanguage(lang);
     navigate(newPath + location.search);
     setOpen(false);

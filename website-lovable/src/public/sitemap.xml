@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://3nexgen.com/</loc>
+    <xhtml:link rel="alternate" hreflang="zh-HK" href="https://3nexgen.com/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://3nexgen.com/en/"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://3nexgen.com/zh-CN/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://3nexgen.com/es/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://3nexgen.com/ja/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://3nexgen.com/ru/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://3nexgen.com/en/"/>
+  </url>
+  <url>
+    <loc>https://3nexgen.com/pricing</loc>
+    <xhtml:link rel="alternate" hreflang="zh-HK" href="https://3nexgen.com/pricing"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://3nexgen.com/en/pricing"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://3nexgen.com/zh-CN/pricing"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://3nexgen.com/es/pricing"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://3nexgen.com/ja/pricing"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://3nexgen.com/ru/pricing"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://3nexgen.com/en/pricing"/>
+  </url>
+  <url>
+    <loc>https://3nexgen.com/technology</loc>
+    <xhtml:link rel="alternate" hreflang="zh-HK" href="https://3nexgen.com/technology"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://3nexgen.com/en/technology"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://3nexgen.com/zh-CN/technology"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://3nexgen.com/es/technology"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://3nexgen.com/ja/technology"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://3nexgen.com/ru/technology"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://3nexgen.com/en/technology"/>
+  </url>
+  <url>
+    <loc>https://3nexgen.com/faq</loc>
+    <xhtml:link rel="alternate" hreflang="zh-HK" href="https://3nexgen.com/faq"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://3nexgen.com/en/faq"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://3nexgen.com/zh-CN/faq"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://3nexgen.com/es/faq"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://3nexgen.com/ja/faq"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://3nexgen.com/ru/faq"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://3nexgen.com/en/faq"/>
+  </url>
+  <url>
+    <loc>https://3nexgen.com/contact</loc>
+    <xhtml:link rel="alternate" hreflang="zh-HK" href="https://3nexgen.com/contact"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://3nexgen.com/en/contact"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://3nexgen.com/zh-CN/contact"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://3nexgen.com/es/contact"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://3nexgen.com/ja/contact"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://3nexgen.com/ru/contact"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://3nexgen.com/en/contact"/>
+  </url>
+  <url>
+    <loc>https://3nexgen.com/onboarding</loc>
+    <xhtml:link rel="alternate" hreflang="zh-HK" href="https://3nexgen.com/onboarding"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://3nexgen.com/en/onboarding"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://3nexgen.com/zh-CN/onboarding"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://3nexgen.com/es/onboarding"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://3nexgen.com/ja/onboarding"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://3nexgen.com/ru/onboarding"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://3nexgen.com/en/onboarding"/>
+  </url>
+  <url>
+    <loc>https://3nexgen.com/bot-guide</loc>
+    <xhtml:link rel="alternate" hreflang="zh-HK" href="https://3nexgen.com/bot-guide"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://3nexgen.com/en/bot-guide"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://3nexgen.com/zh-CN/bot-guide"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://3nexgen.com/es/bot-guide"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://3nexgen.com/ja/bot-guide"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://3nexgen.com/ru/bot-guide"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://3nexgen.com/en/bot-guide"/>
+  </url>
+  <url>
+    <loc>https://3nexgen.com/terms</loc>
+    <xhtml:link rel="alternate" hreflang="zh-HK" href="https://3nexgen.com/terms"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://3nexgen.com/en/terms"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://3nexgen.com/zh-CN/terms"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://3nexgen.com/es/terms"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://3nexgen.com/ja/terms"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://3nexgen.com/ru/terms"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://3nexgen.com/en/terms"/>
+  </url>
+  <url>
+    <loc>https://3nexgen.com/privacy</loc>
+    <xhtml:link rel="alternate" hreflang="zh-HK" href="https://3nexgen.com/privacy"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://3nexgen.com/en/privacy"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://3nexgen.com/zh-CN/privacy"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://3nexgen.com/es/privacy"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://3nexgen.com/ja/privacy"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://3nexgen.com/ru/privacy"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://3nexgen.com/en/privacy"/>
+  </url>
+  <url>
+    <loc>https://3nexgen.com/refund</loc>
+    <xhtml:link rel="alternate" hreflang="zh-HK" href="https://3nexgen.com/refund"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://3nexgen.com/en/refund"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://3nexgen.com/zh-CN/refund"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://3nexgen.com/es/refund"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://3nexgen.com/ja/refund"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://3nexgen.com/ru/refund"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://3nexgen.com/en/refund"/>
+  </url>
+</urlset>

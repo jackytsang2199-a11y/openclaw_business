@@ -1,0 +1,59 @@
+{
+  "meta": {
+    "purpose": "Telegram Bot creation guide text — separated from images for i18n",
+    "images_dir": "processed/",
+    "languages": ["zh-HK"]
+  },
+  "title": {
+    "zh-HK": "如何建立你的 Telegram Bot？"
+  },
+  "steps": [
+    {
+      "id": "step1",
+      "image": "step1-search-botfather.png",
+      "title": {
+        "zh-HK": "搜尋 BotFather"
+      },
+      "instruction": {
+        "zh-HK": "打開 Telegram，在搜尋欄輸入「BotFather」。認住藍色剔號 ✓ 的官方帳號，點擊進入對話。"
+      }
+    },
+    {
+      "id": "step2",
+      "image": "step2-newbot-command.png",
+      "title": {
+        "zh-HK": "建立新 Bot"
+      },
+      "instruction": {
+        "zh-HK": "輸入 /newbot 建立新 Bot。BotFather 會問你兩個問題：\n1. Bot 的顯示名稱（例如「我的 AI 助手」）\n2. Bot 的 username（必須以 bot 結尾，例如 myai_helper_bot）"
+      }
+    },
+    {
+      "id": "step3",
+      "image": "step3-copy-token.png",
+      "title": {
+        "zh-HK": "複製 Bot Token"
+      },
+      "instruction": {
+        "zh-HK": "建立成功後，BotFather 會發送一串 Token（紅框位置）。格式如 123456789:ABCdef... — 複製整串 Token，稍後貼入表格。"
+      },
+      "warning": {
+        "zh-HK": "請妥善保管你的 Token，不要分享給其他人。"
+      }
+    },
+    {
+      "id": "step4",
+      "image": "step4-userinfobot.png",
+      "title": {
+        "zh-HK": "取得你的 Telegram User ID"
+      },
+      "instruction": {
+        "zh-HK": "在 Telegram 搜尋 @userinfobot，向它發送任何訊息。它會回覆你的 User ID（一串數字）。複製這個數字，貼入表格。"
+      },
+      "note": {
+        "zh-HK": "User ID 是一串純數字，例如 123456789。"
+      },
+      "status": "MISSING_IMAGE"
+    }
+  ]
+}

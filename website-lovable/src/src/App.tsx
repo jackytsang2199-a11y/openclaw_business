@@ -23,16 +23,16 @@ const queryClient = new QueryClient();
 function pageRoutes() {
   return (
     <>
-      <Route path="/" element={<Index />} />
-      <Route path="/pricing" element={<Pricing />} />
-      <Route path="/technology" element={<Technology />} />
-      <Route path="/faq" element={<FAQ />} />
-      <Route path="/contact" element={<Contact />} />
-      <Route path="/terms" element={<Terms />} />
-      <Route path="/privacy" element={<Privacy />} />
-      <Route path="/refund" element={<Refund />} />
-      <Route path="/onboarding" element={<Onboarding />} />
-      <Route path="/bot-guide" element={<BotGuide />} />
+      <Route index element={<Index />} />
+      <Route path="pricing" element={<Pricing />} />
+      <Route path="technology" element={<Technology />} />
+      <Route path="faq" element={<FAQ />} />
+      <Route path="contact" element={<Contact />} />
+      <Route path="terms" element={<Terms />} />
+      <Route path="privacy" element={<Privacy />} />
+      <Route path="refund" element={<Refund />} />
+      <Route path="onboarding" element={<Onboarding />} />
+      <Route path="bot-guide" element={<BotGuide />} />
       <Route path="*" element={<NotFound />} />
     </>
   );
