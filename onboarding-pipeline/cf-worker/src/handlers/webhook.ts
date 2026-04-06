@@ -36,29 +36,76 @@ export async function handleWebhook(request: Request, env: Env): Promise<Respons
     return badRequest("Invalid JSON body");
   }
 
-  // Only process order_created events
-  if (payload.meta.event_name !== "order_created") {
-    return json({ ignored: true, event: payload.meta.event_name });
-  }
-
-  // Match order by custom_data.order_id
+  const event = payload.meta.event_name;
   const orderId = payload.meta.custom_data?.order_id;
-  if (!orderId) {
-    console.log("[webhook] Lemon Squeezy payment received without order_id in custom_data — manual investigation needed");
-    return json({ warning: "No order_id in custom_data — payment received but not matched" });
+
+  // Handle order_created — confirm payment
+  if (event === "order_created") {
+    if (!orderId) {
+      console.log("[webhook] Payment received without order_id in custom_data");
+      return json({ warning: "No order_id in custom_data" });
+    }
+    const existing = await getJobById(env.DB, orderId);
+    if (!existing) {
+      console.log(`[webhook] Order ${orderId} not found in D1`);
+      return json({ warning: `Order ${orderId} not found` });
+    }
+    const confirmed = await confirmPayment(env.DB, orderId, "lemon_squeezy");
+    if (!confirmed) {
+      return json({ ok: true, already_confirmed: true });
+    }
+    return json({ ok: true, order_id: confirmed.id, status: confirmed.status });
   }
 
-  const existing = await getJobById(env.DB, orderId);
-  if (!existing) {
-    console.log(`[webhook] Order ${orderId} not found in D1 — payment received but order missing`);
-    return json({ warning: `Order ${orderId} not found` });
+  // Handle subscription_cancelled or subscription_expired — create cancel job
+  if (event === "subscription_cancelled" || event === "subscription_expired") {
+    if (!orderId) {
+      console.log(`[webhook] ${event} received without order_id`);
+      return json({ warning: `${event} without order_id`, event });
+    }
+    const existing = await getJobById(env.DB, orderId);
+    if (!existing) {
+      console.log(`[webhook] ${event}: order ${orderId} not found`);
+      return json({ warning: `Order ${orderId} not found for ${event}`, event });
+    }
+    // Create a cancel job — Pi5 will notify owner, owner confirms via CLI
+    const cancelJobId = `cancel_${orderId}_${Date.now()}`;
+    const now = new Date().toISOString();
+    try {
+      await env.DB.prepare(
+        `INSERT INTO jobs (id, status, job_type, tier, display_name, telegram_user_id, email, bot_token, bot_username, payment_method, created_at, updated_at)
+         VALUES (?, 'ready', 'cancel', ?, ?, ?, ?, ?, ?, 'lemon_squeezy', ?, ?)`
+      ).bind(
+        cancelJobId,
+        existing.tier,
+        existing.display_name || orderId,
+        existing.telegram_user_id || "",
+        existing.email || "",
+        existing.bot_token || "",
+        existing.bot_username || "",
+        now,
+        now,
+      ).run();
+    } catch (e) {
+      console.log(`[webhook] Failed to create cancel job: ${e}`);
+      return json({ error: "Failed to create cancel job", event });
+    }
+    console.log(`[webhook] ${event}: cancel job ${cancelJobId} created for order ${orderId}`);
+    return json({ ok: true, event, cancel_job_id: cancelJobId });
   }
 
-  const confirmed = await confirmPayment(env.DB, orderId, "lemon_squeezy");
-  if (!confirmed) {
-    // Already confirmed — idempotent, no error
-    return json({ ok: true, already_confirmed: true });
+  // Handle subscription_payment_failed — notify only (LS retries automatically)
+  if (event === "subscription_payment_failed") {
+    console.log(`[webhook] Payment failed for order ${orderId || "unknown"}`);
+    return json({ ok: true, event, action: "notify_only" });
   }
 
-  return json({ ok: true, order_id: confirmed.id, status: confirmed.status });
+  // Handle subscription_updated — log only
+  if (event === "subscription_updated") {
+    console.log(`[webhook] Subscription updated for order ${orderId || "unknown"}`);
+    return json({ ok: true, event, action: "logged" });
+  }
+
+  // All other events — ignore
+  return json({ ignored: true, event });
 }
