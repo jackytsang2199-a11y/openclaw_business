@@ -70,7 +70,7 @@
   "openClaw.features.browser.desc": "Comparacion de precios, reservas, formularios, compra de entradas — AI opera el navegador por usted",
 
   "payment.methods": "Metodos de pago: Tarjeta de credito / PayMe",
-  "payment.postCheckout": "Despues de enviar el formulario, seleccione un metodo de pago para completar su pedido. Una vez confirmado el pago, completaremos la instalacion en 30 minutos.",
+  "payment.postCheckout": "Despues de enviar el formulario, seleccione un metodo de pago para completar su pedido. Una vez confirmado el pago, completaremos la instalacion en 24 horas.",
 
   "help.heading": "¿Necesita ayuda para elegir?",
   "help.subtitle": "Envie un ticket de soporte y le recomendaremos el plan mas adecuado.",

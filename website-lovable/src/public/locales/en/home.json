@@ -5,10 +5,10 @@
   "hero.kicker": "Self-Hosted OpenClaw",
   "hero.title": "Your Own Fully Loaded AI Agent",
   "hero.subtitle": "Pre-configured with all plugins. Just provide your Telegram ID to get started \u2014 no API keys needed.",
-  "hero.checks.0": "One-click install, online in 30 minutes",
+  "hero.checks.0": "One-click install, online within 24 hours",
   "hero.checks.1": "All plugins pre-loaded (memory, search, browser)",
   "hero.checks.2": "Zero technical setup, everything included",
-  "hero.flow": "Provide Telegram ID \u2192 Pay \u2192 Online in as fast as 30 minutes",
+  "hero.flow": "Provide Telegram ID \u2192 Pay \u2192 Online within 24 hours",
   "hero.cta": "Get Started",
   "hero.learnMore": "Learn More",
 
@@ -102,7 +102,7 @@
   "comparison.usColumn": "Use NexGen",
   "comparison.rows.0.label": "Time",
   "comparison.rows.0.diy": "3\u20138 hours (not counting debug)",
-  "comparison.rows.0.us": "Remote install in 30 min",
+  "comparison.rows.0.us": "Remote install within 24 hours",
   "comparison.rows.1.label": "Technical Skills",
   "comparison.rows.1.diy": "Docker, VPN, API keys, Linux...",
   "comparison.rows.1.us": "None. If you can use Telegram, you\u2019re set",
@@ -124,19 +124,19 @@
   "steps.items.0.title": "Choose a plan and submit your details",
   "steps.items.0.desc": "Pick the plan that suits you, then provide your Telegram Bot Token and User ID.",
   "steps.items.1.title": "Automatic installation after payment",
-  "steps.items.1.desc": "Once payment is confirmed, our system automatically installs the full AI environment. As fast as 30 minutes.",
+  "steps.items.1.desc": "Once payment is confirmed, our system automatically installs the full AI environment. Ready within 24 hours.",
   "steps.items.2.title": "Start using it",
   "steps.items.2.desc": "Chat with your AI directly on Telegram. It\u2019s that simple.",
 
   "inlineFaq.heading": "Frequently Asked Questions",
   "inlineFaq.items.0.question": "I have zero technical knowledge. Is this for me?",
-  "inlineFaq.items.0.answer": "Absolutely! Our engineering team handles the entire installation, configuration, and maintenance process. Just provide your Telegram ID, choose a plan, and pay \u2014 you can be up and running in as fast as 30 minutes. For any issues, simply submit a support ticket via email.",
+  "inlineFaq.items.0.answer": "Absolutely! Our engineering team handles the entire installation, configuration, and maintenance process. Just provide your Telegram ID, choose a plan, and pay \u2014 you can be up and running within 24 hours. For any issues, simply submit a support ticket via email.",
   "inlineFaq.items.1.question": "What\u2019s included in the monthly fee?",
   "inlineFaq.items.1.answer": "The monthly fee covers everything: VPS server, AI model API usage, system maintenance, and updates. No hidden charges, no extra fees.",
   "inlineFaq.items.2.question": "How is this different from ChatGPT Plus?",
   "inlineFaq.items.2.answer": "ChatGPT Plus is a chatbot. What we install is an AI agent. Agents can remember all your conversations, search the entire web, and operate a browser to complete tasks for you \u2014 not just answer questions, but actually get things done.",
   "inlineFaq.items.3.question": "How do I get started?",
-  "inlineFaq.items.3.answer": "Provide your Telegram ID, choose a plan, and pay. We\u2019ll complete the installation in as fast as 30 minutes. You\u2019ll receive a notification, then start chatting on Telegram right away.",
+  "inlineFaq.items.3.answer": "Provide your Telegram ID, choose a plan, and pay. We\u2019ll complete the installation within 24 hours. You\u2019ll receive a notification, then start chatting on Telegram right away.",
   "inlineFaq.viewAll": "View all FAQs \u2192",
 
   "story.heading": "Why we built this",
@@ -149,7 +149,7 @@
   "trust.noHiddenFees": "No hidden fees",
 
   "finalCta.heading": "Install today, start using it tonight",
-  "finalCta.subtitle": "Remote installation, as fast as 30 minutes",
+  "finalCta.subtitle": "Remote installation, ready within 24 hours",
   "finalCta.ctaButton": "From HK$188/month \u2014 Get Started",
   "finalCta.contactButton": "Submit a Support Ticket"
 }

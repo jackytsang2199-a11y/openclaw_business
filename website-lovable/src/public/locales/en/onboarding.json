@@ -1,10 +1,10 @@
 {
   "meta": {
     "title": "Complete Setup | NexGen",
-    "description": "Fill in your details, choose a payment method, and be set up in 30 minutes."
+    "description": "Fill in your details, choose a payment method, and be set up within 24 hours."
   },
   "pageTitle": "Complete Setup",
-  "pageSubtitle": "Fill in the details below and choose a payment method. Installation begins within 30 minutes of payment confirmation.",
+  "pageSubtitle": "Fill in the details below and choose a payment method. Installation begins within 24 hours of payment confirmation.",
   "form": {
     "planLabel": "Service Plan *",
     "planPlaceholder": "Choose your plan",
@@ -70,7 +70,7 @@
     "paymeEmailHint": "After payment, please send a confirmation email so we can arrange installation:",
     "paymeSendEmail": "Send Payment Confirmation Email",
     "editInfo": "Edit Details",
-    "cardNote": "Installation begins automatically after credit card payment (as fast as 30 min).",
+    "cardNote": "Installation begins automatically after credit card payment (within 24 hours).",
     "paymeNote": "PayMe payments require manual confirmation; installation may take longer.",
     "contactSupport": "Questions? Contact "
   },

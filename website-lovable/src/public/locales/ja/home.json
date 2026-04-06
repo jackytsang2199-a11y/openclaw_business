@@ -5,10 +5,10 @@
   "hero.kicker": "Self-Hosted OpenClaw",
   "hero.title": "あなた専用のフル装備 AI エージェント",
   "hero.subtitle": "全プラグイン設定済み、Telegram ID を提供するだけで開始 — API Key 不要",
-  "hero.checks.0": "ワンクリック設置、30分で稼働開始",
+  "hero.checks.0": "ワンクリック設置、24時間以内に稼働開始",
   "hero.checks.1": "全プラグインをプリインストール（メモリ・検索・ブラウザ）",
   "hero.checks.2": "技術設定は一切不要、料金はすべて込み",
-  "hero.flow": "Telegram ID を提供 → お支払い → 最短30分で稼働開始",
+  "hero.flow": "Telegram ID を提供 → お支払い → 24時間以内に稼働開始",
   "hero.cta": "今すぐ始める",
   "hero.learnMore": "詳しく見る",
 
@@ -102,7 +102,7 @@
   "comparison.usColumn": "NexGen に任せる",
   "comparison.rows.0.label": "時間",
   "comparison.rows.0.diy": "3〜8時間（デバッグ除く）",
-  "comparison.rows.0.us": "30分でリモート設置完了",
+  "comparison.rows.0.us": "24時間以内にリモート設置完了",
   "comparison.rows.1.label": "技術要件",
   "comparison.rows.1.diy": "Docker、VPN、API key、Linux...",
   "comparison.rows.1.us": "ゼロ。Telegram が使えればOK",
@@ -124,19 +124,19 @@
   "steps.items.0.title": "プランを選択して情報を送信",
   "steps.items.0.desc": "最適なプランを選び、Telegram Bot Token と User ID を提供",
   "steps.items.1.title": "お支払い後に自動設置",
-  "steps.items.1.desc": "お支払い確認後、システムが自動で AI 環境一式を設置します。最短30分で完了。",
+  "steps.items.1.desc": "お支払い確認後、システムが自動で AI 環境一式を設置します。24時間以内に完了。",
   "steps.items.2.title": "利用開始",
   "steps.items.2.desc": "Telegram であなたの AI と直接対話するだけ、それだけです",
 
   "inlineFaq.heading": "よくある質問",
   "inlineFaq.items.0.question": "技術的な知識がまったくなくても使えますか？",
-  "inlineFaq.items.0.answer": "もちろんです！設置・設定・メンテナンスはすべて当社のエンジニアチームが対応します。Telegram ID の提供、プランの選択、お支払いだけで、最短30分で利用を開始できます。その後のご質問は、メールでサポートチケットを送信するだけで対応いたします。",
+  "inlineFaq.items.0.answer": "もちろんです！設置・設定・メンテナンスはすべて当社のエンジニアチームが対応します。Telegram ID の提供、プランの選択、お支払いだけで、24時間以内に利用を開始できます。その後のご質問は、メールでサポートチケットを送信するだけで対応いたします。",
   "inlineFaq.items.1.question": "月額料金には何が含まれますか？",
   "inlineFaq.items.1.answer": "月額料金には VPS サーバー、AI モデル API 使用料、システムメンテナンスとアップデートがすべて含まれています。隠れた費用や追加料金はありません。",
   "inlineFaq.items.2.question": "ChatGPT Plus との違いは何ですか？",
   "inlineFaq.items.2.answer": "ChatGPT Plus はチャットボットですが、私たちが設置するのは AI エージェントです。エージェントはすべての対話を記憶し、ウェブ全体から情報を検索し、ブラウザを操作して作業を代行します — 質問に答えるだけでなく、実際にタスクを完了します。",
   "inlineFaq.items.3.question": "どうやって始めればいいですか？",
-  "inlineFaq.items.3.answer": "Telegram ID を提供し、プランを選択してお支払いいただくだけで、最短30分で設置が完了します。完了後に通知が届き、Telegram ですぐに利用を開始できます。",
+  "inlineFaq.items.3.answer": "Telegram ID を提供し、プランを選択してお支払いいただくだけで、24時間以内に設置が完了します。完了後に通知が届き、Telegram ですぐに利用を開始できます。",
   "inlineFaq.viewAll": "すべてのよくある質問を見る →",
 
   "story.heading": "私たちがこれを始めた理由",
@@ -149,7 +149,7 @@
   "trust.noHiddenFees": "隠れた費用なし",
 
   "finalCta.heading": "今日設置して、今夜から使い始める",
-  "finalCta.subtitle": "リモート即時設置、最短30分で完了",
+  "finalCta.subtitle": "リモート即時設置、24時間以内に完了",
   "finalCta.ctaButton": "HK$188/月から — 今すぐ始める",
   "finalCta.contactButton": "サポートチケットを送信"
 }

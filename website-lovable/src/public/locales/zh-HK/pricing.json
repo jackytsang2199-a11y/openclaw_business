@@ -70,7 +70,7 @@
   "openClaw.features.browser.desc": "格價、訂位、填表、搶票，AI 替你操作瀏覽器",
 
   "payment.methods": "付款方式：信用卡 / PayMe",
-  "payment.postCheckout": "提交表格後，選擇付款方式即可完成訂購。付款確認後，我們會在 30 分鐘內完成安裝。",
+  "payment.postCheckout": "提交表格後，選擇付款方式即可完成訂購。付款確認後，我們會在 24 小時內完成安裝。",
 
   "help.heading": "需要協助選擇？",
   "help.subtitle": "提交支援工單，我們會為你推薦最適合的方案。",

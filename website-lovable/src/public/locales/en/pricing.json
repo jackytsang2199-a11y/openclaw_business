@@ -70,7 +70,7 @@
   "openClaw.features.browser.desc": "Price comparison, booking, form filling, ticket grabbing \u2014 AI operates the browser for you",
 
   "payment.methods": "Payment methods: Credit Card / PayMe",
-  "payment.postCheckout": "After submitting the form, choose a payment method to complete your order. Installation begins within 30 minutes of payment confirmation.",
+  "payment.postCheckout": "After submitting the form, choose a payment method to complete your order. Installation begins within 24 hours of payment confirmation.",
 
   "help.heading": "Need help choosing?",
   "help.subtitle": "Submit a support ticket and we\u2019ll recommend the best plan for you.",

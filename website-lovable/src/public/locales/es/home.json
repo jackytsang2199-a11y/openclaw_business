@@ -5,10 +5,10 @@
   "hero.kicker": "Self-Hosted OpenClaw",
   "hero.title": "Su propio agente AI con configuracion completa",
   "hero.subtitle": "Todos los complementos preinstalados. Solo proporcione su Telegram ID para comenzar — sin necesidad de API Key",
-  "hero.checks.0": "Instalacion en un paso, en linea en 30 minutos",
+  "hero.checks.0": "Instalacion en un paso, en linea en 24 horas",
   "hero.checks.1": "Complementos preinstalados (memoria, busqueda, navegador)",
   "hero.checks.2": "Sin configuracion tecnica, todo incluido",
-  "hero.flow": "Proporcione su Telegram ID → Pague → En linea en tan solo 30 minutos",
+  "hero.flow": "Proporcione su Telegram ID → Pague → En linea en un plazo de 24 horas",
   "hero.cta": "Comenzar ahora",
   "hero.learnMore": "Mas informacion",
 
@@ -102,7 +102,7 @@
   "comparison.usColumn": "Elegir NexGen",
   "comparison.rows.0.label": "Tiempo",
   "comparison.rows.0.diy": "3-8 horas (sin contar depuracion)",
-  "comparison.rows.0.us": "Instalacion remota en 30 minutos",
+  "comparison.rows.0.us": "Instalacion remota en 24 horas",
   "comparison.rows.1.label": "Requisitos tecnicos",
   "comparison.rows.1.diy": "Docker, VPN, API key, Linux...",
   "comparison.rows.1.us": "Cero. Solo necesita saber usar Telegram",
@@ -124,19 +124,19 @@
   "steps.items.0.title": "Elija un plan y envie sus datos",
   "steps.items.0.desc": "Elija el plan adecuado para usted, proporcione su Telegram Bot Token y User ID",
   "steps.items.1.title": "Instalacion automatica tras el pago",
-  "steps.items.1.desc": "Una vez confirmado el pago, el sistema instala automaticamente todo el entorno AI. En tan solo 30 minutos.",
+  "steps.items.1.desc": "Una vez confirmado el pago, el sistema instala automaticamente todo el entorno AI. En un plazo de 24 horas.",
   "steps.items.2.title": "Comience a usar",
   "steps.items.2.desc": "Hable con su AI directamente en Telegram, asi de simple",
 
   "inlineFaq.heading": "Preguntas frecuentes",
   "inlineFaq.items.0.question": "No tengo conocimientos tecnicos, ¿puedo usarlo?",
-  "inlineFaq.items.0.answer": "¡Por supuesto! Todo el proceso de instalacion, configuracion y mantenimiento es gestionado por nuestro equipo de ingenieria. Solo necesita proporcionar su Telegram ID, elegir un plan y pagar. En tan solo 30 minutos puede comenzar a usarlo. Si tiene alguna consulta, puede enviar un ticket de soporte por correo electronico.",
+  "inlineFaq.items.0.answer": "¡Por supuesto! Todo el proceso de instalacion, configuracion y mantenimiento es gestionado por nuestro equipo de ingenieria. Solo necesita proporcionar su Telegram ID, elegir un plan y pagar. En un plazo de 24 horas puede comenzar a usarlo. Si tiene alguna consulta, puede enviar un ticket de soporte por correo electronico.",
   "inlineFaq.items.1.question": "¿Que incluye la tarifa mensual?",
   "inlineFaq.items.1.answer": "La tarifa mensual incluye servidor VPS, uso del modelo AI (API), mantenimiento del sistema y actualizaciones. Sin cargos ocultos, sin costos adicionales.",
   "inlineFaq.items.2.question": "¿En que se diferencia de ChatGPT Plus?",
   "inlineFaq.items.2.answer": "ChatGPT Plus es un chatbot. Lo que nosotros instalamos es un agente AI. El agente puede recordar todas las conversaciones, buscar informacion en toda la web y operar el navegador para realizar tareas por usted — no solo responde preguntas, realmente ejecuta tareas por usted.",
   "inlineFaq.items.3.question": "¿Como empiezo a usarlo?",
-  "inlineFaq.items.3.answer": "Proporcione su Telegram ID, elija un plan y pague. Completamos la instalacion en tan solo 30 minutos. Recibira una notificacion y podra comenzar a usarlo directamente en Telegram.",
+  "inlineFaq.items.3.answer": "Proporcione su Telegram ID, elija un plan y pague. Completamos la instalacion en un plazo de 24 horas. Recibira una notificacion y podra comenzar a usarlo directamente en Telegram.",
   "inlineFaq.viewAll": "Ver todas las preguntas frecuentes →",
 
   "story.heading": "¿Por que hacemos esto?",
@@ -149,7 +149,7 @@
   "trust.noHiddenFees": "Sin cargos ocultos",
 
   "finalCta.heading": "Instale hoy, comience a usarlo esta noche",
-  "finalCta.subtitle": "Instalacion remota instantanea, en tan solo 30 minutos",
+  "finalCta.subtitle": "Instalacion remota instantanea, en un plazo de 24 horas",
   "finalCta.ctaButton": "Desde HK$188/mes — Comenzar ahora",
   "finalCta.contactButton": "Enviar ticket de soporte"
 }

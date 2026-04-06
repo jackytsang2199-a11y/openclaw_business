@@ -1,10 +1,10 @@
 {
   "meta": {
     "title": "Completar configuracion | NexGen",
-    "description": "Complete sus datos, elija un metodo de pago, instalacion en 30 minutos."
+    "description": "Complete sus datos, elija un metodo de pago, instalacion en 24 horas."
   },
   "pageTitle": "Completar configuracion",
-  "pageSubtitle": "Complete los siguientes datos y elija un metodo de pago. Una vez confirmado el pago, completaremos la instalacion en 30 minutos.",
+  "pageSubtitle": "Complete los siguientes datos y elija un metodo de pago. Una vez confirmado el pago, completaremos la instalacion en 24 horas.",
   "form": {
     "planLabel": "Plan de servicio *",
     "planPlaceholder": "Seleccione su plan",
@@ -70,7 +70,7 @@
     "paymeEmailHint": "Despues de pagar, envie un correo de confirmacion para que podamos organizar la instalacion:",
     "paymeSendEmail": "Enviar correo de confirmacion de pago",
     "editInfo": "Modificar datos",
-    "cardNote": "Instalacion automatica tras el pago con tarjeta de credito (en tan solo 30 minutos).",
+    "cardNote": "Instalacion automatica tras el pago con tarjeta de credito (en un plazo de 24 horas).",
     "paymeNote": "El pago con PayMe requiere confirmacion manual, el tiempo de instalacion puede ser mayor.",
     "contactSupport": "Si tiene alguna consulta, contacte a "
   },

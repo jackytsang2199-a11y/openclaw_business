@@ -5,10 +5,10 @@
   "hero.kicker": "Self-Hosted OpenClaw",
   "hero.title": "專屬於你的全配版 AI 智能體",
   "hero.subtitle": "已配置全套插件，提供 Telegram ID 即可開始 — 無需 API Key",
-  "hero.checks.0": "一鍵安裝，30 分鐘上線",
+  "hero.checks.0": "一鍵安裝，24 小時內上線",
   "hero.checks.1": "全套插件已預載（記憶 · 搜尋 · 瀏覽器）",
   "hero.checks.2": "無需任何技術設定，費用全包",
-  "hero.flow": "提供 Telegram ID → 付款 → 最快 30 分鐘內上線",
+  "hero.flow": "提供 Telegram ID → 付款 → 24 小時內上線",
   "hero.cta": "立即開始",
   "hero.learnMore": "了解更多",
 
@@ -102,7 +102,7 @@
   "comparison.usColumn": "找 NexGen",
   "comparison.rows.0.label": "時間",
   "comparison.rows.0.diy": "3-8 小時（不計 debug）",
-  "comparison.rows.0.us": "30 分鐘遠程裝好",
+  "comparison.rows.0.us": "24 小時內遠程裝好",
   "comparison.rows.1.label": "技術要求",
   "comparison.rows.1.diy": "Docker、VPN、API key、Linux…",
   "comparison.rows.1.us": "零。懂用 Telegram 就行",
@@ -124,19 +124,19 @@
   "steps.items.0.title": "選擇方案並提交資料",
   "steps.items.0.desc": "選擇適合你的計劃，提供 Telegram Bot Token 和 User ID",
   "steps.items.1.title": "付款後自動安裝",
-  "steps.items.1.desc": "確認付款後，系統自動為你安裝全套 AI 環境。最快 30 分鐘完成。",
+  "steps.items.1.desc": "確認付款後，系統自動為你安裝全套 AI 環境。24 小時內完成。",
   "steps.items.2.title": "開始使用",
   "steps.items.2.desc": "在 Telegram 直接與你的 AI 對話，就這麼簡單",
 
   "inlineFaq.heading": "常見問題",
   "inlineFaq.items.0.question": "我完全不懂技術，適合使用嗎？",
-  "inlineFaq.items.0.answer": "完全適合！整個安裝、設定、維護過程由我們的工程團隊處理。你只需要提供 Telegram ID，選擇方案並付款，最快 30 分鐘內即可開始使用。日後有任何問題，透過電郵提交工單即可。",
+  "inlineFaq.items.0.answer": "完全適合！整個安裝、設定、維護過程由我們的工程團隊處理。你只需要提供 Telegram ID，選擇方案並付款，24 小時內即可開始使用。日後有任何問題，透過電郵提交工單即可。",
   "inlineFaq.items.1.question": "月費包含什麼？",
   "inlineFaq.items.1.answer": "月費已包含 VPS 伺服器、AI 模型 API 使用費、系統維護及更新。無隱藏收費，無額外費用。",
   "inlineFaq.items.2.question": "跟 ChatGPT Plus 有什麼分別？",
   "inlineFaq.items.2.answer": "ChatGPT Plus 是聊天機器人，我們安裝的是 AI 智能體。智能體可以記住所有對話、搜尋全網資訊、操作瀏覽器幫你做事 — 不只是回答問題，是真正動手幫你完成任務。",
   "inlineFaq.items.3.question": "如何開始使用？",
-  "inlineFaq.items.3.answer": "提供你的 Telegram ID，選擇方案並付款，我們最快 30 分鐘內完成安裝。完成後你會收到通知，直接在 Telegram 開始使用。",
+  "inlineFaq.items.3.answer": "提供你的 Telegram ID，選擇方案並付款，我們24 小時內完成安裝。完成後你會收到通知，直接在 Telegram 開始使用。",
   "inlineFaq.viewAll": "查看所有常見問題 →",
 
   "story.heading": "我們為什麼做這件事",
@@ -149,7 +149,7 @@
   "trust.noHiddenFees": "無隱藏費用",
 
   "finalCta.heading": "今天安裝，今晚開始使用",
-  "finalCta.subtitle": "即時遠程安裝，最快 30 分鐘完成",
+  "finalCta.subtitle": "即時遠程安裝，24 小時內完成",
   "finalCta.ctaButton": "由 HK$188/月起 — 立即開始",
   "finalCta.contactButton": "提交支援工單"
 }

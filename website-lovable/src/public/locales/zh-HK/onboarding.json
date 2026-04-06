@@ -1,10 +1,10 @@
 {
   "meta": {
     "title": "完成設定 | NexGen",
-    "description": "填寫設定資料，選擇付款方式，30 分鐘完成安裝。"
+    "description": "填寫設定資料，選擇付款方式，24 小時內完成安裝。"
   },
   "pageTitle": "完成設定",
-  "pageSubtitle": "填寫以下資料並選擇付款方式。付款確認後，我們會在 30 分鐘內完成安裝。",
+  "pageSubtitle": "填寫以下資料並選擇付款方式。付款確認後，我們會在 24 小時內完成安裝。",
   "form": {
     "planLabel": "服務計劃 *",
     "planPlaceholder": "選擇你的方案",
@@ -70,7 +70,7 @@
     "paymeEmailHint": "付款後，請發送電郵確認以便我們安排安裝：",
     "paymeSendEmail": "發送付款確認電郵",
     "editInfo": "修改資料",
-    "cardNote": "信用卡付款後自動開始安裝（最快 30 分鐘）。",
+    "cardNote": "信用卡付款後自動開始安裝（24 小時內）。",
     "paymeNote": "PayMe 付款需人工確認，安裝時間可能較長。",
     "contactSupport": "如有問題，請聯絡 "
   },
