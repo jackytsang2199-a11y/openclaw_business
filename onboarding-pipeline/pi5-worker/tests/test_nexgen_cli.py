@@ -38,5 +38,48 @@ class TestNotificationDedup(unittest.TestCase):
         self.assertEqual(result, "reminder")
 
 
+class TestCLIDispatch(unittest.TestCase):
+    def test_jobs_empty(self):
+        from nexgen_cli import handle_jobs
+        mock_api = MagicMock()
+        mock_api.get_pending_jobs.return_value = []
+        result = handle_jobs(mock_api)
+        self.assertIn("pending", result.lower())
+
+    def test_pool_empty(self):
+        from nexgen_cli import handle_pool
+        mock_api = MagicMock()
+        mock_api.get_recyclable_vps.return_value = None
+        mock_api.get_vps_by_status.return_value = []
+        result = handle_pool(mock_api)
+        self.assertIn("empty", result.lower())
+
+
+class TestUpgradeDowngrade(unittest.TestCase):
+    def test_validate_upgrade(self):
+        from nexgen_cli import validate_tier_change
+        ok, msg = validate_tier_change(current_tier=1, new_tier=2)
+        self.assertTrue(ok)
+        self.assertIn("40", msg)
+        self.assertIn("70", msg)
+
+    def test_validate_downgrade(self):
+        from nexgen_cli import validate_tier_change
+        ok, msg = validate_tier_change(current_tier=3, new_tier=1)
+        self.assertTrue(ok)
+        self.assertIn("100", msg)
+        self.assertIn("40", msg)
+
+    def test_validate_same_tier(self):
+        from nexgen_cli import validate_tier_change
+        ok, msg = validate_tier_change(current_tier=2, new_tier=2)
+        self.assertFalse(ok)
+
+    def test_validate_invalid_tier(self):
+        from nexgen_cli import validate_tier_change
+        ok, msg = validate_tier_change(current_tier=1, new_tier=5)
+        self.assertFalse(ok)
+
+
 if __name__ == "__main__":
     unittest.main()
