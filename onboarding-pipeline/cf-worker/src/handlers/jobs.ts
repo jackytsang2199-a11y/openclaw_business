@@ -1,11 +1,30 @@
 import { Env } from "../lib/types";
 import { verifyWorkerToken, unauthorized, badRequest, json } from "../lib/auth";
-import { getNextJob, getJobById, updateJobStatus } from "../lib/db";
+import { getNextJob, getJobById, updateJobStatus, listJobsByStatus } from "../lib/db";
 
 export async function handleGetNextJob(request: Request, env: Env): Promise<Response> {
   if (!verifyWorkerToken(request, env)) return unauthorized("Invalid worker token");
 
   const job = await getNextJob(env.DB);
+  return json({ job });
+}
+
+export async function handleListJobs(request: Request, env: Env): Promise<Response> {
+  if (!verifyWorkerToken(request, env)) return unauthorized("Invalid worker token");
+
+  const url = new URL(request.url);
+  const status = url.searchParams.get("status");
+  if (!status) return badRequest("status query param is required");
+
+  const jobs = await listJobsByStatus(env.DB, status);
+  return json({ jobs });
+}
+
+export async function handleGetJob(request: Request, env: Env, jobId: string): Promise<Response> {
+  if (!verifyWorkerToken(request, env)) return unauthorized("Invalid worker token");
+
+  const job = await getJobById(env.DB, jobId);
+  if (!job) return json({ error: "Job not found" }, 404);
   return json({ job });
 }
 

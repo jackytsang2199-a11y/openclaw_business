@@ -1,7 +1,7 @@
 import { Env } from "./lib/types";
 import { handleWebhook } from "./handlers/webhook";
 import { handleConfirm } from "./handlers/confirm";
-import { handleGetNextJob, handleUpdateJob } from "./handlers/jobs";
+import { handleGetNextJob, handleUpdateJob, handleListJobs, handleGetJob } from "./handlers/jobs";
 import { handleHealthPing, checkPi5Health } from "./handlers/health";
 import { handleCreateOrder } from "./handlers/orders";
 import { handleGetRecyclableVps, handleCreateVps, handleUpdateVps, handleListVps } from "./handlers/vps";
@@ -61,13 +61,23 @@ export default {
       return handleConfirm(request, env, confirmMatch[1]);
     }
 
-    // Route: Pi5 polls for next job
+    // Route: Pi5 polls for next job (atomically flips ready → provisioning)
     if (method === "GET" && path === "/api/jobs/next") {
       return handleGetNextJob(request, env);
     }
 
-    // Route: Pi5 updates job status
+    // Route: List jobs by status (read-only, no mutation — for CLI "jobs" command)
+    if (method === "GET" && path === "/api/jobs") {
+      return handleListJobs(request, env);
+    }
+
+    // Route: Get single job by ID (read-only)
     const jobMatch = path.match(/^\/api\/jobs\/(\d+)$/);
+    if (method === "GET" && jobMatch) {
+      return handleGetJob(request, env, jobMatch[1]);
+    }
+
+    // Route: Pi5 updates job status
     if (method === "PATCH" && jobMatch) {
       return handleUpdateJob(request, env, jobMatch[1]);
     }
@@ -152,6 +162,8 @@ export default {
       "POST /api/webhook/lemonsqueezy",
       "POST /api/confirm/:orderId",
       "GET  /api/jobs/next",
+      "GET  /api/jobs?status=:status",
+      "GET  /api/jobs/:id",
       "PATCH /api/jobs/:id",
       "POST /api/health",
       "GET  /api/vps/recyclable",

@@ -123,9 +123,24 @@ class ApiClient:
         return resp.json().get("job")
 
     def get_pending_jobs(self) -> list:
-        """Get all jobs with status 'ready'. Uses polling endpoint."""
-        job = self.get_next_job()
-        return [job] if job else []
+        """Get all jobs with status 'ready' WITHOUT mutating them.
+
+        Must NOT use /api/jobs/next — that endpoint atomically flips
+        ready → provisioning, which breaks subsequent deploy attempts.
+        Uses the read-only list endpoint instead.
+        """
+        return self.list_jobs_by_status("ready")
+
+    def list_jobs_by_status(self, status: str) -> list:
+        """Read-only list of jobs by status. Does not mutate."""
+        resp = requests.get(
+            f"{self.base_url}/api/jobs",
+            params={"status": status},
+            headers=self.headers,
+            timeout=10,
+        )
+        resp.raise_for_status()
+        return resp.json().get("jobs", [])
 
     def get_vps_by_status(self, status: str) -> list:
         """Get VPS instances filtered by status."""

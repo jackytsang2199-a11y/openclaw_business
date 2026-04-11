@@ -66,6 +66,14 @@ export async function getJobById(db: D1Database, id: string): Promise<Job | null
   return row ?? null;
 }
 
+export async function listJobsByStatus(db: D1Database, status: string): Promise<Job[]> {
+  const { results } = await db
+    .prepare("SELECT * FROM jobs WHERE status = ? ORDER BY created_at ASC")
+    .bind(status)
+    .all<Job>();
+  return results ?? [];
+}
+
 export async function updateJobStatus(
   db: D1Database,
   id: string,

@@ -81,8 +81,13 @@ def handle_deploy(api: ApiClient, notifier: Notifier, job_id: str, vps_id: str) 
     job = api.get_job(job_id)
     if not job:
         return f"Job {job_id} not found."
-    if job.get("status") != "ready":
-        return f"Job {job_id} status is '{job.get('status')}', expected 'ready'."
+    # Accept both 'ready' (human-triggered directly) and 'provisioning'
+    # (worker.py already polled /api/jobs/next which atomically flips the
+    # status to 'provisioning', but no actual work has started until
+    # deployer.deploy() runs below).
+    valid_starts = {"ready", "provisioning"}
+    if job.get("status") not in valid_starts:
+        return f"Job {job_id} status is '{job.get('status')}', expected ready or provisioning."
 
     from deployer import Deployer
     deployer = Deployer(api, notifier, config.OPENCLAW_INSTALL_DIR)
