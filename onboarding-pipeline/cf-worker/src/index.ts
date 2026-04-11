@@ -18,11 +18,29 @@ import {
 } from "./handlers/usage";
 import { json } from "./lib/auth";
 
+const CORS_HEADERS = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET, POST, PATCH, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, X-API-Key, X-Worker-Token, X-Signature",
+  "Access-Control-Max-Age": "86400",
+};
+
+function withCors(response: Response): Response {
+  const headers = new Headers(response.headers);
+  for (const [k, v] of Object.entries(CORS_HEADERS)) headers.set(k, v);
+  return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
+}
+
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
     const path = url.pathname;
     const method = request.method;
+
+    // CORS preflight
+    if (method === "OPTIONS") {
+      return new Response(null, { status: 204, headers: CORS_HEADERS });
+    }
 
     // Background: check Pi5 health on every request
     ctx.waitUntil(checkPi5Health(env, ctx));
@@ -32,9 +50,9 @@ export default {
       return handleWebhook(request, env);
     }
 
-    // Route: Order submission (public — no auth)
+    // Route: Order submission (public — no auth, needs CORS)
     if (method === "POST" && path === "/api/orders") {
-      return handleCreateOrder(request, env);
+      return withCors(await handleCreateOrder(request, env));
     }
 
     // Route: Manual payment confirm (admin only)
