@@ -48,6 +48,7 @@ def format_vps_list(vps_list: list[dict], title: str = "VPS Instances") -> str:
 
     Args:
         vps_list: List of VPS records from the CF Worker API.
+            May include _live_status and _live_cancel from Contabo API merge.
         title: Section heading for the output.
 
     Returns:
@@ -68,6 +69,15 @@ def format_vps_list(vps_list: list[dict], title: str = "VPS Instances") -> str:
             line += f" | deadline={cancel[:10]}"
         if reinstalls:
             line += f" | reinstalls={reinstalls}"
+        # Contabo live state (added by handle_pool when available)
+        live_status = v.get("_live_status")
+        live_cancel = v.get("_live_cancel")
+        if live_status:
+            ready = live_cancel == "revoked" and live_status == "running"
+            indicator = "✅ ready" if ready else "⚠️ not revoked" if live_cancel != "revoked" else ""
+            line += f" | contabo={live_status},cancel={live_cancel}"
+            if indicator:
+                line += f" {indicator}"
         lines.append(line)
     return "\n".join(lines)
 

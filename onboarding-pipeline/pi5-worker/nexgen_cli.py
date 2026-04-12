@@ -44,6 +44,24 @@ def handle_pool(api: ApiClient) -> str:
     pool = [recyclable] if recyclable else []
     cancelling = api.get_vps_by_status("cancelling")
     active = api.get_vps_by_status("active")
+
+    # Fetch Contabo live state and merge into VPS records
+    contabo_map = {}
+    try:
+        from contabo_client import ContaboClient
+        contabo = ContaboClient()
+        for inst in contabo.get_instances():
+            contabo_map[str(inst["instanceId"])] = inst
+    except Exception:
+        pass  # Contabo unavailable — show D1 data only
+
+    all_vps = {v.get("vps_id"): v for v in cancelling + active + pool}
+    for vps_id, v in all_vps.items():
+        live = contabo_map.get(vps_id, {})
+        v["_live_status"] = live.get("status", "unknown")
+        cancel = live.get("cancelDate")
+        v["_live_cancel"] = "revoked" if cancel is None and live else ("unknown" if not live else str(cancel)[:10])
+
     parts = []
     parts.append(format_vps_list(pool, "Recyclable (next to recycle)"))
     parts.append(format_vps_list(active, "Active VPS"))
