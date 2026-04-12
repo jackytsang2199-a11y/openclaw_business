@@ -57,7 +57,7 @@ if [ "$HTTP_CODE" = "200" ] || [ "$HTTP_CODE" = "201" ] || [ "$HTTP_CODE" = "204
   done
 
   echo "[reinstall] WARNING: SSH not ready after $((MAX_ATTEMPTS * 30))s" >&2
-  echo "$SERVER_IP"
+  exit 1
 else
   echo "[reinstall] ERROR: HTTP $HTTP_CODE" >&2
   echo "$RESPONSE" | head -1 | jq . >&2
