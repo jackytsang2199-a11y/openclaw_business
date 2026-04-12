@@ -167,5 +167,48 @@ class TestNoFreshProvisionFallthrough(unittest.TestCase):
                         "contabo-create.sh should be called when no --vps override")
 
 
+# --- Bug 5: Playbook must bootstrap deploy user before scripts ---
+
+class TestDeployUserBootstrap(unittest.TestCase):
+    """Bug 5: Contabo reinstall does NOT create the 'deploy' user via cloud-init.
+    The playbook must include a Step 0 that SSHs as root to create the user
+    before any install scripts run (which assume deploy@ exists)."""
+
+    def test_prompt_includes_deploy_user_creation(self):
+        """Deployment prompt must have a step that creates deploy user via root SSH."""
+        from playbook import build_deployment_prompt
+        prompt = build_deployment_prompt(
+            job_id="1002", tier=2, server_ip="161.97.88.8",
+            ssh_key_path="/home/pi/.ssh/nexgen_automation",
+            install_dir="/home/pi/openclaw_install",
+            client_env_content="CLIENT_ID=1002\nTIER=2",
+        )
+        # Must SSH as root (not deploy) to create the user
+        self.assertIn("root@161.97.88.8", prompt)
+        # Must create the deploy user
+        self.assertIn("useradd", prompt)
+        # Must set up SSH key for deploy
+        self.assertIn("authorized_keys", prompt)
+        # Must set up passwordless sudo
+        self.assertIn("NOPASSWD", prompt)
+
+    def test_step0_comes_before_step1(self):
+        """User bootstrap must appear BEFORE script upload (which uses deploy@)."""
+        from playbook import build_deployment_prompt
+        prompt = build_deployment_prompt(
+            job_id="1002", tier=2, server_ip="161.97.88.8",
+            ssh_key_path="/key",
+            install_dir="/install",
+            client_env_content="CLIENT_ID=1002",
+        )
+        # Find positions — both must exist
+        bootstrap_pos = prompt.find("useradd")
+        upload_pos = prompt.find("mkdir -p ~/scripts")
+        self.assertNotEqual(bootstrap_pos, -1, "useradd not found in prompt")
+        self.assertNotEqual(upload_pos, -1, "mkdir -p ~/scripts not found in prompt")
+        self.assertGreater(upload_pos, bootstrap_pos,
+                           "deploy user bootstrap must appear before script upload")
+
+
 if __name__ == "__main__":
     unittest.main()

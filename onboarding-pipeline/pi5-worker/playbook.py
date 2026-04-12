@@ -67,6 +67,8 @@ You interpret output, debug failures, and make decisions.
 | ((PASS++)) in bash | Script exits with code 1 | Use PASS=$((PASS+1)) with set -e |
 | apt upgrade conffile prompt | Hangs on sshd_config prompt | Use sudo DEBIAN_FRONTEND=noninteractive + --force-confold |
 | Host key changed | SSH refuses connection | ssh-keygen -R <IP> or use -o UserKnownHostsFile=/dev/null |
+| deploy user missing | SSH as deploy@ fails, Permission denied | Run Step 0 bootstrap — connect as root, create deploy user with useradd |
+| Contabo cloud-init fails | deploy user not created, cloud-init status: error | Expected on recycled VPS — Step 0 handles this automatically |
 """
 
 
@@ -91,12 +93,36 @@ def build_deployment_prompt(
     ssh = f"ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i {ssh_key_path} deploy@{server_ip}"
     scp = f"scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i {ssh_key_path} -r"
 
+    ssh_root = f"ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i {ssh_key_path} root@{server_ip}"
+
     prompt = f"""Deploy OpenClaw for customer {job_id} (Tier {tier}) on VPS {server_ip}.
 
 ## SSH Access
 ```
 {ssh}
 ```
+
+## Step 0: Bootstrap deploy user (required for recycled VPS)
+
+Contabo reinstall does NOT reliably create the `deploy` user via cloud-init.
+This step ensures the user exists before any scripts run. Connect as root first:
+
+```bash
+{ssh_root} "id deploy 2>/dev/null && echo 'USER_EXISTS' || echo 'USER_MISSING'"
+```
+
+If the output contains `USER_MISSING`, create the deploy user:
+```bash
+{ssh_root} "useradd -m -s /bin/bash deploy && echo 'deploy ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/deploy && chmod 440 /etc/sudoers.d/deploy && mkdir -p /home/deploy/.ssh && chmod 700 /home/deploy/.ssh && cp /root/.ssh/authorized_keys /home/deploy/.ssh/authorized_keys && chmod 600 /home/deploy/.ssh/authorized_keys && chown -R deploy:deploy /home/deploy/.ssh && echo 'DEPLOY_USER_CREATED'"
+```
+
+If the output contains `USER_EXISTS`, skip user creation.
+
+Verify deploy SSH works:
+```bash
+{ssh} "whoami"
+```
+Must output `deploy`. If it fails, debug the SSH key setup above.
 
 ## Step 1: Upload scripts and QA to VPS
 
