@@ -22,9 +22,18 @@ class VpsLifecycle:
         self.notifier = notifier
         self.provision_dir = config.OPENCLAW_INSTALL_DIR / "provision"
 
-    def try_recycle(self, job_id: str, tier: int) -> Optional[str]:
-        """Check for recyclable VPS and recycle it. Returns server IP or None."""
-        recyclable = self.api.get_recyclable_vps()
+    def try_recycle(self, job_id: str, tier: int, vps_id: str = None) -> Optional[str]:
+        """Check for recyclable VPS and recycle it. Returns server IP or None.
+
+        If vps_id is specified (from CLI --vps flag), look up that specific VPS
+        instead of picking the oldest from the recyclable pool.
+        """
+        if vps_id:
+            # Operator specified a VPS — look it up directly
+            vps_list = self.api.get_vps_by_status("cancelling")
+            recyclable = next((v for v in vps_list if v.get("vps_id") == vps_id), None)
+        else:
+            recyclable = self.api.get_recyclable_vps()
         if not recyclable:
             return None
 
@@ -33,7 +42,7 @@ class VpsLifecycle:
         ip = recyclable["contabo_ip"]
         old_reinstall_count = recyclable.get("reinstall_count", 0)
 
-        print(f"[recycle] {job_id}: Found recyclable VPS {vps_id} ({ip})")
+        print(f"[recycle] {job_id}: Found recyclable VPS {vps_id} ({ip})", flush=True)
 
         # Step 1: Verify cancellation is revoked (must be done manually in Contabo panel)
         result = subprocess.run(
@@ -42,7 +51,7 @@ class VpsLifecycle:
             cwd=str(config.OPENCLAW_INSTALL_DIR),
         )
         if result.returncode != 0:
-            print(f"[recycle] {job_id}: Revoke check failed: {result.stderr}")
+            print(f"[recycle] {job_id}: Revoke check failed: {result.stderr}", flush=True)
             self.notifier.send(
                 f"{job_id}: VPS {vps_id} still has pending cancellation.\n"
                 f"Revoke manually: https://my.contabo.com/compute\n"
@@ -57,7 +66,7 @@ class VpsLifecycle:
             cwd=str(config.OPENCLAW_INSTALL_DIR),
         )
         if result.returncode != 0:
-            print(f"[recycle] {job_id}: Reinstall failed: {result.stderr}")
+            print(f"[recycle] {job_id}: Reinstall failed: {result.stderr}", flush=True)
             self.notifier.send(
                 f"{job_id}: VPS {vps_id} reinstall failed after revoke — "
                 f"VPS is un-cancelled but needs manual OS reinstall"
@@ -85,11 +94,11 @@ class VpsLifecycle:
         contract_id = job.get("contabo_contract_id", vps_id)
 
         if not vps_id:
-            print(f"[cancel] {job_id}: No vps_id in job — cannot cancel")
+            print(f"[cancel] {job_id}: No vps_id in job — cannot cancel", flush=True)
             self.api.update_job(job_id, "failed", error_log="No vps_id in cancel job")
             return
 
-        print(f"[cancel] {job_id}: Processing cancellation for VPS {vps_id}")
+        print(f"[cancel] {job_id}: Processing cancellation for VPS {vps_id}", flush=True)
 
         # Step 1: Wipe customer data (OS reinstall)
         result = subprocess.run(
@@ -98,7 +107,7 @@ class VpsLifecycle:
             cwd=str(config.OPENCLAW_INSTALL_DIR),
         )
         if result.returncode != 0:
-            print(f"[cancel] {job_id}: Wipe (reinstall) failed: {result.stderr}")
+            print(f"[cancel] {job_id}: Wipe (reinstall) failed: {result.stderr}", flush=True)
             self.notifier.send(
                 f"{job_id}: VPS {vps_id} wipe failed — "
                 f"proceeding with cancellation, manual wipe needed"
@@ -111,7 +120,7 @@ class VpsLifecycle:
             cwd=str(config.OPENCLAW_INSTALL_DIR),
         )
         if result.returncode != 0:
-            print(f"[cancel] {job_id}: Contabo cancel failed: {result.stderr}")
+            print(f"[cancel] {job_id}: Contabo cancel failed: {result.stderr}", flush=True)
             self.api.update_job(
                 job_id, "failed",
                 error_log=f"Contabo cancel API failed: {result.stderr[:200]}"

@@ -67,7 +67,7 @@ class Deployer:
             )
 
             # Step 2: Provision VPS (sync — deterministic API call)
-            server_ip = self._provision_vps(job_id, tier)
+            server_ip = self._provision_vps(job_id, tier, job=job)
             if not server_ip:
                 self._handle_failure(job_id, bot, telegram_user_id, "VPS provisioning failed")
                 return False
@@ -102,7 +102,7 @@ class Deployer:
         except Exception as e:
             import traceback
             error_msg = str(e)[:500]
-            print(f"[deployer] {job_id}: EXCEPTION: {error_msg}")
+            print(f"[deployer] {job_id}: EXCEPTION: {error_msg}", flush=True)
             traceback.print_exc()
             self.api.update_job(job_id, "failed", error_log=error_msg)
             self.notifier.notify_failed(job_id, error_msg)
@@ -201,7 +201,7 @@ class Deployer:
 
         # Auth health check: verify Claude Max OAuth token exists (zero-cost filesystem check)
         if not config.CLAUDE_AUTH_DIR.exists():
-            print(f"[agent] {job_id}: ABORT — ~/.claude/ not found. Run 'claude login' on Pi5.")
+            print(f"[agent] {job_id}: ABORT — ~/.claude/ not found. Run 'claude login' on Pi5.", flush=True)
             self.notifier.send(f"{job_id}: Claude auth missing! Run 'claude login' on Pi5.")
             return False
 
@@ -219,15 +219,15 @@ class Deployer:
             ):
                 if isinstance(message, ResultMessage):
                     result_text = message.result or ""
-                    print(f"[agent] Session complete. Cost: ${message.total_cost_usd or 0:.4f}")
+                    print(f"[agent] Session complete. Cost: ${message.total_cost_usd or 0:.4f}", flush=True)
 
         except Exception as e:
             agent_error = str(e)
-            print(f"[agent] Agent SDK error: {agent_error}")
+            print(f"[agent] Agent SDK error: {agent_error}", flush=True)
 
         # Parse result
         if "DEPLOYMENT_SUCCESS" in result_text:
-            print(f"[agent] {job_id}: DEPLOYMENT_SUCCESS")
+            print(f"[agent] {job_id}: DEPLOYMENT_SUCCESS", flush=True)
             return True
 
         failure_reason = "Agent did not produce DEPLOYMENT_SUCCESS"
@@ -236,21 +236,36 @@ class Deployer:
         elif agent_error:
             failure_reason = f"Agent SDK error: {agent_error[:300]}"
 
-        print(f"[agent] {job_id}: FAILED — {failure_reason}")
+        print(f"[agent] {job_id}: FAILED — {failure_reason}", flush=True)
         return False
 
-    def _provision_vps(self, job_id: str, tier: int) -> Optional[str]:
-        """Recycle-first VPS provisioning. Returns server IP or None."""
+    def _provision_vps(self, job_id: str, tier: int, job: dict = None) -> Optional[str]:
+        """Recycle-first VPS provisioning. Returns server IP or None.
+
+        If job contains _override_vps_id (set by CLI --vps flag), recycle
+        THAT specific VPS. If recycling fails with an override, abort —
+        do NOT fall through to fresh provisioning (prevents accidental
+        Contabo billing when operator explicitly chose a VPS).
+        """
         from vps_lifecycle import VpsLifecycle
         lifecycle = VpsLifecycle(self.api, self.notifier)
 
-        # --- Recycling branch: check pool first ---
-        recycled_ip = lifecycle.try_recycle(job_id, tier)
+        override_vps_id = (job or {}).get("_override_vps_id")
+
+        # --- Recycling branch ---
+        recycled_ip = lifecycle.try_recycle(job_id, tier, vps_id=override_vps_id)
         if recycled_ip:
-            print(f"[deploy] {job_id}: Recycled existing VPS -> {recycled_ip}")
+            print(f"[deploy] {job_id}: Recycled existing VPS -> {recycled_ip}", flush=True)
             return recycled_ip
 
-        # --- Fresh provisioning: no recyclable VPS available ---
+        # If operator specified --vps and recycle failed, abort.
+        # Do NOT create a new VPS they didn't ask for.
+        if override_vps_id:
+            print(f"[deploy] {job_id}: Recycle of VPS {override_vps_id} failed. "
+                  f"Aborting — will NOT create a new VPS.", flush=True)
+            return None
+
+        # --- Fresh provisioning: no recyclable VPS and no override ---
         provision_dir = self.install_dir / "provision"
         provider = os.environ.get("PROVISION_PROVIDER", "contabo")
         create_script = f"{provider}-create.sh"
@@ -261,7 +276,7 @@ class Deployer:
             cwd=str(self.install_dir),
         )
         if result.returncode != 0:
-            print(f"[deploy] {create_script} failed: {result.stderr}")
+            print(f"[deploy] {create_script} failed: {result.stderr}", flush=True)
             return None
 
         result = subprocess.run(
@@ -270,7 +285,7 @@ class Deployer:
             cwd=str(self.install_dir),
         )
         if result.returncode != 0:
-            print(f"[deploy] wait-for-ssh failed: {result.stderr}")
+            print(f"[deploy] wait-for-ssh failed: {result.stderr}", flush=True)
             return None
 
         info_file = self.install_dir / "clients" / job_id / "server-info.env"
@@ -314,7 +329,7 @@ class Deployer:
                 "billing_start": __import__("datetime").datetime.utcnow().isoformat() + "Z",
             })
         except Exception as e:
-            print(f"[deploy] WARNING: failed to register VPS in D1: {e}")
+            print(f"[deploy] WARNING: failed to register VPS in D1: {e}", flush=True)
 
         return server_ip
 

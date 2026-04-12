@@ -41,7 +41,7 @@ if [ "$HTTP_CODE" = "200" ] || [ "$HTTP_CODE" = "201" ] || [ "$HTTP_CODE" = "204
     "https://api.contabo.com/v1/compute/instances/${INSTANCE_ID}" \
     | jq -r '.data[0].ipConfig.v4.ip // empty')
 
-  MAX_ATTEMPTS=20
+  MAX_ATTEMPTS=40
   for i in $(seq 1 $MAX_ATTEMPTS); do
     # Try deploy user first (cloud-init creates it), fall back to root
     if ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=5 \
