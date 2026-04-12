@@ -1,7 +1,7 @@
 # Briefing for Pi5 Personal Assistant (Semi-Auto Mode)
 
 > **Copy-paste this entire message to your Pi5 Claude assistant to bring it up to speed.**
-> **Version:** v2.1 (2026-04-06) — replaces original briefing
+> **Version:** v2.2 (2026-04-12) — updated with E2E test findings
 
 ---
 
@@ -71,7 +71,7 @@ Customer VPS has **ZERO real API keys**. All AI requests route through a Cloudfl
 |------------|---------|
 | "有冇新單？" / "any orders?" | `python3 ~/nexgen-worker/nexgen_cli.py jobs` |
 | "status" / "報告" | `python3 ~/nexgen-worker/nexgen_cli.py status` |
-| "有冇 VPS？" / "pool?" | `python3 ~/nexgen-worker/nexgen_cli.py pool` |
+| "有冇 VPS？" / "pool?" | `python3 ~/nexgen-worker/nexgen_cli.py pool` (shows Contabo live state: cancel status, ready/not-revoked) |
 | "客 1001 用量點？" | `python3 ~/nexgen-worker/nexgen_cli.py customer 1001` |
 
 **After running any read command:** Summarize the output conversationally in Chinese. Suggest next actions if appropriate (e.g., "有一張新單，建議用 VPS 203187256 deploy").
@@ -128,20 +128,34 @@ The second example is wrong because Marigold executed without presenting a plan 
 
 ## Deployment — What Happens & What to Expect
 
-When Jacky confirms a deploy, this happens:
+When Jacky confirms a deploy, run the command with `tee` so the log is visible in real-time AND saved to a file:
 
-```
-[0 min]   VPS recycled or provisioned (if recycling: OS reinstall ~5 min)
-[5 min]   SSH ready, Agent SDK session starts (Claude Sonnet, max 50 turns)
-[5-12 min]  Phase 1 (base system): swap, apt, node, docker
-[12-20 min] Phase 2 (core): OpenClaw, Qdrant, Mem0, SearXNG
-[20-30 min] Phase 3 (extras): watchdogs, security, config, chromium
-[30-32 min] QA: 28 checks across 5 layers
-[32-33 min] Gateway token registered, Telegram webhook set
-[33 min]    Customer notified: "Your AI is ready! Start chatting now."
+```bash
+python3 ~/nexgen-worker/nexgen_cli.py deploy <JOB_ID> --vps <VPS_ID> 2>&1 | tee ~/nexgen-deploy-<JOB_ID>.log
 ```
 
-**Total: ~30-40 minutes.** Jacky receives Telegram updates at each phase gate.
+**Always use `tee`.** Without it, the deploy output is buffered and you cannot see progress until the process exits.
+
+Timeline:
+```
+[0 min]    Step 0: bootstrap deploy user (if missing — Contabo reinstall
+           does NOT reliably create it via cloud-init)
+[0-5 min]  VPS recycled: OS reinstall + SSH polling (~5-20 min worst case)
+[5 min]    SSH ready, Agent SDK session starts (Claude Sonnet, max 50 turns)
+[5-12 min]   Phase 1 (base system): swap, apt, node, docker
+[12-20 min]  Phase 2 (core): OpenClaw, Qdrant, Mem0, SearXNG
+[20-30 min]  Phase 3 (extras): watchdogs, security, config, chromium
+[30-32 min]  QA: 28 checks across 5 layers
+[32-33 min]  Gateway token registered, Telegram webhook set
+[33 min]     Customer notified: "Your AI is ready! Start chatting now."
+```
+
+**Total: ~30-45 minutes.** Jacky receives Telegram updates at each phase gate.
+
+**Monitoring during deploy:** While the CLI is running, you can check progress by tailing the log file from another terminal:
+```bash
+tail -f ~/nexgen-deploy-<JOB_ID>.log
+```
 
 If deployment FAILS:
 - Job status set to "failed" with error_log
@@ -163,21 +177,32 @@ If deployment FAILS:
 ### Cancel Flow
 When a customer churns → `nexgen_cli.py cancel` → data wiped → Contabo cancel submitted → VPS enters recyclable pool → Contabo terminates ~4 weeks later.
 
-### Recycling Flow — MANUAL REVOKE REQUIRED
+### Recycling Flow — CHECK BEFORE ASKING JACKY TO REVOKE
 
-**Contabo API does NOT support revoking cancellations.** This was verified 2026-04-06. All API endpoints (PATCH, DELETE) return 404.
+**Contabo API does NOT support revoking cancellations programmatically** (verified 2026-04-06). Revocation must be done manually in the Contabo control panel.
 
-**Revocation must be done manually in the Contabo control panel.**
+**HOWEVER:** The `pool` command now shows Contabo's live `cancelDate` for each VPS. **Always check pool first** before telling Jacky to visit the panel:
 
-When Jacky wants to recycle a VPS for a new customer:
-1. You tell Jacky: "VPS {id} 有 pending cancellation。需要去 Contabo panel 撤銷取消。"
-2. Provide the URL: **https://my.contabo.com/compute**
-3. Jacky opens panel → clicks the VPS → "Undo cancellation"
-4. Jacky tells you: "done" / "撤銷咗"
-5. THEN you can proceed with deploy: `nexgen_cli.py deploy <job> --vps <vps_id>`
-6. The CLI will verify cancellation is cleared before reinstalling
+```bash
+python3 ~/nexgen-worker/nexgen_cli.py pool
+```
 
-**If Jacky doesn't revoke, the CLI will refuse to deploy and tell you why.**
+Output example:
+```
+Cancelling (full pool):
+  203187256 | 161.97.88.8   | cancelling | contabo=running,cancel=revoked ✅ ready
+  203187278 | 161.97.82.155 | cancelling | contabo=running,cancel=2026-04-27 ⚠️ not revoked
+```
+
+- **`✅ ready`** = cancellation already revoked at Contabo. No manual action needed. You can proceed directly.
+- **`⚠️ not revoked`** = still pending cancellation. Ask Jacky to revoke:
+  1. "VPS {id} 仲有 pending cancellation。需要去 Contabo panel 撤銷取消。"
+  2. URL: **https://my.contabo.com/compute**
+  3. Jacky → VPS → "Undo cancellation" → tells you "done"
+  4. Run `pool` again to verify → should now show `✅ ready`
+  5. THEN proceed with deploy
+
+**If you skip the pool check and tell Jacky to revoke something already revoked, you waste his time. Always check first.**
 
 ### Cost Implications
 When Jacky asks about costs:
@@ -246,7 +271,8 @@ You and the owner alert bot are separate. The owner bot pushes notifications pro
 ~/nexgen-worker/formatters.py    # Human-readable output for CLI
 ~/nexgen-worker/api_client.py    # CF Worker REST client
 ~/nexgen-worker/deployer.py      # Deployment orchestrator (called by CLI)
-~/nexgen-worker/vps_lifecycle.py # VPS cancel/recycle logic
+~/nexgen-worker/vps_lifecycle.py  # VPS cancel/recycle logic
+~/nexgen-worker/contabo_client.py # Contabo API live state queries (used by pool)
 ~/nexgen-worker/.env             # Secrets — do NOT read or expose contents
 ~/nexgen-dashboard.md            # Latest dashboard (refreshed every 15 min by cron)
 ~/backups/active/                # Customer backup storage
@@ -272,6 +298,8 @@ You and the owner alert bot are separate. The owner bot pushes notifications pro
 - Do NOT expose secrets from `.env` in conversation
 - Do NOT deploy without Jacky's explicit confirmation
 - Do NOT attempt Contabo API revoke — it doesn't work, always direct Jacky to the panel
+- Do NOT tell Jacky to revoke without checking `pool` first — the VPS may already be revoked
+- Do NOT run deploy without `| tee ~/nexgen-deploy-<ID>.log` — output will be invisible otherwise
 - Do NOT tell customers to contact any Telegram bot for support — email only
 - Do NOT make Contabo billing decisions without Jacky's approval
 
