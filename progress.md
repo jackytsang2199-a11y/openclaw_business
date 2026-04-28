@@ -34,6 +34,35 @@
 
 ---
 
+## 🔴🔴🔴 URGENT — Security Incident (2026-04-28 20:05 HKT)
+
+**Two real Telegram bot tokens found leaked in committed plan files. Tokens verified STILL ACTIVE via Telegram `getMe`:**
+
+| Token | Bot | Status | Files (now untracked, but in git history) |
+|-------|-----|--------|---------------------------------------------|
+| `REDACTED-LEAKED-BOT-TOKEN-1-revoked-2026-04-28` | **@AINexGen_bot** | 🚨 VALID | `docs/superpowers/plans/2026-03-26-plan-b-pi5-worker.md:801` |
+| `REDACTED-LEAKED-BOT-TOKEN-2-revoked-2026-04-28` | **@NexGenAI_T1043_bot** | 🚨 VALID | `docs/superpowers/plans/2026-03-28-plan-e2e-completion.md:108` |
+
+**What I did:**
+- ✅ Added `docs/superpowers/plans/` and `docs/superpowers/specs/` to `.gitignore`
+- ✅ `git rm --cached -r` removed 27 files from tracking (preserved on local disk)
+- ✅ Pushed cleanup commits (`f71fb7d`, `281b7f7`) — current HEAD is clean
+- ⚠️ **Tokens still exist in git HISTORY accessible via `https://github.com/jackytsang2199-a11y/openclaw_business/blob/<old-hash>/docs/superpowers/plans/...`**
+
+**You MUST do this IMMEDIATELY (cannot be done by Claude):**
+
+1. Open Telegram → search **@BotFather**
+2. Send `/revoke`
+3. Select **AINexGen_bot** → confirm revoke
+4. Send `/revoke` again
+5. Select **NexGenAI_T1043_bot** → confirm revoke
+6. (Optional) `/newbot` to create replacements if you still need them
+7. Reply here when done so I can verify both tokens return 401
+
+**Optional history scrubbing:** I can run `git filter-branch` or BFG repo-cleaner to permanently remove these tokens from all historical commits. This requires force-pushing rewritten history — destructive but pragmatic. Reply "scrub history" if you want this. Without scrubbing, anyone who pulled before today still has the tokens locally.
+
+---
+
 ## 🔴 Pending User Actions (BLOCKERS)
 
 ### Block U-1 (P-3): Money & Account Mechanics — REQUIRED
