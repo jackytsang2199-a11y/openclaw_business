@@ -34,7 +34,7 @@
 
 ---
 
-## 🔴🔴🔴 URGENT — Security Incident (2026-04-28 20:05 HKT)
+## 🟢 Security Incident — RESOLVED (2026-04-28 20:05 → 21:30 HKT)
 
 **Two real Telegram bot tokens found leaked in committed plan files. Tokens verified STILL ACTIVE via Telegram `getMe`:**
 
@@ -59,7 +59,23 @@
 6. (Optional) `/newbot` to create replacements if you still need them
 7. Reply here when done so I can verify both tokens return 401
 
-**Optional history scrubbing:** I can run `git filter-branch` or BFG repo-cleaner to permanently remove these tokens from all historical commits. This requires force-pushing rewritten history — destructive but pragmatic. Reply "scrub history" if you want this. Without scrubbing, anyone who pulled before today still has the tokens locally.
+**Resolution timeline:**
+
+| Step | Time | Result |
+|------|------|--------|
+| User revokes both bots via @BotFather | 21:00 | ✅ Old tokens return 401 Unauthorized |
+| User generates new tokens, shares with Claude | 21:05 | ✅ New tokens valid, bots reachable |
+| New tokens saved to `.secrets/plan-a-cf-worker.env` (gitignored) | 21:10 | ✅ AINEXGEN_BOT_TOKEN, NEXGENAI_T1043_BOT_TOKEN appended |
+| Contabo creds migrated from Pi5 `.env` to `.secrets/` | 21:10 | ✅ CONTABO_CLIENT_ID + SECRET + USER + PASSWORD + SSH_KEY_ID + ROOT_PASSWORD_ID |
+| `git filter-repo --replace-text` scrubs blobs across all 128 commits | 21:25 | ✅ Token strings absent from any file in any commit |
+| `git filter-repo --replace-message` scrubs commit messages | 21:28 | ✅ Token strings absent from commit metadata too |
+| Force-push to GitHub `origin/main` (rewrote history) | 21:30 | ✅ Public repo no longer contains either token |
+| Final verification — `git log -p --all \| grep <token>` | 21:30 | ✅ 0 matches |
+
+**Caveats:**
+- GitHub may still serve old tokens via direct hash URLs for a short window (~hours) before reflog cleanup
+- Anyone who cloned the repo BEFORE 21:30 today still has the leaked tokens locally — but the bots are revoked anyway, so no exploitation possible
+- Both new tokens are stored only in gitignored `.secrets/`, never committed
 
 ---
 
