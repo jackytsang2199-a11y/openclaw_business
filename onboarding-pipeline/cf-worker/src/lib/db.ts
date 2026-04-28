@@ -285,6 +285,21 @@ export async function updateUsageBudget(
     .first<ApiUsage>();
 }
 
+export async function updateUsageBudgetAndTier(
+  db: D1Database,
+  customerId: string,
+  budgetHkd: number,
+  tier: number
+): Promise<ApiUsage | null> {
+  const now = new Date().toISOString();
+  return db
+    .prepare(
+      "UPDATE api_usage SET monthly_budget_hkd = ?, tier = ?, updated_at = ? WHERE customer_id = ? RETURNING *"
+    )
+    .bind(budgetHkd, tier, now, customerId)
+    .first<ApiUsage>();
+}
+
 export async function updateUsageBudgetByTier(
   db: D1Database,
   tier: number,

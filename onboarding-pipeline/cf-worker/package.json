@@ -7,8 +7,10 @@
     "deploy": "wrangler deploy",
     "test": "vitest run",
     "test:watch": "vitest",
-    "db:init": "wrangler d1 execute nexgen-jobs --local --file=schema.sql",
-    "db:init:remote": "wrangler d1 execute nexgen-jobs --remote --file=schema.sql"
+    "db:init": "wrangler d1 execute nexgen-jobs --local --file=migrations/0001_baseline.sql",
+    "db:init:remote": "echo 'BLOCKED. Production migrations must be applied manually with explicit backup. See MIGRATIONS.md' && exit 1",
+    "db:migrate:remote": "wrangler d1 execute nexgen-jobs --remote --file=migrations/0001_baseline.sql",
+    "db:reset:test": "wrangler d1 execute nexgen-jobs --local --file=schema-fresh-init.sql && wrangler d1 execute nexgen-jobs --local --file=migrations/0001_baseline.sql"
   },
   "devDependencies": {
     "@cloudflare/vitest-pool-workers": "^0.6.0",

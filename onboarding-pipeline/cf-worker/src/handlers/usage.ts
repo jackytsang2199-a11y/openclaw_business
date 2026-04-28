@@ -12,6 +12,7 @@ import {
   getUsageByCustomerId,
   listAllUsage,
   updateUsageBudget,
+  updateUsageBudgetAndTier,
   updateUsageBudgetByTier,
   resetUsageMonth,
   revokeToken,
@@ -76,11 +77,20 @@ export async function handleUpdateUsage(request: Request, env: Env, customerId: 
     return badRequest("Missing required field: monthly_budget_hkd");
   }
 
-  const updated = await updateUsageBudget(env.DB, customerId, body.monthly_budget_hkd as number);
+  // Tier is optional. When supplied, also update tier (used by upgrade/downgrade flow
+  // which previously left api_usage.tier stale — Codex Round 3 finding).
+  const newTier = body.tier as number | undefined;
+  const updated = newTier !== undefined
+    ? await updateUsageBudgetAndTier(env.DB, customerId, body.monthly_budget_hkd as number, newTier)
+    : await updateUsageBudget(env.DB, customerId, body.monthly_budget_hkd as number);
+
   await writeAuditLog(env.DB, {
-    action: "budget_updated",
+    action: newTier !== undefined ? "tier_and_budget_updated" : "budget_updated",
     customer_id: customerId,
-    details: JSON.stringify({ before: existing.monthly_budget_hkd, after: body.monthly_budget_hkd }),
+    details: JSON.stringify({
+      before: { tier: existing.tier, budget: existing.monthly_budget_hkd },
+      after: { tier: newTier ?? existing.tier, budget: body.monthly_budget_hkd },
+    }),
     actor_ip: request.headers.get("CF-Connecting-IP") || undefined,
   });
 
