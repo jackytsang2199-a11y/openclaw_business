@@ -176,6 +176,7 @@ export async function handleCreateUsage(request: Request, env: Env): Promise<Res
       customer_id: body.customer_id as string,
       gateway_token: body.gateway_token as string,
       tier: body.tier as number,
+      monthly_budget_hkd: body.monthly_budget_hkd as number | undefined,
     });
     return json({ usage }, 201);
   } catch (err: unknown) {
