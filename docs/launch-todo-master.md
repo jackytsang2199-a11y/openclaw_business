@@ -341,16 +341,18 @@ This is the #1 financial-risk fix. Without this, day-1 disaster.
 | Owner | Claude (deploy) + User (provides secret from 0.B) |
 | What | `wrangler secret put LEMONSQUEEZY_WEBHOOK_SECRET` |
 
-### Task 2.6: LS Subscription Identity Map (NEW from Codex Round 2)
+### Task 2.6: LS Subscription Identity Map (NEW from Codex Round 2; refined Round 3)
 
 **Critical fix:** v4 plan still relied on `custom_data.order_id` for lifecycle events. Real LS subscription events reference `subscription_id`, not order_id.
+
+**Architecture decision (Codex Round 3):** Current schema has no `customers` table — customer state is split across `jobs` (one row per order) and `api_usage` (one row per active service). Rather than introduce a new table, **extend `api_usage`** with LS identity columns. `api_usage.customer_id` (already a UUID-ish) becomes the canonical link.
 
 | Field | Value |
 |-------|-------|
 | Owner | Claude |
 | Files | `cf-worker/migrations/0003_subscription_identity.sql`, `cf-worker/src/handlers/webhook.ts` |
-| Schema | Add columns to `customers` table: `ls_order_id`, `ls_subscription_id`, `ls_customer_id`, `ls_variant_id`, `ls_status`, `ls_renews_at`, `ls_ends_at` |
-| Logic | (a) On `order_created`: store all 7 fields. (b) On any subsequent event (renewal/cancel/refund/expire/failed): lookup customer by `subscription_id` first, fallback to `order_id` from `custom_data`, fallback to email. (c) Store every event in `webhook_events` for audit. |
+| Schema | Add columns to existing **`api_usage`** table: `ls_order_id`, `ls_subscription_id`, `ls_customer_id`, `ls_variant_id`, `ls_status`, `ls_renews_at`, `ls_ends_at`. (No new table.) |
+| Logic | (a) On `order_created`: store all 7 fields when `api_usage` row is created (or upsert if customer pre-exists). (b) On any subsequent event (renewal/cancel/refund/expire/failed): lookup `api_usage` by `ls_subscription_id` first, fallback to `customer_id` via `jobs` join, fallback to email. (c) Store every event in `webhook_events` for audit. |
 | Test | Use 5+ real captured LS payloads (download from LS dashboard's webhook history) — not hand-mocks |
 | Acceptance | Subscription cancel test: cancel referencing only `subscription_id` (no custom_data) → correct customer marked cancelled |
 

@@ -11,7 +11,7 @@
 
 - **Language:** 香港書面語 (formal HK Chinese) for default. English variant for en-locale customers.
 - **NO emoji** in formal communication (rare exception: ✅ for confirmations is OK).
-- **NO slang** (嘅、咩、唔該、佢、我哋 should be 的、什麼、麻煩、他/她、我們).
+- **NO slang** (嘅、咩、唔、佢 — replace with 的、什麼、不、他/她). 「我哋」 is acceptable in HK business written Chinese.
 - **NO sass / tsundere voice.** Neutral, warm, professional.
 - **Sign off:** "NexGen 團隊" / "The NexGen Team".
 - **Support email:** support@3nexgen.com (always).
