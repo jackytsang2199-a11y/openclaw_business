@@ -20,3 +20,9 @@ onboarding-pipeline/pi5-worker/.env
 openclaw_install/.env
 openclaw_install/clients/*/server-info.env
 *.session
+
+# Plans + specs — keep local only (may contain real bot tokens, dev notes,
+# or sensitive operational details). Per user instruction 2026-04-28.
+# Active plans live elsewhere: docs/launch-todo-master.md is allowed.
+docs/superpowers/plans/
+docs/superpowers/specs/
