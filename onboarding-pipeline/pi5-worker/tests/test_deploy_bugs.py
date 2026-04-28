@@ -21,10 +21,15 @@ class TestReinstallTimeout(unittest.TestCase):
     Contabo reinstalls can take up to 15 min. Should be >= 30."""
 
     def test_max_attempts_is_at_least_30(self):
+        # Try repo-relative path first, then Pi5 home directory layout
         script_path = os.path.join(
             os.path.dirname(__file__), "..", "..", "..", "openclaw_install",
             "provision", "contabo-reinstall.sh"
         )
+        if not os.path.exists(script_path):
+            script_path = os.path.expanduser(
+                "~/openclaw_install/provision/contabo-reinstall.sh"
+            )
         with open(script_path) as f:
             content = f.read()
         match = re.search(r"MAX_ATTEMPTS=(\d+)", content)
@@ -208,6 +213,90 @@ class TestDeployUserBootstrap(unittest.TestCase):
         self.assertNotEqual(upload_pos, -1, "mkdir -p ~/scripts not found in prompt")
         self.assertGreater(upload_pos, bootstrap_pos,
                            "deploy user bootstrap must appear before script upload")
+
+
+# --- Bug 14: Gateway token registration must include correct budget per tier ---
+
+class TestGatewayBudgetRegistration(unittest.TestCase):
+    """Bug 14: deployer._register_gateway_token must pass the correct
+    monthly_budget_hkd for each tier to api.register_gateway_token."""
+
+    def test_tier_budgets_are_defined(self):
+        """TIER_BUDGETS must map all 3 tiers to correct HKD amounts."""
+        from deployer import Deployer
+        self.assertEqual(Deployer.TIER_BUDGETS, {1: 40.0, 2: 70.0, 3: 100.0})
+
+    def test_register_sends_budget_for_tier2(self):
+        """_register_gateway_token for tier 2 must call api with monthly_budget_hkd=70."""
+        from deployer import Deployer
+        mock_api = MagicMock()
+        mock_notifier = MagicMock()
+        deployer = Deployer(mock_api, mock_notifier)
+
+        deployer._register_gateway_token("1002", "fake_token_abc", 2)
+
+        mock_api.register_gateway_token.assert_called_once_with(
+            customer_id="1002",
+            gateway_token="fake_token_abc",
+            tier=2,
+            monthly_budget_hkd=70.0,
+        )
+
+    def test_register_sends_budget_for_all_tiers(self):
+        """_register_gateway_token must send correct budget for tiers 1, 2, 3."""
+        from deployer import Deployer
+        expected = {1: 40.0, 2: 70.0, 3: 100.0}
+
+        for tier, budget in expected.items():
+            mock_api = MagicMock()
+            mock_notifier = MagicMock()
+            deployer = Deployer(mock_api, mock_notifier)
+
+            deployer._register_gateway_token(f"test_{tier}", "token_x", tier)
+
+            _, kwargs = mock_api.register_gateway_token.call_args
+            self.assertEqual(kwargs["monthly_budget_hkd"], budget,
+                             f"Tier {tier} should send budget {budget}, got {kwargs.get('monthly_budget_hkd')}")
+
+
+class TestApiClientSendsBudget(unittest.TestCase):
+    """api_client.register_gateway_token must include monthly_budget_hkd in JSON payload."""
+
+    @patch("api_client.requests.post")
+    def test_payload_includes_budget(self, mock_post):
+        """POST /api/usage payload must contain monthly_budget_hkd when provided."""
+        from api_client import ApiClient
+        mock_post.return_value = MagicMock(
+            status_code=201,
+            json=lambda: {"usage": {"id": 1, "monthly_budget_hkd": 70}},
+        )
+        mock_post.return_value.raise_for_status = MagicMock()
+
+        client = ApiClient("http://test", "test-token")
+        client.register_gateway_token("1002", "gw_token", 2, monthly_budget_hkd=70.0)
+
+        call_kwargs = mock_post.call_args
+        payload = call_kwargs.kwargs.get("json") or call_kwargs[1].get("json")
+        self.assertEqual(payload["monthly_budget_hkd"], 70.0)
+        self.assertEqual(payload["tier"], 2)
+        self.assertEqual(payload["customer_id"], "1002")
+
+    @patch("api_client.requests.post")
+    def test_payload_omits_budget_when_none(self, mock_post):
+        """POST /api/usage payload must NOT contain monthly_budget_hkd when None."""
+        from api_client import ApiClient
+        mock_post.return_value = MagicMock(
+            status_code=201,
+            json=lambda: {"usage": {"id": 1, "monthly_budget_hkd": None}},
+        )
+        mock_post.return_value.raise_for_status = MagicMock()
+
+        client = ApiClient("http://test", "test-token")
+        client.register_gateway_token("1002", "gw_token", 2)
+
+        call_kwargs = mock_post.call_args
+        payload = call_kwargs.kwargs.get("json") or call_kwargs[1].get("json")
+        self.assertNotIn("monthly_budget_hkd", payload)
 
 
 if __name__ == "__main__":

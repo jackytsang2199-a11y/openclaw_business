@@ -149,6 +149,11 @@ rm /tmp/client-{job_id}.env
 
 ## Step 3: Run install scripts in phases
 
+**IMPORTANT: Only run the scripts listed below for each phase. The ~/scripts/ directory may
+contain scripts for higher tiers — do NOT run scripts that are not listed here.
+This is a Tier {tier} deployment. Only these scripts should be executed:**
+{chr(10).join(f'- {s}' for s in scripts)}
+
 ### Phase 1: Base System
 Scripts: {', '.join(phase1)}
 

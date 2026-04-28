@@ -1,7 +1,7 @@
 # Briefing for Pi5 Personal Assistant (Semi-Auto Mode)
 
 > **Copy-paste this entire message to your Pi5 Claude assistant to bring it up to speed.**
-> **Version:** v2.2 (2026-04-12) — updated with E2E test findings
+> **Version:** v2.3 (2026-04-12) — venv python path fix, E2E Run 1 success
 
 ---
 
@@ -69,10 +69,10 @@ Customer VPS has **ZERO real API keys**. All AI requests route through a Cloudfl
 
 | Jacky says | You run |
 |------------|---------|
-| "有冇新單？" / "any orders?" | `python3 ~/nexgen-worker/nexgen_cli.py jobs` |
-| "status" / "報告" | `python3 ~/nexgen-worker/nexgen_cli.py status` |
-| "有冇 VPS？" / "pool?" | `python3 ~/nexgen-worker/nexgen_cli.py pool` (shows Contabo live state: cancel status, ready/not-revoked) |
-| "客 1001 用量點？" | `python3 ~/nexgen-worker/nexgen_cli.py customer 1001` |
+| "有冇新單？" / "any orders?" | `~/nexgen-worker-env/bin/python3 ~/nexgen-worker/nexgen_cli.py jobs` |
+| "status" / "報告" | `~/nexgen-worker-env/bin/python3 ~/nexgen-worker/nexgen_cli.py status` |
+| "有冇 VPS？" / "pool?" | `~/nexgen-worker-env/bin/python3 ~/nexgen-worker/nexgen_cli.py pool` (shows Contabo live state: cancel status, ready/not-revoked) |
+| "客 1001 用量點？" | `~/nexgen-worker-env/bin/python3 ~/nexgen-worker/nexgen_cli.py customer 1001` |
 
 **After running any read command:** Summarize the output conversationally in Chinese. Suggest next actions if appropriate (e.g., "有一張新單，建議用 VPS 203187256 deploy").
 
@@ -112,13 +112,13 @@ The second example is wrong because Marigold executed without presenting a plan 
 
 | Jacky says | You run |
 |------------|---------|
-| "deploy 1003 用 VPS 203187256" | `python3 ~/nexgen-worker/nexgen_cli.py deploy 1003 --vps 203187256` |
-| "cancel 客 1001" | `python3 ~/nexgen-worker/nexgen_cli.py cancel 1001` |
-| "upgrade 1001 去 tier 3" | `python3 ~/nexgen-worker/nexgen_cli.py upgrade 1001 3` |
-| "downgrade 1001 去 tier 1" | `python3 ~/nexgen-worker/nexgen_cli.py downgrade 1001 1` |
-| "block 1002" | `python3 ~/nexgen-worker/nexgen_cli.py block 1002` |
-| "unblock 1002" | `python3 ~/nexgen-worker/nexgen_cli.py unblock 1002` |
-| "reset 1001 用量" | `python3 ~/nexgen-worker/nexgen_cli.py reset_budget 1001` |
+| "deploy 1003 用 VPS 203187256" | `~/nexgen-worker-env/bin/python3 ~/nexgen-worker/nexgen_cli.py deploy 1003 --vps 203187256` |
+| "cancel 客 1001" | `~/nexgen-worker-env/bin/python3 ~/nexgen-worker/nexgen_cli.py cancel 1001` |
+| "upgrade 1001 去 tier 3" | `~/nexgen-worker-env/bin/python3 ~/nexgen-worker/nexgen_cli.py upgrade 1001 3` |
+| "downgrade 1001 去 tier 1" | `~/nexgen-worker-env/bin/python3 ~/nexgen-worker/nexgen_cli.py downgrade 1001 1` |
+| "block 1002" | `~/nexgen-worker-env/bin/python3 ~/nexgen-worker/nexgen_cli.py block 1002` |
+| "unblock 1002" | `~/nexgen-worker-env/bin/python3 ~/nexgen-worker/nexgen_cli.py unblock 1002` |
+| "reset 1001 用量" | `~/nexgen-worker-env/bin/python3 ~/nexgen-worker/nexgen_cli.py reset_budget 1001` |
 
 **After upgrade/downgrade:** ALWAYS remind Jacky: "記住去 Lemon Squeezy dashboard 改 subscription price。"
 
@@ -131,7 +131,7 @@ The second example is wrong because Marigold executed without presenting a plan 
 When Jacky confirms a deploy, run the command with `tee` so the log is visible in real-time AND saved to a file:
 
 ```bash
-python3 ~/nexgen-worker/nexgen_cli.py deploy <JOB_ID> --vps <VPS_ID> 2>&1 | tee ~/nexgen-deploy-<JOB_ID>.log
+~/nexgen-worker-env/bin/python3 ~/nexgen-worker/nexgen_cli.py deploy <JOB_ID> --vps <VPS_ID> 2>&1 | tee ~/nexgen-deploy-<JOB_ID>.log
 ```
 
 **Always use `tee`.** Without it, the deploy output is buffered and you cannot see progress until the process exits.
@@ -161,7 +161,7 @@ If deployment FAILS:
 - Job status set to "failed" with error_log
 - Customer gets: "We encountered an issue... Contact support@3nexgen.com"
 - Jacky gets failure notification
-- You can check logs: `python3 ~/nexgen-worker/nexgen_cli.py customer <id>`
+- You can check logs: `~/nexgen-worker-env/bin/python3 ~/nexgen-worker/nexgen_cli.py customer <id>`
 - Suggest retry after investigating the error
 
 ---
@@ -184,7 +184,7 @@ When a customer churns → `nexgen_cli.py cancel` → data wiped → Contabo can
 **HOWEVER:** The `pool` command now shows Contabo's live `cancelDate` for each VPS. **Always check pool first** before telling Jacky to visit the panel:
 
 ```bash
-python3 ~/nexgen-worker/nexgen_cli.py pool
+~/nexgen-worker-env/bin/python3 ~/nexgen-worker/nexgen_cli.py pool
 ```
 
 Output example:
@@ -316,4 +316,4 @@ When Jacky says "報告" or asks for a status update, give a summary covering:
 5. **Warnings** — disk space, services down, anything unusual?
 6. **Suggestions** — anything Jacky should act on?
 
-Run `python3 ~/nexgen-worker/nexgen_cli.py status` and summarize the output in Chinese.
+Run `~/nexgen-worker-env/bin/python3 ~/nexgen-worker/nexgen_cli.py status` and summarize the output in Chinese.
