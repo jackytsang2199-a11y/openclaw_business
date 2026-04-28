@@ -6,6 +6,8 @@ export interface Env {
   OWNER_TELEGRAM_BOT_TOKEN: string;
   OWNER_TELEGRAM_CHAT_ID: string;
   VARIANT_TIER_MAP: string;
+  VARIANT_VALIDATION_STRICT?: string;     // "1" = strict reject; default lenient
+  ALLOW_TEST_MODE_IN_PROD?: string;       // "1" = accept LS test_mode webhooks; default reject
   DEEPSEEK_API_KEY: string;
   OPENAI_API_KEY: string;
   DEEPSEEK_INPUT_RATE: string;
@@ -35,6 +37,12 @@ export interface Job {
   re_queue_count: number;
   created_at: string;
   updated_at: string;
+  // Phase 2 — LS identity persisted at order_created
+  ls_order_id: string | null;
+  ls_subscription_id: string | null;
+  ls_customer_id: string | null;
+  ls_variant_id: string | null;
+  ls_test_mode: number;     // 0 = live, 1 = test
 }
 
 export interface VpsInstance {

@@ -3,6 +3,8 @@ import { verifyLemonSqueezySignature } from "../lib/hmac";
 import {
   confirmPayment,
   getJobById,
+  getJobByLsSubscriptionId,
+  getJobByLsOrderId,
   getWebhookEventByEventId,
   insertWebhookEvent,
   updateWebhookEventResult,
@@ -11,6 +13,7 @@ import {
   getUsageByLsCustomerId,
   getUsageByCustomerId,
   linkLsIdentity,
+  linkJobLsIdentity,
   setPaymentFailed,
   clearPaymentFailed,
   setSubscriptionStatus,
@@ -78,16 +81,24 @@ interface LemonSqueezyWebhook {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Helper: derive a stable event id, preferring header → body → synthesized
+// Helper: derive a stable event id, preferring header → body → body hash
+//
+// Codex Round 4 #4: synthetic id `synth:event_name:data.id` would collapse
+// distinct renewals (same subscription_id) into a single dedup. Replaced
+// with SHA-256 of the raw body — guaranteed unique per delivery payload,
+// so re-deliveries of the SAME body still dedupe.
 // ─────────────────────────────────────────────────────────────────────────────
 
-function deriveEventId(request: Request, payload: LemonSqueezyWebhook): string {
+async function deriveEventId(request: Request, payload: LemonSqueezyWebhook, rawBody: string): Promise<string> {
   const header = request.headers.get("X-Event-Id");
   if (header) return header;
   if (payload.meta.event_id) return payload.meta.event_id;
-  // Synthetic deterministic key — used for legacy LS deliveries lacking event_id.
-  // This is per-payload deterministic so re-deliveries dedupe; not 100% bulletproof.
-  return `synth:${payload.meta.event_name}:${payload.data.id}`;
+
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(rawBody));
+  const hex = Array.from(new Uint8Array(buf))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+  return `bodyhash:${hex.slice(0, 32)}`;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -105,6 +116,8 @@ async function resolveCustomer(
   const lsCustomerId = attrs.customer_id !== undefined ? String(attrs.customer_id) : null;
   const internalOrderId = payload.meta.custom_data?.order_id;
 
+  // 1. api_usage by subscription_id (most reliable for subscription_* events,
+  //    only works once Pi5 deployer has created the api_usage row)
   if (subId) {
     const u = await getUsageBySubscriptionId(env.DB, subId);
     if (u) return u;
@@ -117,12 +130,60 @@ async function resolveCustomer(
     const u = await getUsageByLsCustomerId(env.DB, lsCustomerId);
     if (u) return u;
   }
+
+  // 2. Fallback via jobs row → resolve internal customer_id, then api_usage
+  //    Covers the window between order_created and api_usage creation.
+  if (subId) {
+    const job = await getJobByLsSubscriptionId(env.DB, subId);
+    if (job) {
+      const u = await getUsageByCustomerId(env.DB, job.id);
+      if (u) return u;
+    }
+  }
+  if (lsOrderId) {
+    const job = await getJobByLsOrderId(env.DB, lsOrderId);
+    if (job) {
+      const u = await getUsageByCustomerId(env.DB, job.id);
+      if (u) return u;
+    }
+  }
+
+  // 3. Last resort: caller-supplied internal order id
   if (internalOrderId) {
-    // Fallback via jobs row → if we created api_usage tagged with internal id
     const u = await getUsageByCustomerId(env.DB, internalOrderId);
     if (u) return u;
   }
   return null;
+}
+
+/**
+ * Helper: insert a cancel job for a given internal order id (idempotent-ish —
+ * timestamp suffix prevents PK collision). Returns the cancel job id.
+ */
+async function createCancelJob(env: Env, internalOrderId: string, reason: string): Promise<string | null> {
+  const existing = await getJobById(env.DB, internalOrderId);
+  if (!existing) return null;
+  const cancelJobId = `cancel_${internalOrderId}_${Date.now()}`;
+  const now = new Date().toISOString();
+  // The bot_token + bot_username UNIQUE constraint forces us to suffix the
+  // cancel job's values so they don't collide with the original order. The
+  // deployer already keys actions off jobs.id + jobs.job_type, not bot_*.
+  const suffix = `__cancel_${Date.now()}`;
+  try {
+    await env.DB.prepare(
+      `INSERT INTO jobs (id, status, job_type, tier, display_name, telegram_user_id, email, bot_token, bot_username, payment_method, error_log, created_at, updated_at)
+       VALUES (?, 'ready', 'cancel', ?, ?, ?, ?, ?, ?, 'lemon_squeezy', ?, ?, ?)`,
+    ).bind(
+      cancelJobId, existing.tier, existing.display_name || internalOrderId,
+      existing.telegram_user_id || "", existing.email || "",
+      (existing.bot_token || cancelJobId) + suffix, (existing.bot_username || cancelJobId) + suffix,
+      reason, now, now,
+    ).run();
+    return cancelJobId;
+  } catch (e) {
+    console.log(`[webhook] createCancelJob failed: ${e}`);
+    return null;
+  }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -154,12 +215,35 @@ export async function handleWebhook(request: Request, env: Env): Promise<Respons
   }
 
   const event = payload.meta.event_name;
-  const eventId = deriveEventId(request, payload);
+  const eventId = await deriveEventId(request, payload, body);
   const attrs = payload.data.attributes;
   const lsTestMode = Boolean(payload.meta.test_mode ?? attrs.test_mode);
   const internalOrderId = payload.meta.custom_data?.order_id;
   const subId = attrs.subscription_id !== undefined ? String(attrs.subscription_id) : null;
   const lsOrderId = event.startsWith("order_") ? String(payload.data.id) : null;
+  const lsCustomerId = attrs.customer_id !== undefined ? String(attrs.customer_id) : null;
+  const variantId = attrs.first_order_item?.variant_id !== undefined
+    ? String(attrs.first_order_item.variant_id)
+    : (attrs.variant_id !== undefined ? String(attrs.variant_id) : null);
+
+  // ── Production test_mode rejection (Codex Round 4 #9) ──────────────────
+  // LS test webhooks must NOT be processed by production worker. Set
+  // ALLOW_TEST_MODE_IN_PROD="1" only when intentionally driving E2E tests.
+  if (lsTestMode && env.ALLOW_TEST_MODE_IN_PROD !== "1") {
+    console.log(`[webhook] ${event}: rejecting test_mode webhook in prod`);
+    // Still record for audit, then return 400
+    await insertWebhookEvent(env.DB, {
+      event_id: eventId,
+      event_name: event,
+      ls_test_mode: true,
+      signature_valid: sigValid,
+      ls_subscription_id: subId,
+      ls_order_id: lsOrderId,
+      payload_json: body,
+      result_status: "rejected_test_mode_in_prod",
+    }).catch(() => {});
+    return json({ rejected: "test_mode_in_prod", event }, 400);
+  }
 
   // ── Idempotency: dedupe by event_id ─────────────────────────────────────
   const dupe = await getWebhookEventByEventId(env.DB, eventId);
@@ -200,22 +284,25 @@ export async function handleWebhook(request: Request, env: Env): Promise<Respons
     if (event === "order_created") {
       // Variant validation
       const variantMap = parseVariantMap(env.VARIANT_TIER_MAP || "{}");
-      const variantId = attrs.first_order_item?.variant_id !== undefined
-        ? String(attrs.first_order_item.variant_id)
-        : undefined;
       const totalCents = typeof attrs.total === "number" ? attrs.total : undefined;
       const currency = attrs.currency;
 
-      const validation = validateVariant(variantMap, variantId, totalCents, currency);
+      const validation = validateVariant(variantMap, variantId ?? undefined, totalCents, currency);
       if (!validation.ok) {
-        // Don't fail-close in soft-launch with placeholder variant map.
-        // If variant_map is empty, log+warn and proceed. Otherwise reject.
-        if (Object.keys(variantMap).length === 0) {
-          console.log(`[webhook] order_created variant validation skipped — empty VARIANT_TIER_MAP`);
+        const strict = env.VARIANT_VALIDATION_STRICT === "1";
+        const mapEmpty = Object.keys(variantMap).length === 0;
+        if (mapEmpty || !strict) {
+          // Soft mode (Codex Round 4 #3) — log + proceed. Owner gets a single
+          // alert per variant problem so prod isn't silent during soft launch.
+          console.log(`[webhook] order_created soft-validation: ${validation.reason} (strict=${strict}, map_empty=${mapEmpty})`);
+          void notifyOwner(
+            env.OWNER_TELEGRAM_BOT_TOKEN,
+            env.OWNER_TELEGRAM_CHAT_ID,
+            `<b>ℹ️ LS variant soft-validate</b>\nReason: <code>${validation.reason}</code>\nVariant: <code>${variantId ?? "?"}</code>\nTotal cents: ${totalCents ?? "?"}\nMode: ${strict ? "strict" : "lenient"}, map ${mapEmpty ? "EMPTY" : "set"}\nProceeding because not strict / map empty.`,
+          );
         } else {
           resultStatus = `rejected_${validation.reason}`;
           errorMessage = JSON.stringify({ expected: validation.expected, actual: validation.actual });
-          // Fire-and-forget: notification must NOT block webhook response
           void notifyOwner(
             env.OWNER_TELEGRAM_BOT_TOKEN,
             env.OWNER_TELEGRAM_CHAT_ID,
@@ -243,17 +330,28 @@ export async function handleWebhook(request: Request, env: Env): Promise<Respons
         return json({ ok: true, already_confirmed: true });
       }
 
-      // Link LS identity for future lifecycle events. Customer record may
-      // not yet exist (api_usage created later by Pi5 deployer) — link is
-      // best-effort here; deployer should also set ls_* on creation.
       resolvedCustomerId = internalOrderId;
+
+      // Codex Round 4 #1: persist LS identity on the JOBS row at order_created.
+      // api_usage doesn't yet exist — Pi5 deployer creates it later via
+      // POST /api/usage, which inherits ls_* from this jobs row.
+      await linkJobLsIdentity(env.DB, internalOrderId, {
+        ls_order_id: lsOrderId,
+        ls_subscription_id: subId,
+        ls_customer_id: lsCustomerId,
+        ls_variant_id: variantId,
+        ls_test_mode: lsTestMode,
+      });
+
+      // Best-effort: also link to api_usage if a row already exists (rare,
+      // but happens when deploy completed before webhook arrived)
       const usage = await getUsageByCustomerId(env.DB, internalOrderId);
       if (usage) {
         await linkLsIdentity(env.DB, internalOrderId, {
           ls_order_id: lsOrderId,
           ls_subscription_id: subId,
-          ls_customer_id: attrs.customer_id !== undefined ? String(attrs.customer_id) : null,
-          ls_variant_id: variantId ?? null,
+          ls_customer_id: lsCustomerId,
+          ls_variant_id: variantId,
           ls_status: "active",
         });
       }
@@ -320,8 +418,10 @@ export async function handleWebhook(request: Request, env: Env): Promise<Respons
     // ── subscription_cancelled / subscription_expired ────────────────────
     if (event === "subscription_cancelled" || event === "subscription_expired") {
       const customer = await resolveCustomer(env, payload);
+      let internalId = internalOrderId;
       if (customer) {
         resolvedCustomerId = customer.customer_id;
+        internalId = internalId ?? customer.customer_id;
         const newStatus = event === "subscription_cancelled" ? "cancelled" : "expired";
         await setSubscriptionStatus(env.DB, customer.customer_id, newStatus, attrs.ends_at ?? undefined);
         await writeAuditLog(env.DB, {
@@ -329,31 +429,18 @@ export async function handleWebhook(request: Request, env: Env): Promise<Respons
           customer_id: customer.customer_id,
           details: JSON.stringify({ event_id: eventId, ls_subscription_id: subId, ends_at: attrs.ends_at }),
         });
+      } else if (subId) {
+        // No api_usage row yet — try resolving via jobs.ls_subscription_id
+        const job = await getJobByLsSubscriptionId(env.DB, subId);
+        if (job) internalId = job.id;
       }
 
-      // Legacy support: also create a cancel job via internal order_id
-      if (!internalOrderId) {
-        return json({ ok: true, event, action: "subscription_status_updated", warning: "no internal order_id" });
+      if (!internalId) {
+        return json({ ok: true, event, action: "subscription_status_updated", warning: "no internal order id resolved" });
       }
-      const existing = await getJobById(env.DB, internalOrderId);
-      if (!existing) {
-        return json({ ok: true, event, action: "subscription_status_updated", warning: `internal order ${internalOrderId} not found` });
-      }
-      const cancelJobId = `cancel_${internalOrderId}_${Date.now()}`;
-      const now = new Date().toISOString();
-      try {
-        await env.DB.prepare(
-          `INSERT INTO jobs (id, status, job_type, tier, display_name, telegram_user_id, email, bot_token, bot_username, payment_method, created_at, updated_at)
-           VALUES (?, 'ready', 'cancel', ?, ?, ?, ?, ?, ?, 'lemon_squeezy', ?, ?)`,
-        ).bind(
-          cancelJobId, existing.tier, existing.display_name || internalOrderId,
-          existing.telegram_user_id || "", existing.email || "",
-          existing.bot_token || "", existing.bot_username || "",
-          now, now,
-        ).run();
-      } catch (e) {
+      const cancelJobId = await createCancelJob(env, internalId, `${event}: event_id=${eventId}`);
+      if (!cancelJobId) {
         resultStatus = "cancel_job_insert_failed";
-        errorMessage = String(e).slice(0, 200);
         return json({ error: "Failed to create cancel job", event });
       }
       return json({ ok: true, event, cancel_job_id: cancelJobId });
@@ -367,10 +454,15 @@ export async function handleWebhook(request: Request, env: Env): Promise<Respons
         return json({ ok: true, warning: "Customer not found for refund", event });
       }
       resolvedCustomerId = customer.customer_id;
-      // Budget→0 + block immediately
+      // Budget→0 + block immediately. Refund means service ends NOW (Codex Round 4 #6).
       await updateUsageBudget(env.DB, customer.customer_id, 0);
       await setBlocked(env.DB, customer.customer_id);
-      await setSubscriptionStatus(env.DB, customer.customer_id, "refunded", new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString());
+      const nowIso = new Date().toISOString();
+      await setSubscriptionStatus(env.DB, customer.customer_id, "refunded", nowIso);
+
+      // Codex Round 4 #6: refund must actually CREATE a cancel job, not just
+      // log "scheduled within 24h". Cancel ASAP. Customer is paid out.
+      const cancelJobId = await createCancelJob(env, customer.customer_id, `refund: event_id=${eventId}`);
 
       const refundAmount = typeof attrs.refunded_amount === "number"
         ? attrs.refunded_amount
@@ -387,9 +479,9 @@ export async function handleWebhook(request: Request, env: Env): Promise<Respons
       await writeAuditLog(env.DB, {
         action: "refund_processed",
         customer_id: customer.customer_id,
-        details: JSON.stringify({ event_id: eventId, ls_subscription_id: subId, amount_cents: refundAmount }),
+        details: JSON.stringify({ event_id: eventId, ls_subscription_id: subId, amount_cents: refundAmount, cancel_job_id: cancelJobId }),
       });
-      return json({ ok: true, event, action: "refund_handled", schedule_cancel: "within_24h" });
+      return json({ ok: true, event, action: "refund_handled", cancel_job_id: cancelJobId });
     }
 
     // ── subscription_updated — log only ──────────────────────────────────

@@ -215,17 +215,45 @@ function currentMonth(): string {
 
 export async function createApiUsage(
   db: D1Database,
-  params: { customer_id: string; gateway_token: string; tier: number; monthly_budget_hkd?: number }
+  params: {
+    customer_id: string;
+    gateway_token: string;
+    tier: number;
+    monthly_budget_hkd?: number;
+    // Phase 2: optional LS identity passthrough — populated by inheriting from jobs row when present
+    ls_order_id?: string | null;
+    ls_subscription_id?: string | null;
+    ls_customer_id?: string | null;
+    ls_variant_id?: string | null;
+    ls_status?: string | null;
+  },
 ): Promise<ApiUsage> {
   const now = new Date().toISOString();
   const month = currentMonth();
   return db
     .prepare(
-      `INSERT INTO api_usage (customer_id, gateway_token, tier, monthly_budget_hkd, current_month, current_spend_hkd, total_requests, total_tokens_in, total_tokens_out, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, 0, 0, 0, 0, ?, ?)
-       RETURNING *`
+      `INSERT INTO api_usage (
+         customer_id, gateway_token, tier, monthly_budget_hkd,
+         current_month, current_spend_hkd, total_requests,
+         total_tokens_in, total_tokens_out, created_at, updated_at,
+         ls_order_id, ls_subscription_id, ls_customer_id, ls_variant_id, ls_status
+       ) VALUES (?, ?, ?, ?, ?, 0, 0, 0, 0, ?, ?, ?, ?, ?, ?, ?)
+       RETURNING *`,
     )
-    .bind(params.customer_id, params.gateway_token, params.tier, params.monthly_budget_hkd ?? null, month, now, now)
+    .bind(
+      params.customer_id,
+      params.gateway_token,
+      params.tier,
+      params.monthly_budget_hkd ?? null,
+      month,
+      now,
+      now,
+      params.ls_order_id ?? null,
+      params.ls_subscription_id ?? null,
+      params.ls_customer_id ?? null,
+      params.ls_variant_id ?? null,
+      params.ls_status ?? null,
+    )
     .first<ApiUsage>() as Promise<ApiUsage>;
 }
 
@@ -455,44 +483,49 @@ export interface InsertWebhookEventParams {
 }
 
 /**
- * Insert webhook event. Returns null if event_id already exists (UNIQUE conflict),
- * which the caller treats as "duplicate, already processed".
+ * Insert webhook event idempotently. Returns null if event_id already exists.
+ *
+ * Uses INSERT OR IGNORE + meta.changes check rather than try/catch on error
+ * string matching — D1 production may format error strings differently from
+ * miniflare local. (Codex Round 4 finding #8.)
  */
 export async function insertWebhookEvent(
   db: D1Database,
   params: InsertWebhookEventParams,
 ): Promise<WebhookEvent | null> {
   const now = new Date().toISOString();
-  try {
-    return await db
-      .prepare(
-        `INSERT INTO webhook_events
-           (event_id, event_name, ls_test_mode, signature_valid, customer_id,
-            ls_subscription_id, ls_order_id, payload_json, processed_at,
-            result_status, error_message, created_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-         RETURNING *`,
-      )
-      .bind(
-        params.event_id,
-        params.event_name,
-        params.ls_test_mode ? 1 : 0,
-        params.signature_valid ? 1 : 0,
-        params.customer_id ?? null,
-        params.ls_subscription_id ?? null,
-        params.ls_order_id ?? null,
-        params.payload_json,
-        now,
-        params.result_status ?? null,
-        params.error_message ?? null,
-        now,
-      )
-      .first<WebhookEvent>();
-  } catch (err) {
-    // UNIQUE constraint violation → duplicate
-    if (String(err).includes("UNIQUE")) return null;
-    throw err;
-  }
+  const result = await db
+    .prepare(
+      `INSERT OR IGNORE INTO webhook_events
+         (event_id, event_name, ls_test_mode, signature_valid, customer_id,
+          ls_subscription_id, ls_order_id, payload_json, processed_at,
+          result_status, error_message, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    )
+    .bind(
+      params.event_id,
+      params.event_name,
+      params.ls_test_mode ? 1 : 0,
+      params.signature_valid ? 1 : 0,
+      params.customer_id ?? null,
+      params.ls_subscription_id ?? null,
+      params.ls_order_id ?? null,
+      params.payload_json,
+      now,
+      params.result_status ?? null,
+      params.error_message ?? null,
+      now,
+    )
+    .run();
+
+  // No row inserted → duplicate event_id (race or repeat delivery)
+  if (result.meta.changes === 0) return null;
+
+  // Fetch the inserted row to return — needed by some callers
+  return db
+    .prepare("SELECT * FROM webhook_events WHERE event_id = ?")
+    .bind(params.event_id)
+    .first<WebhookEvent>();
 }
 
 export async function updateWebhookEventResult(
@@ -556,8 +589,16 @@ export interface LsIdentityParams {
 }
 
 /**
- * Set/update LS identity columns on api_usage. Coalesce semantics: existing
- * non-null values are preserved unless the new value is non-null.
+ * Set/update LS identity columns on api_usage.
+ *
+ * Per Codex Round 4 finding #7: identity columns (order_id, subscription_id,
+ * customer_id, variant_id) use UPDATE-ON-WRITE semantics — a fresh non-null
+ * value REPLACES any prior value, including non-null ones. This handles
+ * resubscribe/upgrade flows where LS issues a new subscription_id for the
+ * same customer.
+ *
+ * Status fields (ls_status, ls_renews_at, ls_ends_at) still use COALESCE
+ * to avoid accidental clearing during partial updates.
  */
 export async function linkLsIdentity(
   db: D1Database,
@@ -568,10 +609,10 @@ export async function linkLsIdentity(
   return db
     .prepare(
       `UPDATE api_usage SET
-         ls_order_id        = COALESCE(?, ls_order_id),
-         ls_subscription_id = COALESCE(?, ls_subscription_id),
-         ls_customer_id     = COALESCE(?, ls_customer_id),
-         ls_variant_id      = COALESCE(?, ls_variant_id),
+         ls_order_id        = CASE WHEN ? IS NOT NULL THEN ? ELSE ls_order_id END,
+         ls_subscription_id = CASE WHEN ? IS NOT NULL THEN ? ELSE ls_subscription_id END,
+         ls_customer_id     = CASE WHEN ? IS NOT NULL THEN ? ELSE ls_customer_id END,
+         ls_variant_id      = CASE WHEN ? IS NOT NULL THEN ? ELSE ls_variant_id END,
          ls_status          = COALESCE(?, ls_status),
          ls_renews_at       = COALESCE(?, ls_renews_at),
          ls_ends_at         = COALESCE(?, ls_ends_at),
@@ -580,10 +621,10 @@ export async function linkLsIdentity(
        RETURNING *`,
     )
     .bind(
-      ids.ls_order_id ?? null,
-      ids.ls_subscription_id ?? null,
-      ids.ls_customer_id ?? null,
-      ids.ls_variant_id ?? null,
+      ids.ls_order_id ?? null, ids.ls_order_id ?? null,
+      ids.ls_subscription_id ?? null, ids.ls_subscription_id ?? null,
+      ids.ls_customer_id ?? null, ids.ls_customer_id ?? null,
+      ids.ls_variant_id ?? null, ids.ls_variant_id ?? null,
       ids.ls_status ?? null,
       ids.ls_renews_at ?? null,
       ids.ls_ends_at ?? null,
@@ -591,6 +632,70 @@ export async function linkLsIdentity(
       customerId,
     )
     .first<ApiUsage>();
+}
+
+/**
+ * Persist LS identity on a jobs row (called by webhook order_created handler).
+ * Update-on-write for IDs.
+ */
+export async function linkJobLsIdentity(
+  db: D1Database,
+  jobId: string,
+  ids: {
+    ls_order_id?: string | null;
+    ls_subscription_id?: string | null;
+    ls_customer_id?: string | null;
+    ls_variant_id?: string | null;
+    ls_test_mode?: boolean;
+  },
+): Promise<Job | null> {
+  const now = new Date().toISOString();
+  return db
+    .prepare(
+      `UPDATE jobs SET
+         ls_order_id        = CASE WHEN ? IS NOT NULL THEN ? ELSE ls_order_id END,
+         ls_subscription_id = CASE WHEN ? IS NOT NULL THEN ? ELSE ls_subscription_id END,
+         ls_customer_id     = CASE WHEN ? IS NOT NULL THEN ? ELSE ls_customer_id END,
+         ls_variant_id      = CASE WHEN ? IS NOT NULL THEN ? ELSE ls_variant_id END,
+         ls_test_mode       = ?,
+         updated_at = ?
+       WHERE id = ?
+       RETURNING *`,
+    )
+    .bind(
+      ids.ls_order_id ?? null, ids.ls_order_id ?? null,
+      ids.ls_subscription_id ?? null, ids.ls_subscription_id ?? null,
+      ids.ls_customer_id ?? null, ids.ls_customer_id ?? null,
+      ids.ls_variant_id ?? null, ids.ls_variant_id ?? null,
+      ids.ls_test_mode ? 1 : 0,
+      now,
+      jobId,
+    )
+    .first<Job>();
+}
+
+/**
+ * Find a job by LS subscription_id (used to resolve customer when api_usage
+ * has not yet been created — between order_created and Pi5 deploy completion).
+ */
+export async function getJobByLsSubscriptionId(
+  db: D1Database,
+  lsSubscriptionId: string,
+): Promise<Job | null> {
+  return db
+    .prepare("SELECT * FROM jobs WHERE ls_subscription_id = ?")
+    .bind(lsSubscriptionId)
+    .first<Job>();
+}
+
+export async function getJobByLsOrderId(
+  db: D1Database,
+  lsOrderId: string,
+): Promise<Job | null> {
+  return db
+    .prepare("SELECT * FROM jobs WHERE ls_order_id = ?")
+    .bind(lsOrderId)
+    .first<Job>();
 }
 
 export async function setPaymentFailed(

@@ -15,7 +15,11 @@ database_id = "3456a3ee-7d15-4db2-9af1-27c274a31322"
 
 # Environment variables (non-secret defaults)
 [vars]
-VARIANT_TIER_MAP = '{"placeholder_variant_1":1,"placeholder_variant_2":2,"placeholder_variant_3":3}'
+# VARIANT_TIER_MAP shape: { variant_id: { tier: 1|2|3, cycle: "monthly"|"quarterly"|"annual", amount_cents: NNNN } }
+# Empty {} = soft validation mode (warn + accept). Switch to populated map + VARIANT_VALIDATION_STRICT="1" before public launch.
+VARIANT_TIER_MAP = "{}"
+VARIANT_VALIDATION_STRICT = "0"
+ALLOW_TEST_MODE_IN_PROD = "0"
 OWNER_TELEGRAM_CHAT_ID = "340067089"
 # DeepSeek V3.2: $0.28/1M input, $0.42/1M output
 DEEPSEEK_INPUT_RATE = "0.00000028"

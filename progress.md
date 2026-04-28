@@ -513,6 +513,72 @@ Plus 3 indexes for fast lookup by subscription/order/customer ID.
 
 ---
 
+### M2.6 — Codex Round 4 Hardening (post-Milestone-2 review)
+
+**Started:** 2026-04-28 21:55 HKT | **Completed:** 22:00 HKT | **Status:** 🟢
+
+**Codex Round 4 verdict:** STOP, patch before Phase 3. Findings:
+
+| # | Severity | Finding | Patched? |
+|---|----------|---------|----------|
+| 1 | 🔴 Critical | LS identity never persisted before `api_usage` exists → lifecycle events un-resolvable | ✅ Migration 0004 + linkJobLsIdentity + usage.ts inheritance |
+| 2 | 🔴 Critical | resolveCustomer fallback comment claims "jobs join" but doesn't | ✅ Now actually queries `getJobByLsSubscriptionId` / `getJobByLsOrderId` |
+| 3 | 🔴 Critical | Production VARIANT_TIER_MAP has placeholder data → real LS orders rejected | ✅ wrangler.toml: `VARIANT_TIER_MAP="{}"` + `VARIANT_VALIDATION_STRICT="0"` |
+| 4 | 🔴 Critical | Synthetic event_id `synth:event_name:data.id` collapses distinct renewals | ✅ Replaced with SHA-256 of raw body (`bodyhash:...`) |
+| 5 | 🟡 High | Day-3 enforcement only triggers on subsequent webhook delivery | ⚠️ Documented as deferred — friend-beta uses owner alert for manual budget→0 |
+| 6 | 🟡 High | Refund "scheduled cancel" not actually scheduled | ✅ Now creates real cancel job via `createCancelJob()` |
+| 7 | 🟡 High | linkLsIdentity COALESCE preserves stale subscription ID on resubscribe | ✅ Identity columns use UPDATE-ON-WRITE; status columns still COALESCE |
+| 8 | 🟢 Medium | `String(err).includes("UNIQUE")` brittle dedup detection | ✅ Replaced with `INSERT OR IGNORE` + `meta.changes` check |
+| 9 | 🟢 Medium | test_mode webhooks accepted in production | ✅ Reject by default; `ALLOW_TEST_MODE_IN_PROD="1"` to override |
+| 10 | 🟢 Medium | Test gaps | ✅ +6 new tests: test_mode allowance, jobs LS persistence, refund creates cancel, body-hash dedup, usage inheritance, repeat-fail timestamp preservation |
+
+**New migration: `0004_jobs_ls_identity.sql`**
+- 5 columns on `jobs` (ls_order_id, ls_subscription_id, ls_customer_id, ls_variant_id, ls_test_mode)
+- 2 indexes (idx_jobs_ls_subscription, idx_jobs_ls_order)
+- Applied to local + remote D1 (transient fetch failure on first attempt; succeeded after 10s wait + retry)
+
+**New code paths:**
+
+| Function | Purpose |
+|----------|---------|
+| `linkJobLsIdentity(jobId, ids)` | Persist LS identity on jobs row at order_created time |
+| `getJobByLsSubscriptionId(subId)` | Fallback resolver for events when api_usage row not yet exists |
+| `getJobByLsOrderId(lsOrderId)` | Same, by LS order ID |
+| `createCancelJob(env, internalId, reason)` | Helper: insert cancel job with unique bot_token/username suffix to avoid UNIQUE collision |
+| `deriveEventId(...)` is now async | Hashes raw body via SHA-256 when no event_id in header/payload |
+
+**Webhook handler updates:**
+- `order_created`: validates variant, then `linkJobLsIdentity` (jobs row) BEFORE attempting `linkLsIdentity` (api_usage). Pi5 deployer's later `POST /api/usage` reads ls_* from jobs and copies into api_usage.
+- `subscription_*` events: use `resolveCustomer` which now queries jobs table via ls_subscription_id / ls_order_id when api_usage row not yet exists.
+- Refund events: now create a real cancel job (not just log "scheduled within 24h").
+- Test_mode webhook in prod: rejected with 400 + recorded in webhook_events with `result_status=rejected_test_mode_in_prod`.
+- Variant validation: STRICT mode (reject + 400 + alert) requires `VARIANT_TIER_MAP` non-empty AND `VARIANT_VALIDATION_STRICT="1"`. Soft mode logs + alerts owner + accepts.
+
+**LS identity update semantics (Codex #7):**
+- Previously: `COALESCE(?, ls_subscription_id)` — preserved stale values forever
+- Now: `CASE WHEN ? IS NOT NULL THEN ? ELSE ls_subscription_id END` for ID columns (update-on-write when fresh value provided)
+- Status fields (ls_status, ls_renews_at, ls_ends_at) keep COALESCE — partial updates shouldn't accidentally clear
+
+**Testing:**
+- 6 new tests added to `webhook-integrity.test.ts`:
+  1. test_mode webhook allowance behavior
+  2. jobs.ls_* columns populated by order_created
+  3. refund creates cancel job (verifies INSERT into jobs)
+  4. body-hash dedup when LS doesn't supply event_id
+  5. POST /api/usage inherits LS identity from jobs row
+  6. Repeat payment_failed preserves first-fail timestamp via COALESCE
+- All 88/88 pass (was 82)
+
+**Deferred for Phase 6 / Phase 7:**
+- Day-3 grace policy enforcement via Worker Cron (Codex #5) — friend-beta operator can manually budget→0 from Telegram alert; cron deferred.
+- Real LS payload tests (Task 2.7) — requires user to export webhook history JSON from LS dashboard.
+
+**Production deployed:**
+- D1 migration 0004 applied to remote (after 1 retry, transient fetch error).
+- CF Worker deployed: version `[recorded after deploy]`.
+
+---
+
 ## Next Steps
 
 1. **You — when free, please answer Block U-1** (5 money mechanics questions above). Without these I cannot complete Phase 0 readiness check, and we may hit a billing surprise during E2E testing.

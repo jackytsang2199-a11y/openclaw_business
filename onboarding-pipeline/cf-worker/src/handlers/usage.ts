@@ -9,6 +9,7 @@ import {
 } from "../lib/auth";
 import {
   createApiUsage,
+  getJobById,
   getUsageByCustomerId,
   listAllUsage,
   updateUsageBudget,
@@ -181,12 +182,23 @@ export async function handleCreateUsage(request: Request, env: Env): Promise<Res
     return badRequest("Missing required fields: customer_id, gateway_token, tier");
   }
 
+  // Codex Round 4 #1: inherit LS identity from the jobs row if it exists.
+  // Pi5 deployer doesn't know about LS identity (webhook stored it on jobs);
+  // we copy it forward here so future subscription_* events resolve correctly.
+  const customerId = body.customer_id as string;
+  const job = await getJobById(env.DB, customerId).catch(() => null);
+
   try {
     const usage = await createApiUsage(env.DB, {
-      customer_id: body.customer_id as string,
+      customer_id: customerId,
       gateway_token: body.gateway_token as string,
       tier: body.tier as number,
       monthly_budget_hkd: body.monthly_budget_hkd as number | undefined,
+      ls_order_id: job?.ls_order_id ?? null,
+      ls_subscription_id: job?.ls_subscription_id ?? null,
+      ls_customer_id: job?.ls_customer_id ?? null,
+      ls_variant_id: job?.ls_variant_id ?? null,
+      ls_status: job?.ls_subscription_id ? "active" : null,
     });
     return json({ usage }, 201);
   } catch (err: unknown) {

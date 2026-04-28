@@ -15,6 +15,8 @@ export default defineWorkersConfig({
             OWNER_TELEGRAM_BOT_TOKEN: "test-bot-token",
             OWNER_TELEGRAM_CHAT_ID: "340067089",
             VARIANT_TIER_MAP: '{"var_tier1":1,"var_tier2":2,"var_tier3":3}',
+            VARIANT_VALIDATION_STRICT: "1",
+            ALLOW_TEST_MODE_IN_PROD: "1",
             DEEPSEEK_API_KEY: "test-deepseek-key",
             OPENAI_API_KEY: "test-openai-key",
             DEEPSEEK_INPUT_RATE: "0.00000028",
