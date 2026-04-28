@@ -320,6 +320,60 @@ ea3d114 fix(legal+faq): align FAQ refund copy + operationalize cooling-off windo
 
 ---
 
+### M2.0 — Phase 2.0 D1 Migrations
+
+**Started:** 2026-04-28 21:35 HKT | **Status:** 🟢 SQL written + applied to local D1
+
+**Designed two migrations following Codex Round 2 + 3 architecture decisions:**
+
+#### `migrations/0002_payment_integrity.sql`
+
+| Object | Purpose | Idempotent? |
+|--------|---------|-------------|
+| `webhook_events` table | Per-LS-event audit trail with `event_id UNIQUE` constraint = idempotency key | ✅ `CREATE TABLE IF NOT EXISTS` |
+| 4 indexes on webhook_events (event_id, ls_subscription_id, customer_id, processed_at) | Lookup performance for replay/debug + de-dup queries | ✅ `CREATE INDEX IF NOT EXISTS` |
+| `api_usage.payment_failed_at TEXT` column | Drives 0/3/7-day grace policy state machine | ❌ `ALTER TABLE ADD COLUMN` (D1/SQLite limit) |
+
+**Schema highlights for `webhook_events`:**
+- `event_id UNIQUE` — LS provides this, gives us bulletproof dedup
+- `ls_test_mode INTEGER` — flag webhook test-vs-live deliveries (Codex C1)
+- `signature_valid INTEGER` — record whether HMAC passed (audit if disputes arise)
+- `payload_json TEXT` — full body retained for replay/debug
+- `result_status TEXT` — enum-ish: `ok | rejected_variant_mismatch | rejected_amount_mismatch | rejected_test_mode_in_prod | duplicate | order_not_found | error`
+
+#### `migrations/0003_subscription_identity.sql`
+
+7 LS identity columns added to `api_usage` (per Codex Round 3 decision: extend existing table, no new `customers` table):
+
+| Column | Purpose |
+|--------|---------|
+| `ls_order_id` | LS order ID (≠ our internal `id`) |
+| `ls_subscription_id` | LS subscription — primary lookup key for renewal/cancel/refund events |
+| `ls_customer_id` | LS-side customer ID for customer-level events |
+| `ls_variant_id` | Stored on order_created — used to detect variant mismatches in later events |
+| `ls_status` | active / cancelled / expired / past_due / unpaid |
+| `ls_renews_at` | ISO timestamp; null after cancel |
+| `ls_ends_at` | ISO timestamp; set when subscription ends |
+
+Plus 3 indexes for fast lookup by subscription/order/customer ID.
+
+**Lookup priority documented in migration header:**
+1. `ls_subscription_id` (most reliable — present on all subscription_* events)
+2. `ls_order_id`
+3. `ls_customer_id`
+4. `user_email` (last resort, not unique)
+
+**Verification:**
+- ✅ Applied to local D1 successfully (`api_usage` cid 14-21 = new columns; `webhook_events` cid 0-12)
+- ✅ All `success: true` responses from wrangler
+
+**Caveats noted in migration headers:**
+- ALTER TABLE not idempotent — running 0002 or 0003 twice will fail on existing column
+- Re-validation: `wrangler d1 execute --command "PRAGMA table_info(api_usage)"`
+- Production application path documented in `MIGRATIONS.md`
+
+---
+
 ## Next Steps
 
 1. **You — when free, please answer Block U-1** (5 money mechanics questions above). Without these I cannot complete Phase 0 readiness check, and we may hit a billing surprise during E2E testing.
