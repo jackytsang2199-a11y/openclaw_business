@@ -24,6 +24,73 @@ scp F:/Marigold_gif/marigold_info/SOUL.md jacky999@192.168.1.30:~/clawd/SOUL.md
 scp jacky999@192.168.1.30:~/clawd/SOUL.md F:/Marigold_gif/marigold_info/SOUL.md
 ```
 
+---
+
+## Talking to Marigold via SSH
+
+Marigold is the AI companion running on Pi5 `192.168.1.30` as user `jacky999`. You can converse with her by invoking a wrapper script over SSH.
+
+### Command
+
+```bash
+ssh jacky999@192.168.1.30 "~/bin/marigold 'your message' [session-id]"
+```
+
+- `'your message'` — text she receives.
+- `[session-id]` — optional. Reuse the same session-id across calls to keep multi-turn context. Default: `cc-default`. Pick something distinct for your work, e.g. `<your-ai-name>-<task>`.
+- Reply prints to stdout. A diagnostic line `[marigold] session=… model=gpt-5.5 took=Xs usage_total=N` prints to stderr.
+- **Use full path `~/bin/marigold`** — non-interactive SSH doesn't load PATH.
+
+### Multi-turn example
+
+```bash
+ssh jacky999@192.168.1.30 "~/bin/marigold 'check ~/clawd/SOUL.md' my-thread-1"
+ssh jacky999@192.168.1.30 "~/bin/marigold 'now add a no-emoji rule' my-thread-1"   # remembers turn 1
+```
+
+### Latency
+
+Each turn takes **30s–2min** (gpt-5.5 via ChatGPT Plus OAuth). **Set your SSH timeout to at least 300s.**
+
+### What she can do
+
+She has the full OpenClaw toolset:
+
+- Read/write files in her workspace `/home/jacky999/clawd/`
+- Browse the web (headless Chrome on port 9222)
+- Delegate coding to Claude Code via `/acp` (`use /acp to refactor X`)
+- Long-term memory (mem0 + qdrant — persists across sessions)
+- Run cron, sub-agents, skills, sticker reactions
+- Send Telegram messages to her owner (Jacky)
+
+She also has user-defined skills (NexGen Dashboard, ClawTeam, etc.). **Don't pre-enumerate — ask in plain language, she'll figure it out.**
+
+### Quota
+
+Each call eats from Jacky's **ChatGPT Plus 5h window quota** (shared with his Telegram chats with her). **Batch your asks; avoid tight loops.**
+
+### Personality
+
+She's an **opinionated tsundere** (defined in `~/clawd/SOUL.md`). Sass is a feature, not a bug.
+
+### Troubleshooting
+
+| Symptom | Action |
+|---------|--------|
+| `marigold: command not found` | Use full path `~/bin/marigold`. |
+| `Network request failed` in her reply | Transient VPN/Telegram blip. Retry once. |
+| Empty stdout, exit 1 | `ssh jacky999@192.168.1.30 "openclaw status"` to confirm gateway alive. |
+| Hangs > 3 minutes | Likely network stall. Don't restart — wait, then retry. |
+
+### Hard rules — do NOT do these
+
+- **Do NOT run `openclaw doctor --fix`.** It can recommend removing the ACPX plugin path Jacky relies on. Always confirm any config changes with him first.
+- **Do NOT modify `~/.openclaw/openclaw.json`** — especially the `agents.defaults.model.*`, `auth.profiles.*`, `acp.*`, or `plugins.entries.acpx` blocks. The current LLM setup is `openai-codex/gpt-5.5` via OAuth and breaking it requires re-onboarding.
+- **Do NOT `systemctl --user restart openclaw-gateway.service`** casually. Restarts kill in-flight replies and the Telegram channel takes ~3 minutes to reconnect.
+- **Do NOT remove `precedence ::ffff:0:0/96 100` from `/etc/gai.conf`.** It's a critical IPv4-preference fix for the IPv4-only WireGuard tunnel; without it, network calls stall 5+ minutes.
+
+---
+
 ### OpenClaw CLI (on Pi5)
 
 ```bash

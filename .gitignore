@@ -4,6 +4,7 @@ onboarding-pipeline/cf-worker/node_modules/
 
 # Build artifacts
 onboarding-pipeline/cf-worker/.wrangler/
+.wrangler/
 __pycache__/
 
 # Website source has its own .git (jackytsang2199-a11y/openclaw_website-1797296e)
