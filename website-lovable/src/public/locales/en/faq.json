@@ -20,7 +20,7 @@
   "basic.3.a": "No. The monthly fee includes a dedicated server, set up and managed entirely by us.",
 
   "billing.0.q": "Is there a contract? Can I cancel anytime?",
-  "billing.0.a": "No contract. Choose from monthly, quarterly, or annual plans. Quarterly and annual plans come with discounts. Cancel anytime \u2014 no refunds. Service continues until the end of your current billing cycle.",
+  "billing.0.a": "No contract. Choose from monthly, quarterly, or annual plans. Quarterly and annual plans come with discounts. Cancel anytime; service continues until the end of your current billing cycle. Refunds available within 7 days of initial purchase if unused, plus full refund for installation that fails on our side. See our Refund Policy for details.",
   "billing.1.q": "What does the monthly fee include?",
   "billing.1.a": "The monthly fee is all-inclusive: VPS server, AI compute costs, system maintenance, and monitoring. You won\u2019t pay a single cent extra.",
   "billing.2.q": "What payment methods do you accept?",

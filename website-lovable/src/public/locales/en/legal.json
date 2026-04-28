@@ -15,7 +15,7 @@
     },
     "sla": {
       "title": "Service Availability",
-      "body": "We operate on a best-effort basis to maintain continuous service. Where a service outage caused by us exceeds 24 continuous hours, affected service days will be credited on a pro-rata basis. We do not provide a numeric uptime guarantee."
+      "body": "We use commercially reasonable efforts to maintain continuous service. Where a service outage caused by us exceeds 24 continuous hours, affected service days will be credited on a pro-rata basis. We do not provide a numeric uptime guarantee."
     },
     "termination": {
       "title": "Termination",
@@ -91,7 +91,7 @@
     },
     "noRefund": {
       "title": "Cooling-off Period & Cancellation",
-      "body": "You may request a full refund within 7 calendar days of your initial purchase date if you have not yet used the service. After this 7-day period, fees paid for the current billing cycle are non-refundable, but you may cancel at any time and the service will remain active until the end of the current billing cycle, after which the server will be reclaimed."
+      "body": "You may request a full refund within 7 calendar days of your initial purchase date, provided your bot has not yet processed any AI request (i.e. before the first successful chat completion via our proxy). After this 7-day period or after first use, fees paid for the current billing cycle are non-refundable, but you may cancel at any time and the service will remain active until the end of the current billing cycle, after which the server will be reclaimed."
     },
     "outage": {
       "title": "Service Outage",

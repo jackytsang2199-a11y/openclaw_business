@@ -15,7 +15,7 @@
     },
     "sla": {
       "title": "Disponibilidad del servicio",
-      "body": "Operamos con maximo esfuerzo para mantener el servicio en funcionamiento continuo. Si por causas atribuibles a nosotros el servicio se interrumpe por mas de 24 horas continuas, compensaremos proporcionalmente los dias de servicio afectados. No ofrecemos una garantia numerica de disponibilidad."
+      "body": "Empleamos esfuerzos comercialmente razonables para mantener el servicio en funcionamiento continuo. Si por causas atribuibles a nosotros el servicio se interrumpe por mas de 24 horas continuas, compensaremos proporcionalmente los dias de servicio afectados. No ofrecemos una garantia numerica de disponibilidad."
     },
     "termination": {
       "title": "Terminacion del servicio",
@@ -91,7 +91,7 @@
     },
     "noRefund": {
       "title": "Periodo de desistimiento y cancelacion",
-      "body": "Puede solicitar un reembolso completo dentro de los 7 dias calendario desde la fecha de su compra inicial, siempre que aun no haya utilizado el servicio. Pasado este periodo de 7 dias, los cargos ya pagados del periodo de facturacion actual no son reembolsables, pero puede cancelar en cualquier momento; el servicio continuara hasta el final del periodo de facturacion actual y el servidor sera recuperado."
+      "body": "Puede solicitar un reembolso completo dentro de los 7 dias calendario desde la fecha de su compra inicial, siempre que su bot aun no haya procesado ninguna solicitud de IA (es decir, antes de la primera respuesta del asistente a traves de nuestro proxy). Pasado este periodo de 7 dias o tras el primer uso, los cargos del periodo de facturacion actual no son reembolsables, pero puede cancelar en cualquier momento; el servicio continuara hasta el final del periodo de facturacion actual y el servidor sera recuperado."
     },
     "outage": {
       "title": "Interrupciones del servicio",

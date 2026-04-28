@@ -20,7 +20,7 @@
   "basic.3.a": "No. La tarifa mensual ya incluye un servidor dedicado, configurado y gestionado por nosotros.",
 
   "billing.0.q": "¿Hay contrato? ¿Puedo cancelar en cualquier momento?",
-  "billing.0.a": "No hay contrato. Puede elegir entre planes mensuales, trimestrales y anuales. Los planes trimestrales y anuales tienen descuento. Puede cancelar en cualquier momento, sin reembolso. El servicio continuara hasta el final del periodo de facturacion actual.",
+  "billing.0.a": "No hay contrato. Puede elegir entre planes mensuales, trimestrales y anuales. Los planes trimestrales y anuales tienen descuento. Puede cancelar en cualquier momento; el servicio continuara hasta el final del periodo de facturacion actual. Se admite reembolso completo dentro de los 7 dias desde la compra inicial si no ha utilizado el servicio, asi como reembolso completo si la instalacion falla por causas atribuibles a nosotros. Consulte nuestra Politica de Reembolso.",
   "billing.1.q": "¿Que incluye la tarifa mensual?",
   "billing.1.a": "La tarifa mensual es todo incluido: servidor VPS, costos de computacion AI, mantenimiento y monitoreo del sistema. No necesita pagar nada adicional.",
   "billing.2.q": "¿Que metodos de pago aceptan?",
