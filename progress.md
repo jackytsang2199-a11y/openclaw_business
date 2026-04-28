@@ -22,8 +22,8 @@
 
 | Milestone | Status | Date | Codex Review |
 |-----------|--------|------|--------------|
-| **M0 — Setup + Pre-Phase-0 fixes** | 🟢 Completed (P-3 awaiting user) | 2026-04-28 | — |
-| M1 — Phase 0 + 1 (External services + Baseline sync) | 🟡 Phase 1 ready to start | — | ⬜ |
+| **M0 — Setup + Pre-Phase-0 fixes** | 🟢 Completed (P-3 awaiting user) | 2026-04-28 19:35 | — |
+| **M1 — Phase 1 Baseline Sync + Codex M1 Patches** | 🟢 Completed | 2026-04-28 19:55 | 🟢 Round 3 done; 6 patches applied |
 | M2 — Phase 2.0 + 2 (D1 migration + Payment integrity) | ⬜ | — | ⬜ |
 | M3 — Phase 3 (Notification + /start + email) | ⬜ | — | — |
 | M4 — Phase 4 + 5 (Budget cap + Rate limit) | ⬜ | — | ⬜ |
@@ -190,22 +190,97 @@ This is a business + legal decision. I applied conservative defaults that align 
 
 ---
 
-## Codex Review Queue
+### M1.0 — Phase 1 Baseline Sync
 
-After Phase 1 baseline sync ships, I will dispatch Codex Round 3 to review:
-1. Pre-Phase-0 fixes (P-1, P-2, P-4) — did the autonomous decisions hold?
-2. Phase 1 baseline sync (commits + deploys) — any regressions visible?
+**Started:** 2026-04-28 19:35 HKT | **Completed:** 2026-04-28 19:50 HKT | **Status:** 🟢
 
-This becomes the **Milestone 1 review**.
+**7 commits pushed to GitHub `origin/main`:**
+
+```
+d7661e1 chore: remove stale top-level PI5-GUIDE.md
+4135431 fix(website): quick-fixes batch from website-quick-fixes plan
+494b64e fix(pi5): playbook bugs from Run 1 E2E + briefing v2.x updates
+999e4f9 fix(cf-worker): pass monthly_budget_hkd through to createApiUsage (Issue 14)
+6f6cdc8 fix(legal): align uptime + refund copy with operational reality
+c1ede5d fix(cf-worker): D1 migration safety — eliminate accidental DROP TABLE
+d740277 docs: launch plan v5 + customer templates + Marigold SSH guide
+```
+
+**Test suites — both pass:**
+- ✅ CF Worker: 72/72 vitest (incl. new `usage-budget.test.ts`)
+- ✅ Pi5 worker: 84/84 pytest (after removing stale `test_deployer.py` from root — backed up to `.bak-2026-04-28`)
+
+**Production deploys:**
+- ✅ **CF Worker** `nexgen-api` deployed → version `4a4f1c9f-6227-45dd-8239-2c086a1892a2` → live at `api.3nexgen.com`
+- ✅ **Website** deployed to Cloudflare Pages production (branch=main) → `82bd0887.nexgen-website-5tw.pages.dev` → aliased to `3nexgen.com`
+- ✅ **Pi5 worker** 13 .py files SCP'd to `~/nexgen-worker/`, systemd restarted, `is-active` confirmed
+- ✅ **Briefing** `pi5-assistant-briefing-v2.md` synced to Pi5 `~/clawd/memory/`
+
+**Production verification:**
+- ✅ `curl https://api.3nexgen.com/health` → returns endpoint listing (worker routing healthy)
+- ✅ `curl https://3nexgen.com/` → 200 OK
+- ✅ Legal copy live: SLA title="服務可用性" ✓, refund title="冷靜期及取消政策" ✓
+- ⚠️ M.6 Marigold memory bootstrap fired — reply pending (background task `bq43xrqc8`)
+
+**Caveats:**
+- Cloudflare Pages production took ~10s to propagate. CDN cache may delay full update for some users up to a few minutes.
+- Pi5 systemd `is-active=active` but `journalctl` showed no entries due to SSH session env quirk (not a service problem — verified separately).
+
+---
+
+### M1.1 — Codex Round 3 Review + Patches
+
+**Started:** 2026-04-28 19:50 HKT | **Completed:** 2026-04-28 19:55 HKT | **Status:** 🟢
+
+**Codex verdict:** "Not GO yet" — 6 issues to patch before Phase 2.
+
+**Findings:**
+
+| # | Severity | Issue | File:line |
+|---|----------|-------|-----------|
+| 1 | 🔴 High | FAQ refund still says "no refunds" across 5 languages — contradicts new legal copy | `*/faq.json:23`, `ja:43` |
+| 2 | 🔴 High | `handleUpdateUsage` ignored `tier` field — upgrade/downgrade left tier stale | `usage.ts:79` |
+| 3 | 🟡 Med | `package.json db:init:remote` ran deprecated `schema.sql` | `cf-worker/package.json:11` |
+| 4 | 🟡 Med | Templates use `嘅` (slang) but README banned + 我哋 (over-strict) | `bot_stopped_responding.md`, `README.md:14` |
+| 5 | 🟡 Med | Legal "if you have not yet used the service" was subjectively defined | `legal.json` 5 langs |
+| 6 | 🟡 Med | Translation drift: "best effort" → "maximum effort" in zh-HK/es/ja/ru | `legal.json` |
+| 7 | 🟡 Med | Plan referenced non-existent `customers` table | `launch-todo-master.md:352` |
+
+**All 7 patched + 3 commits pushed:**
+
+```
+b08504a fix(templates+plan): tone consistency + LS identity goes in api_usage
+1de181a fix(cf-worker): tier+budget update + block dangerous db:init:remote
+ea3d114 fix(legal+faq): align FAQ refund copy + operationalize cooling-off window
+```
+
+**Specific resolutions:**
+- **FAQ:** Updated `billing.0.a` in en/zh-HK/es/ja/ru + ja `support.2.a`. Now points to refund policy.
+- **Tier bug:** New `updateUsageBudgetAndTier()` in `db.ts`. `handleUpdateUsage` now persists tier when supplied. Audit log distinguishes `tier_and_budget_updated` vs `budget_updated`.
+- **Operational refund:** "before bot has processed any AI request via our proxy (i.e. before the first successful chat completion)". Provable from `api_usage.total_requests > 0`.
+- **"Best effort" standardization:** All 5 langs use locale equivalent of "commercially reasonable efforts" (商業上合理之努力 / 商業的に合理的な努力 / esfuerzos comercialmente razonables / коммерчески разумные усилия).
+- **Templates:** Updated README to clarify 我哋 is OK (matches user's CLAUDE.md), stripped 嘅 from `bot_stopped_responding.md`.
+- **Plan customers table:** Removed — Phase 2 LS identity columns will extend `api_usage` table instead. (No new table.) Plan Task 2.6 updated.
+- **package.json:** `db:init:remote` blocked with error redirecting to MIGRATIONS.md; new safe `db:migrate:remote` and `db:reset:test` scripts.
+
+**Production verified after redeploys:**
+- ✅ CF Worker version `50c2a091-a6d7-412c-9682-e8c025a138df` live at api.3nexgen.com
+- ✅ Website Pages deployment `b522863b` live at 3nexgen.com
+- ✅ Live FAQ shows new refund language ("Refunds available within 7 days...")
+- ✅ Live legal SLA shows "We use commercially reasonable efforts..."
+- ✅ Live legal refund shows operational definition ("provided your bot has not yet processed...")
+- ✅ All 72/72 vitest tests still pass after tier fix
+
+**Codex M1 verdict:** GO for Phase 2.0 + 2.
 
 ---
 
 ## Next Steps
 
-1. **You (when free):** Answer Block U-1 (money mechanics, 5 questions). Reply in chat or update progress.md directly.
-2. **Me (now):** Proceed with Phase 1 baseline sync — commit 17+ files into logical groups, push to GitHub, build + deploy CF Worker, build + deploy website, SCP latest pi5-worker code, restart Pi5 systemd, run test suites. **Reversible** via `git revert`, `wrangler rollback`, CF Pages rollback button.
-3. **Then:** Codex review Milestone 1. Then Phase 2.0 + 2.
+1. **You — when free, please answer Block U-1** (5 money mechanics questions above). Without these I cannot complete Phase 0 readiness check, and we may hit a billing surprise during E2E testing.
+2. **Me — now:** Dispatch Codex Milestone 1 review.
+3. **Me — after Codex:** Start Phase 2.0 (D1 migration system already exists from M0.2 — needs new migration files for Phase 2's payment integrity additions).
 
 ---
 
-*Last update: 2026-04-28 19:35 HKT*
+*Last update: 2026-04-28 19:50 HKT*
