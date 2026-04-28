@@ -72,6 +72,31 @@ export interface ApiUsage {
   total_tokens_out: number;
   created_at: string;
   updated_at: string;
+  // Phase 2 additions (Codex Round 1+2)
+  payment_failed_at: string | null;     // null = good standing; ISO timestamp = first-fail date
+  ls_order_id: string | null;
+  ls_subscription_id: string | null;
+  ls_customer_id: string | null;
+  ls_variant_id: string | null;
+  ls_status: string | null;             // active | cancelled | expired | past_due | unpaid
+  ls_renews_at: string | null;
+  ls_ends_at: string | null;
+}
+
+export interface WebhookEvent {
+  id: number;
+  event_id: string;                     // LS event UUID — unique
+  event_name: string;
+  ls_test_mode: number;                 // 0/1
+  signature_valid: number;              // 0/1
+  customer_id: string | null;
+  ls_subscription_id: string | null;
+  ls_order_id: string | null;
+  payload_json: string;
+  processed_at: string;
+  result_status: string | null;
+  error_message: string | null;
+  created_at: string;
 }
 
 export interface UsageHistory {

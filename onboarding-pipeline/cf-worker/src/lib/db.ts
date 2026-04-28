@@ -1,4 +1,4 @@
-import { Job, VpsInstance, ApiUsage } from "./types";
+import { Job, VpsInstance, ApiUsage, WebhookEvent } from "./types";
 
 // --- ID generation ---
 
@@ -427,4 +427,218 @@ export async function writeUsageHistory(
       params.budget_hkd, now
     )
     .run();
+}
+
+// ── Phase 2: Webhook events (idempotency + audit trail) ──
+
+export async function getWebhookEventByEventId(
+  db: D1Database,
+  eventId: string,
+): Promise<WebhookEvent | null> {
+  return db
+    .prepare("SELECT * FROM webhook_events WHERE event_id = ?")
+    .bind(eventId)
+    .first<WebhookEvent>();
+}
+
+export interface InsertWebhookEventParams {
+  event_id: string;
+  event_name: string;
+  ls_test_mode: boolean;
+  signature_valid: boolean;
+  customer_id?: string | null;
+  ls_subscription_id?: string | null;
+  ls_order_id?: string | null;
+  payload_json: string;
+  result_status?: string | null;
+  error_message?: string | null;
+}
+
+/**
+ * Insert webhook event. Returns null if event_id already exists (UNIQUE conflict),
+ * which the caller treats as "duplicate, already processed".
+ */
+export async function insertWebhookEvent(
+  db: D1Database,
+  params: InsertWebhookEventParams,
+): Promise<WebhookEvent | null> {
+  const now = new Date().toISOString();
+  try {
+    return await db
+      .prepare(
+        `INSERT INTO webhook_events
+           (event_id, event_name, ls_test_mode, signature_valid, customer_id,
+            ls_subscription_id, ls_order_id, payload_json, processed_at,
+            result_status, error_message, created_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+         RETURNING *`,
+      )
+      .bind(
+        params.event_id,
+        params.event_name,
+        params.ls_test_mode ? 1 : 0,
+        params.signature_valid ? 1 : 0,
+        params.customer_id ?? null,
+        params.ls_subscription_id ?? null,
+        params.ls_order_id ?? null,
+        params.payload_json,
+        now,
+        params.result_status ?? null,
+        params.error_message ?? null,
+        now,
+      )
+      .first<WebhookEvent>();
+  } catch (err) {
+    // UNIQUE constraint violation → duplicate
+    if (String(err).includes("UNIQUE")) return null;
+    throw err;
+  }
+}
+
+export async function updateWebhookEventResult(
+  db: D1Database,
+  eventId: string,
+  resultStatus: string,
+  errorMessage?: string,
+  customerId?: string,
+): Promise<void> {
+  const now = new Date().toISOString();
+  await db
+    .prepare(
+      `UPDATE webhook_events
+       SET result_status = ?, error_message = ?, customer_id = COALESCE(?, customer_id), processed_at = ?
+       WHERE event_id = ?`,
+    )
+    .bind(resultStatus, errorMessage ?? null, customerId ?? null, now, eventId)
+    .run();
+}
+
+// ── Phase 2: api_usage LS identity + payment lifecycle ──
+
+export async function getUsageBySubscriptionId(
+  db: D1Database,
+  lsSubscriptionId: string,
+): Promise<ApiUsage | null> {
+  return db
+    .prepare("SELECT * FROM api_usage WHERE ls_subscription_id = ?")
+    .bind(lsSubscriptionId)
+    .first<ApiUsage>();
+}
+
+export async function getUsageByLsOrderId(
+  db: D1Database,
+  lsOrderId: string,
+): Promise<ApiUsage | null> {
+  return db
+    .prepare("SELECT * FROM api_usage WHERE ls_order_id = ?")
+    .bind(lsOrderId)
+    .first<ApiUsage>();
+}
+
+export async function getUsageByLsCustomerId(
+  db: D1Database,
+  lsCustomerId: string,
+): Promise<ApiUsage | null> {
+  return db
+    .prepare("SELECT * FROM api_usage WHERE ls_customer_id = ?")
+    .bind(lsCustomerId)
+    .first<ApiUsage>();
+}
+
+export interface LsIdentityParams {
+  ls_order_id?: string | null;
+  ls_subscription_id?: string | null;
+  ls_customer_id?: string | null;
+  ls_variant_id?: string | null;
+  ls_status?: string | null;
+  ls_renews_at?: string | null;
+  ls_ends_at?: string | null;
+}
+
+/**
+ * Set/update LS identity columns on api_usage. Coalesce semantics: existing
+ * non-null values are preserved unless the new value is non-null.
+ */
+export async function linkLsIdentity(
+  db: D1Database,
+  customerId: string,
+  ids: LsIdentityParams,
+): Promise<ApiUsage | null> {
+  const now = new Date().toISOString();
+  return db
+    .prepare(
+      `UPDATE api_usage SET
+         ls_order_id        = COALESCE(?, ls_order_id),
+         ls_subscription_id = COALESCE(?, ls_subscription_id),
+         ls_customer_id     = COALESCE(?, ls_customer_id),
+         ls_variant_id      = COALESCE(?, ls_variant_id),
+         ls_status          = COALESCE(?, ls_status),
+         ls_renews_at       = COALESCE(?, ls_renews_at),
+         ls_ends_at         = COALESCE(?, ls_ends_at),
+         updated_at = ?
+       WHERE customer_id = ?
+       RETURNING *`,
+    )
+    .bind(
+      ids.ls_order_id ?? null,
+      ids.ls_subscription_id ?? null,
+      ids.ls_customer_id ?? null,
+      ids.ls_variant_id ?? null,
+      ids.ls_status ?? null,
+      ids.ls_renews_at ?? null,
+      ids.ls_ends_at ?? null,
+      now,
+      customerId,
+    )
+    .first<ApiUsage>();
+}
+
+export async function setPaymentFailed(
+  db: D1Database,
+  customerId: string,
+  failedAt?: string,
+): Promise<ApiUsage | null> {
+  const now = new Date().toISOString();
+  const ts = failedAt ?? now;
+  // Only set if not already set (preserves first-fail timestamp for grace policy)
+  return db
+    .prepare(
+      `UPDATE api_usage
+       SET payment_failed_at = COALESCE(payment_failed_at, ?), updated_at = ?
+       WHERE customer_id = ?
+       RETURNING *`,
+    )
+    .bind(ts, now, customerId)
+    .first<ApiUsage>();
+}
+
+export async function clearPaymentFailed(
+  db: D1Database,
+  customerId: string,
+): Promise<ApiUsage | null> {
+  const now = new Date().toISOString();
+  return db
+    .prepare(
+      `UPDATE api_usage SET payment_failed_at = NULL, updated_at = ? WHERE customer_id = ? RETURNING *`,
+    )
+    .bind(now, customerId)
+    .first<ApiUsage>();
+}
+
+export async function setSubscriptionStatus(
+  db: D1Database,
+  customerId: string,
+  status: string,
+  endsAt?: string,
+): Promise<ApiUsage | null> {
+  const now = new Date().toISOString();
+  return db
+    .prepare(
+      `UPDATE api_usage
+       SET ls_status = ?, ls_ends_at = COALESCE(?, ls_ends_at), updated_at = ?
+       WHERE customer_id = ?
+       RETURNING *`,
+    )
+    .bind(status, endsAt ?? null, now, customerId)
+    .first<ApiUsage>();
 }

@@ -374,6 +374,145 @@ Plus 3 indexes for fast lookup by subscription/order/customer ID.
 
 ---
 
+### M2.1 — Phase 2 Constants + Notify Helpers
+
+**Started:** 2026-04-28 21:42 HKT | **Completed:** 21:43 HKT | **Status:** 🟢
+
+**Created `src/lib/constants.ts`:**
+- `EXPECTED_PRICES_HKD_CENTS` — canonical tier × billing-cycle → cents map (9 entries) sourced from CLAUDE.md pricing table
+- `parseVariantMap(rawJson)` — accepts both legacy shape `{var_x: 2}` and new shape `{var_x: {tier, cycle, amount_cents}}`. Falls back to monthly + canonical price when only tier given.
+- `validateVariant(map, variant_id, total_cents, currency)` — returns `{ok, reason, expected, actual}` with reasons: `missing_variant_id | unknown_variant | amount_mismatch | currency_mismatch`
+
+**Created `src/lib/notify.ts`:**
+- `notifyOwner(botToken, chatId, message)` — best-effort Telegram alert with 5s timeout. Failures logged but NEVER throw.
+- 3 formatter functions: `formatVariantMismatchAlert`, `formatPaymentFailedAlert`, `formatRefundAlert`
+- All `notifyOwner` calls in webhook.ts use `void` (fire-and-forget) — must not block webhook response.
+
+**Lessons learned:**
+- Originally used `await notifyOwner(...)` and the variant-rejection test timed out at 5s. Diagnosed that `await` blocks the webhook response on Telegram fetch (which 404s for fake test bot tokens).
+- Switched all 3 notify call sites to `void notifyOwner(...).catch(...)`. Webhook latency now <100ms regardless of Telegram availability.
+
+---
+
+### M2.2 — Phase 2 DB Helpers + Type Updates
+
+**Started:** 2026-04-28 21:43 HKT | **Completed:** 21:44 HKT | **Status:** 🟢
+
+**Updated `src/lib/types.ts`:**
+- Added 8 new fields to `ApiUsage` interface (payment_failed_at + 7 ls_* columns)
+- New `WebhookEvent` interface matching the new table
+
+**Added 9 helper functions to `src/lib/db.ts`:**
+
+| Function | Purpose |
+|----------|---------|
+| `getWebhookEventByEventId` | Idempotency dedup check |
+| `insertWebhookEvent` | Record event in-flight; returns null on UNIQUE conflict (race dedup) |
+| `updateWebhookEventResult` | Update result_status post-handling (called in finally{}) |
+| `getUsageBySubscriptionId` | Primary lookup — most reliable on subscription_* events |
+| `getUsageByLsOrderId` | Fallback lookup |
+| `getUsageByLsCustomerId` | Customer-level events |
+| `linkLsIdentity` | Set 7 ls_* columns with COALESCE semantics (preserve existing non-null) |
+| `setPaymentFailed` | Set payment_failed_at IF NULL (preserves first-fail timestamp) |
+| `clearPaymentFailed` | Clear on renewal success |
+| `setSubscriptionStatus` | Set ls_status + optional ls_ends_at |
+
+**Imported `WebhookEvent` type into db.ts.**
+
+---
+
+### M2.3 — Phase 2 webhook.ts Rewrite
+
+**Started:** 2026-04-28 21:44 HKT | **Completed:** 21:46 HKT | **Status:** 🟢
+
+**Architecture — single handler, 9 event types, 1 idempotency layer:**
+
+```
+1. HMAC verify
+2. JSON parse
+3. Derive event_id from X-Event-Id header → meta.event_id → synth: prefix
+4. Idempotency check via webhook_events table
+5. Insert event in-flight (catches UNIQUE race)
+6. Switch on event_name:
+   - order_created           → variant validate → confirmPayment → linkLsIdentity → audit
+   - subscription_payment_success → resolveCustomer → clearPaymentFailed
+   - subscription_payment_failed   → setPaymentFailed → if Day≥3: budget→0 + block → notify
+   - subscription_cancelled / expired → setSubscriptionStatus → create cancel job (legacy)
+   - subscription_payment_refunded / order_refunded → budget→0 + block + status='refunded' + 24h cancel
+   - subscription_updated   → setSubscriptionStatus from attrs.status
+   - others                 → log + ignore
+7. finally: updateWebhookEventResult (always records outcome)
+```
+
+**Customer resolution priority** (Codex Round 2 — supports webhooks without `custom_data`):
+1. `ls_subscription_id` (most reliable, present on all subscription_* events)
+2. `ls_order_id` (order_* events)
+3. `ls_customer_id` (customer-level events)
+4. `custom_data.order_id` (our internal ID, fallback)
+
+**Variant validation behavior:**
+- Strict reject + 400 + owner alert when `VARIANT_TIER_MAP` is non-empty AND mismatch
+- Soft skip + log when `VARIANT_TIER_MAP` is `{}` (allows soft launch with placeholder env)
+- User must update `VARIANT_TIER_MAP` env var via `wrangler.toml` once real LS variant IDs known
+
+**Backward compatibility:**
+- Existing test `returns already_confirmed on duplicate webhook` preserved by adding `already_confirmed: true` to dedup response on `order_created` events specifically
+
+---
+
+### M2.4 — Phase 2 Tests
+
+**Started:** 2026-04-28 21:46 HKT | **Completed:** 21:50 HKT | **Status:** 🟢
+
+**Updated `test/setup.ts`:**
+- Extended `api_usage` CREATE TABLE with 8 new columns
+- Added `webhook_events` CREATE TABLE
+
+**Created `test/webhook-integrity.test.ts`** with 10 new tests covering:
+
+| # | Test | Verifies |
+|---|------|----------|
+| 1 | reject unknown variant_id | variant validation strict mode |
+| 2 | reject mismatched amount | amount validation works |
+| 3 | reject wrong currency | currency validation works |
+| 4 | accept matching order | happy path with full validation |
+| 5 | dedupe by event_id even when bodies differ | idempotency primary path |
+| 6 | dedupe via X-Event-Id header | header-based event_id |
+| 7 | refund zeroes budget + blocks customer | refund handling |
+| 8 | sets payment_failed_at on first fail (Day 0) | grace policy state machine |
+| 9 | clears payment_failed_at on subsequent renewal | recovery path |
+| 10 | handles subscription_cancelled via subscription_id only (no custom_data) | LS identity lookup priority |
+
+**Test result: 82/82 pass (72 existing + 10 new).**
+
+---
+
+### M2.5 — Phase 2 Production Deploy
+
+**Started:** 2026-04-28 21:50 HKT | **Completed:** 21:52 HKT | **Status:** 🟢
+
+**D1 production migrations applied:**
+- ✅ `0002_payment_integrity.sql` — webhook_events table + payment_failed_at column. 8 rows written.
+- ✅ `0003_subscription_identity.sql` — 7 ls_* columns + 3 indexes. 16 rows written.
+
+**Schema verified post-migration via `PRAGMA table_info(api_usage)`:**
+- 22 columns total (was 14 pre-migration)
+- New columns at cid 14-21: payment_failed_at, ls_order_id, ls_subscription_id, ls_customer_id, ls_variant_id, ls_status, ls_renews_at, ls_ends_at
+- `webhook_events` table exists, COUNT=0
+
+**CF Worker deployed:**
+- Version `14921315-cb82-41dc-b4fb-0a120abe37e5`
+- Live at `api.3nexgen.com`
+- All env bindings preserved (no breaking changes to wrangler.toml)
+
+**Caveat:**
+- Could not run `wrangler d1 export` for explicit backup — wrangler 3.114.17 returns "fetch failed" intermittently; export needs `CLOUDFLARE_API_TOKEN` env var (not OAuth). Proceeded without explicit dump because:
+  - All migration operations are additive (no DROP, no DELETE, no UPDATE on existing data)
+  - Rollback path: re-create dropped column via fresh ALTER, no data loss
+  - Production had only 1 customer record (#1002 from E2E Run 1) — manually recoverable if needed
+
+---
+
 ## Next Steps
 
 1. **You — when free, please answer Block U-1** (5 money mechanics questions above). Without these I cannot complete Phase 0 readiness check, and we may hit a billing surprise during E2E testing.
