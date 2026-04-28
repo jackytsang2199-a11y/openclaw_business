@@ -11,11 +11,11 @@
     },
     "payment": {
       "title": "Terminos de pago",
-      "body": "Todos los planes son de prepago, con tres opciones disponibles: mensual, trimestral y anual. Los planes trimestrales y anuales cuentan con descuento. Todos los cargos se calculan en dolares de Hong Kong (HKD). No se realizan reembolsos una vez efectuado el pago."
+      "body": "Todos los planes son de prepago, con tres opciones disponibles: mensual, trimestral y anual. Los planes trimestrales y anuales cuentan con descuento. Todos los cargos se calculan en dolares de Hong Kong (HKD). Los reembolsos se otorgan en los casos descritos en nuestra Politica de Reembolso."
     },
     "sla": {
-      "title": "Garantia de servicio",
-      "body": "Nos comprometemos a una disponibilidad del servicio superior al 99%. Si por causas atribuibles a nosotros el servicio se interrumpe por mas de 24 horas, compensaremos proporcionalmente los dias de servicio afectados."
+      "title": "Disponibilidad del servicio",
+      "body": "Operamos con maximo esfuerzo para mantener el servicio en funcionamiento continuo. Si por causas atribuibles a nosotros el servicio se interrumpe por mas de 24 horas continuas, compensaremos proporcionalmente los dias de servicio afectados. No ofrecemos una garantia numerica de disponibilidad."
     },
     "termination": {
       "title": "Terminacion del servicio",
@@ -90,8 +90,8 @@
       "body": "Todos los planes (mensual, trimestral, anual) son de prepago. Los cargos se cobran al inicio de cada periodo de facturacion."
     },
     "noRefund": {
-      "title": "Sin reembolsos",
-      "body": "No se realizan reembolsos por los cargos ya cobrados. Tras la cancelacion del servicio, este continuara hasta el final del periodo de facturacion actual y el servidor sera recuperado."
+      "title": "Periodo de desistimiento y cancelacion",
+      "body": "Puede solicitar un reembolso completo dentro de los 7 dias calendario desde la fecha de su compra inicial, siempre que aun no haya utilizado el servicio. Pasado este periodo de 7 dias, los cargos ya pagados del periodo de facturacion actual no son reembolsables, pero puede cancelar en cualquier momento; el servicio continuara hasta el final del periodo de facturacion actual y el servidor sera recuperado."
     },
     "outage": {
       "title": "Interrupciones del servicio",
