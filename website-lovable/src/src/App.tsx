@@ -1,7 +1,4 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Layout from "./components/Layout";
 import LanguageDetector from "./components/LanguageDetector";
@@ -16,8 +13,6 @@ import Refund from "./pages/Refund";
 import Onboarding from "./pages/Onboarding";
 import BotGuide from "./pages/BotGuide";
 import NotFound from "./pages/NotFound";
-
-const queryClient = new QueryClient();
 
 /** Page routes shared by both the default (zh-HK, no prefix) and prefixed language layouts. */
 function pageRoutes() {
@@ -39,11 +34,8 @@ function pageRoutes() {
 }
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
+  <TooltipProvider>
+    <BrowserRouter>
         <Routes>
           {/* Default language (zh-HK) — no URL prefix */}
           <Route element={<LanguageDetector />}>
@@ -60,8 +52,7 @@ const App = () => (
           </Route>
         </Routes>
       </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+  </TooltipProvider>
 );
 
 export default App;

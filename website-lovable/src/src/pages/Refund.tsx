@@ -1,5 +1,6 @@
 import SEOHead from "@/components/SEOHead";
 import { useTranslation } from 'react-i18next';
+import { SUPPORT_EMAIL } from '@/lib/constants';
 
 const SECTIONS = ['prepaid', 'noRefund', 'outage', 'failedInstall'] as const;
 
@@ -27,10 +28,10 @@ const Refund = () => {
           <p>
             {t('refund.contact.body')}
             <a
-              href="mailto:support@3nexgen.com"
+              href={`mailto:${SUPPORT_EMAIL}`}
               className="text-primary hover:underline"
             >
-              support@3nexgen.com
+              {SUPPORT_EMAIL}
             </a>
           </p>
         </div>

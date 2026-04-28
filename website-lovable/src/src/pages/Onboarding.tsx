@@ -82,6 +82,8 @@ const Onboarding = () => {
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [orderId, setOrderId] = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   useEffect(() => {
     if (tierParam && planParam) {
@@ -95,25 +97,61 @@ const Onboarding = () => {
 
   const isValid = form.email && emailRegex.test(form.email) && form.plan && form.botToken && botTokenRegex.test(form.botToken) && form.userId && userIdRegex.test(form.userId);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setTouched({ email: true, botToken: true, userId: true });
     if (!isValid) return;
 
     setIsSubmitting(true);
-    // Save form data to localStorage so it persists through payment redirect
-    sessionStorage.setItem("nexgen_onboarding", JSON.stringify(form));
-    setTimeout(() => {
+    setSubmitError(null);
+
+    // Parse tier from plan id (e.g. "pro-quarterly" -> 2)
+    const tierMap: Record<string, number> = { starter: 1, pro: 2, elite: 3 };
+    const tierName = form.plan.split("-")[0];
+    const tier = tierMap[tierName];
+
+    try {
+      const res = await fetch("https://api.3nexgen.com/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          tier,
+          display_name: form.botName || `NexGen ${tierName}`,
+          telegram_user_id: form.userId,
+          email: form.email,
+          bot_token: form.botToken,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setSubmitError(data.error || `Order creation failed (${res.status})`);
+        setIsSubmitting(false);
+        return;
+      }
+      const newOrderId = data.order?.id;
+      if (!newOrderId) {
+        setSubmitError("Order created but no ID returned");
+        setIsSubmitting(false);
+        return;
+      }
+      setOrderId(newOrderId);
+      sessionStorage.setItem("nexgen_onboarding", JSON.stringify({ ...form, orderId: newOrderId }));
       setIsSubmitting(false);
       setSubmitted(true);
-    }, 400);
+    } catch (err) {
+      setSubmitError(err instanceof Error ? err.message : "Network error");
+      setIsSubmitting(false);
+    }
   };
 
   const handleCardPayment = () => {
     const url = checkoutUrls[form.plan];
-    if (url) {
-      // Pass email as prefill param for LS checkout
-      const checkoutUrl = `${url}?checkout[email]=${encodeURIComponent(form.email)}`;
+    if (url && orderId) {
+      // Pass order_id as custom_data so webhook can find the pending D1 job
+      const params = new URLSearchParams();
+      params.set("checkout[email]", form.email);
+      params.set("checkout[custom][order_id]", orderId);
+      const checkoutUrl = `${url}?${params.toString()}`;
       sessionStorage.removeItem("nexgen_onboarding");
       window.open(checkoutUrl, "_blank", "noopener,noreferrer");
     }
@@ -384,6 +422,13 @@ const Onboarding = () => {
             className="rounded-xl py-3 transition-all duration-200"
           />
         </div>
+
+        {/* Submit error */}
+        {submitError && (
+          <div className="rounded-xl border border-destructive/50 bg-destructive/10 p-4 text-sm text-destructive">
+            {submitError}
+          </div>
+        )}
 
         {/* Submit */}
         <div className="pt-4">

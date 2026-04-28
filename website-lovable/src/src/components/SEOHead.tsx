@@ -32,7 +32,9 @@ export default function SEOHead({ page }: SEOHeadProps) {
       <meta property="og:description" content={description} />
       <meta property="og:url" content={`${SITE_URL}${getLocalizedPath(basePath, currentLang)}`} />
       <meta property="og:type" content="website" />
+      <meta property="og:image" content={`${SITE_URL}/og-image.png`} />
       <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:image" content={`${SITE_URL}/og-image.png`} />
       {SUPPORTED_LANGUAGES.map((lang) => (
         <link key={lang} rel="alternate" hrefLang={lang} href={`${SITE_URL}${getLocalizedPath(basePath, lang)}`} />
       ))}
