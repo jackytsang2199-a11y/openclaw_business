@@ -3,7 +3,39 @@
 > **Mode:** AI-driven autonomous execution (Claude + Marigold)
 > **Started:** 2026-04-28 19:10 HKT
 > **Plan:** [`docs/launch-todo-master.md`](docs/launch-todo-master.md) v5
-> **Target:** Tier A Friend Beta launch (10-14 calendar days)
+> **Target:** ~~Tier A Friend Beta launch (10-14 calendar days)~~ → **PROJECT SHUTDOWN 2026-04-28**
+
+---
+
+## 🛑 SHUTDOWN — Project paused indefinitely
+
+**Decision (2026-04-28):** User stepping away from NexGen due to other commitments. Choosing safe shutdown over launch.
+
+**Strategy:** Delete public-facing infrastructure (CF Pages + Worker) → revoke all API keys + bot tokens → cancel paid subscriptions (Contabo) → preserve git source code for possible future relaunch.
+
+**Shutdown progress:**
+
+| Stage | Action | Owner | Status |
+|-------|--------|-------|--------|
+| 1 | Delete CF Worker `nexgen-api` | Claude | 🟢 Done 2026-04-28 — `api.3nexgen.com` returns 522 |
+| 1 | Delete CF Pages `nexgen-website` | User (dashboard) | 🟡 In progress |
+| 1 | Stop Pi5 nexgen-worker systemd | Claude | ⬜ Next |
+| 2 | Revoke OpenAI API key | User | ⬜ Pending |
+| 2 | Revoke DeepSeek API key | User | ⬜ Pending |
+| 2 | Revoke Telegram bot tokens (5 bots) via @BotFather | User | ⬜ Pending |
+| 2 | Revoke Contabo API client credentials | User | ⬜ Pending |
+| 3 | Cancel Contabo VPS subscriptions (203187256, 203187278) | User | ⬜ Pending |
+| 3 | Pause / archive 9 Lemon Squeezy products | User | ⬜ Pending |
+| 5 | Delete D1 database `nexgen-jobs` | Claude (after Stage 2) | ⬜ Pending |
+| 5 | Make GitHub repo private | User | ⬜ Optional |
+
+**Preservation:**
+- ✅ All source code committed + pushed to `jackytsang2199-a11y/openclaw_business`
+- ✅ Customer templates, plan docs, migration files all preserved in repo
+- ✅ Git history scrubbed of leaked tokens (filter-repo Round 1 + 2 done earlier today)
+- ✅ Local `.secrets/plan-a-cf-worker.env` retained (gitignored) until Stage 2 verification complete; will wipe after
+
+---
 
 ---
 
